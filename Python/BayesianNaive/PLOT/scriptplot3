@@ -1,0 +1,23 @@
+set term epslatex standalone color
+set out "tmp.tex"
+
+set xrange [0:1.001]
+set yrange [0:200]
+
+set title '  Probability Distribution: $1000$ most clicked adds  '
+
+set xlabel ' clicks in percent '
+set ylabel ' number of tokens '
+
+unset clip  one
+
+f(x) = 0
+
+binwidth=0.0001
+ bin(x,width)=width*floor(x/width)
+
+
+plot \
+'plot_histosorthead1000.dat' using (bin(($1),binwidth)):(1.0) smooth freq with boxes t "sample.tsv"
+
+
