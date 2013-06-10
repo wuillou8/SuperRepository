@@ -1,0 +1,10 @@
+set term epslatex standalone color
+set out "tmp.tex"
+
+set title '  Linear Regression Conv.: $f(x) = \theta_0 + \theta_1  x  $  '
+
+set xlabel ' $\theta_0$ '
+set ylabel ' $\theta_1$ '
+
+plot '../RESU/linRegression.resu' u 2:3 w l t '',\
+	'../RESU/linRegressionConv.resu' u 2:3 ps 2 pt 7 t 'convergence point'

@@ -1,0 +1,5 @@
+Implementing  3rd Exercice:
+http://openclassroom.stanford.edu/MainFolder/DocumentPage.php?course=MachineLearning&doc=exercises/ex3/ex3.html
+
+There is a bug with that version as data fromthe 2 exercise also could not converge.
+working with list instead of vectors leads to pbm
