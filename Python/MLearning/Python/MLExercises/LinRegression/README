@@ -1,9 +1,0 @@
-implementating Linear Regression:
-#################################
-http://openclassroom.stanford.edu/MainFolder/DocumentPage.php?course=MachineLearning&doc=exercises/ex2/ex2.html
-I have written it for only one learning rate alpha = 0.07.
-It could be an idea to compare a few learning rates.
-
-run the code:
-#############
-run scriptrun.sh
