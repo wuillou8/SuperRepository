@@ -1,4 +1,4 @@
-// MyMatrix class
+// OO MyMatrix class
 
 namespace Matrices
 open Vectors

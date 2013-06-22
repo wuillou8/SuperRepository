@@ -1,6 +1,7 @@
 // My Vectors class
 
 // open Utils
+// OO Vector type
 
 namespace Vectors
 

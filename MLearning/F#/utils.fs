@@ -8,3 +8,9 @@ module Basics =
         for i in i0..i1 do
             t <- t + f i
         t
+    
+
+    let rec sumfunct ls f = // sum over a list, functional style
+        match ls with
+            | []    -> 0
+            | l::lt -> f l + sumfunct lt f 
