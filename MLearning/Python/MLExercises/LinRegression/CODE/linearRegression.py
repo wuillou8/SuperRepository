@@ -68,7 +68,7 @@ alpha = 0.07
 #f = open("LinearRegression.txt","w")
 
 #Iterations/Analysis
-for i in range(0,5000):
+for i in range(0,10000):
 	theta_zero = theta_s
 	theta_s = Iteration(alpha, theta_s, xlist, ylist)	
 	print  i, theta_s[0], theta_s[1] 
