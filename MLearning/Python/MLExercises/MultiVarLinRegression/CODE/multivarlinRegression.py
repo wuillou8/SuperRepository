@@ -56,6 +56,17 @@ def Iteration( alpha, theta, x_vect, y_vect ):
 	#theta[1] = theta[1] - alpha*sum_h_theta(theta, x_vect, y_vect) 
 	return Iteration
 
+def J_theta ( theta, x_vect, y_vect ):
+	J_theta = list() #0.0]*len(x_vect)
+	one_m = 1.0/(2.0*len(x_vect))
+	for tmp in zip(x_vect, y_vect):
+		j_tmp =  h_theta(theta,tmp[0]) - float(tmp[1])
+		var = one_m*j_tmp*j_tmp
+		print var , list(type(var))
+		J_theta.append(var)
+		J_theta = sum(J_theta)
+	return J_theta
+
 #sum_i h_theta^i - y^i
 def sum_h_theta (theta, x_vect, y_vect): # N-Dim
 	sum_h_theta = [0.0]*len(theta)
@@ -98,8 +109,13 @@ def dist(vec1,vec2):
 xlist = ImportFile("DATA/ex3x.dat")
 ylist = ImportFile("DATA/ex3y.dat")
 
+xlist = ImportFile("DATA/ex2xx.dat")
+ylist = ImportFile("DATA/ex2y.dat")
+
+
+
 #normalise data
-ylist = normalist( [float(row[0]) for row in ylist] )
+ylist = list( [float(row[0]) for row in ylist] )
 xlist0 = normalist( [float(row[0]) for row in xlist] )
 xlist1 = normalist( [float(row[1]) for row in xlist] )
 #print mean(xlist0), mean(xlist1)	-->Ok
@@ -118,14 +134,15 @@ alpha = 0.07
 print xlist, n
 
 
-for i in range(1,10):#5000):
+for i in range(1,10000): #5000):
 	theta_zero = theta_s
 	theta_s = Iteration(alpha, theta_s, xlist, ylist)	
 	print  i, theta_s[0], theta_s[1], theta_s[2] 
+	#print "Jtheta",  J_theta ( theta_s, xlist, ylist )
 	#	dist(theta_s, Iteration(alpha, theta_s, xlist, ylist))
 
 #print "theta final", theta_s
 
 #print h_theta(theta_s, xlist[0]), theta_s, xlist[0]
 #print theta_s
-3print sum_h_theta(theta_s, xlist, ylist)
+#print sum_h_theta(theta_s, xlist, ylist)
