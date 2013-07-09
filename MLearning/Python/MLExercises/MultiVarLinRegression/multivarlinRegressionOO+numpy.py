@@ -51,7 +51,7 @@ class Analysis:
 			grad_desc.append( theta[i] - (alpha/self.Size)*dot( (dot(theta,transpose(self.xx_data))-self.xy_data), transpose(self.xx_data[:,i])))
 		return array(grad_desc)
 
-analy = Analysis("ex4y.dat","ex4x.dat")
+analy = Analysis("DATA/ex3y.dat","DATA/ex3x.dat")
 Analysis.norm_data(analy)
 
 print "Analysis"
