@@ -27,18 +27,16 @@ def get_stdev(vec, avg):
 def get_normalise(vec):
 	avg = get_avg(vec)
 	stdev = get_stdev(vec, avg)
-	#print avg, stdev
 	return (vec - avg) / stdev 
 
 class Analysis:
-	# Testing sample
 	def __init__(self, testValname, testClass):
 		self.xy_data = loadtxt(testValname) 
 		self.xx_data = insert(loadtxt(testClass), 0, 1, axis=1) 
 		self.Size = self.xx_data.shape[0]
 		self.Dim = self.xx_data.shape[1]
 	
-	def norm_data(self): #self):
+	def norm_data(self):
 		for i in range(1,self.Dim):
 			self.xx_data[:,i] = get_normalise(self.xx_data[:,i])
 
