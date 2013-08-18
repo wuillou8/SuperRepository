@@ -15,7 +15,6 @@ class ProbCalculator:
 		P_n_t_j = []
 		# select out data necessary for the comput
 		v_data = self.v_data[n_start:n_end]
-		#print v_data
 		for n_,tmp in enumerate(v_data):
 			n = tmp[0] # customer index
 			P_n_t_j.append(exp(dot(v_data[n_][3:], transpose(self.v_coef[n-1][1:]))))
