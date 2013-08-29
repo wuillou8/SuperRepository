@@ -1,0 +1,8 @@
+template < size_t D >
+inline size_t Weave< D >::coordToIndex(typename Weave< D >::DimArray const &coord) const
+{
+  typename Weave< D >::DimArray diff = coord + d_off;
+  for (size_t idx = 0; idx < D; ++idx)
+    diff.coeffRef(idx) = diff.coeff(idx) % d_dims.coeff(idx);
+  return (diff * d_surf.head(D)).sum();
+}

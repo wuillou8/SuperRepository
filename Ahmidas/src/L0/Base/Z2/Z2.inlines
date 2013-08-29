@@ -1,0 +1,14 @@
+inline double Base::Z2::operator()()
+{
+  if (d_state & d_mask64)
+    d_state = ((d_state ^ d_maskPoly) << 1 | 1);
+  else
+    d_state <<= 1;
+  d_scale.asUInt ^= (d_state & d_mask64);
+  return d_scale.asDouble;
+}
+
+inline void Base::Z2::setScale(double const scale)
+{
+  d_scale.asDouble = scale;
+}

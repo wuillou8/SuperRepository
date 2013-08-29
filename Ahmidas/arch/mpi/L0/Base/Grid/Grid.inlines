@@ -1,0 +1,118 @@
+namespace Base
+{
+inline Grid::~Grid()
+{
+  s_agent.val--;
+}
+
+inline MPI::Cartcomm const &Grid::grid() const
+{
+  return d_grid;
+}
+
+inline MPI::Cartcomm &Grid::timeSlice()
+{
+  return d_timeSlice;
+}
+
+inline size_t Grid::rank() const
+{
+  return d_grid.Get_rank();
+}
+
+inline size_t Grid::rank(int const *coord) const
+{
+  return d_grid.Get_cart_rank(coord);
+}
+
+inline size_t const* Grid::coords() const
+{
+  return d_coords;
+}
+
+inline size_t Grid::coord(size_t idx) const
+{
+  return d_coords[idx];
+}
+
+inline size_t const *Grid::dims() const
+{
+  return d_dims;
+}
+
+inline size_t Grid::dim(size_t idx) const
+{
+  return d_dims[idx];
+}
+
+inline size_t const *Grid::sizes() const
+{
+  return d_sizes;
+}
+
+inline size_t Grid::size(size_t idx) const
+{
+  return d_sizes[idx];
+}
+
+inline size_t const *Grid::surfaces() const
+{
+  return d_surfaces;
+}
+
+inline size_t Grid::surface(size_t idx) const
+{
+  return d_surfaces[idx];
+}
+
+inline size_t Grid::localVolume() const
+{
+  return d_localVolume;
+}
+
+inline size_t Grid::totalVolume() const
+{
+  return (d_L * d_L * d_L * d_T);
+}
+
+inline size_t const *Grid::dimSizes() const
+{
+  return d_dimSizes;
+}
+
+inline size_t Grid::dimSize(size_t idx) const
+{
+  return (idx == 4 ? d_localVolume : d_dimSizes[idx]);
+}
+
+inline size_t Grid::neighbour(SpaceTimeIndex idx, Direction dir) const
+{
+  int result, rank;
+  d_grid.Shift(idx, dir, rank, result);
+  return result;
+}
+
+inline size_t Grid::contiguousBlock() const
+{
+  return d_contiguousBlock;
+}
+
+inline bool Grid::bigEndian() const
+{
+  return d_bigEndian;
+}
+
+inline Grid::MPIAgent::MPIAgent()
+  : val(42)
+{
+  // We would need argv and argc to be able to pass arguments
+  std::cout << "initializing MPI" << std::endl;
+  MPI::Init();
+}
+
+inline Grid::MPIAgent::~MPIAgent()
+{
+  MPI::Finalize();
+  std::cout << "MPI finalized" << std::endl;
+}
+}

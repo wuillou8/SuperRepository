@@ -1,0 +1,6 @@
+template< typename Scalar, size_t Dim, size_t Rank1, size_t Rank2 >
+Tensor< Scalar, Dim, Rank1 + Rank2 > operator*(Tensor< Scalar, Dim, Rank1 > const &left, Tensor< Scalar, Dim, Rank2 > const &right)
+{
+  Eigen::Matrix< Scalar, Power< Dim, Rank1 >::value, Power< Dim, Rank2 >::value > result = left.linear() * right.linear().transpose();
+  return Tensor< Scalar, Dim, Rank1 + Rank2 >(result.data());
+}

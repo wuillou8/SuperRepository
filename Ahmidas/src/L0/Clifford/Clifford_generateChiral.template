@@ -1,0 +1,11 @@
+template< size_t Dim >
+void Clifford< Dim >::generateChiral()
+{
+  // Generate should only be called if s_gamma is uninitialized.
+  assert(!s_chiral);
+
+  GMatrix *g = gamma();
+  s_chiral = new GMatrix(std::complex< double >(0, 1) * g[0]);
+  for (size_t idx = 1; idx < Dim; ++idx)
+    *s_chiral = *s_chiral * g[idx];
+}
