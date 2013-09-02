@@ -1,8 +1,0 @@
-template< typename Scalar, size_t Dim, size_t Rank1, size_t Rank2, size_t Value1, size_t Value2 >
-Tensor< Scalar, Dim, Rank1 + Rank2 - 2 > contract(Tensor< Scalar, Dim, Rank1 > const &left, Index< Value1 >, Tensor< Scalar, Dim, Rank2 > const &right, Index< Value2 >)
-{
-  Eigen::Matrix< Scalar, Power< Dim, Rank1 - 1 >::value, Power< Dim, Rank2 - 1 >::value >
-  result((const_cast< Tensor< Scalar, Dim, Rank1 > & >(left)[Index< Value1 >()].transpose() *
-          const_cast< Tensor< Scalar, Dim, Rank2 > & >(right)[Index< Value2 >()]).eval());
-  return Tensor< Scalar, Dim, Rank1 + Rank2 - 2 >(result.data());
-}

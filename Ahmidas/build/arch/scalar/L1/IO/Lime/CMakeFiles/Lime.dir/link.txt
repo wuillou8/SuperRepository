@@ -1,2 +1,0 @@
-/usr/bin/ar cr libLime.a  CMakeFiles/Lime.dir/Reader/Reader.cpp.o CMakeFiles/Lime.dir/Reader/Reader_Reader.cpp.o CMakeFiles/Lime.dir/Writer/Writer.cpp.o CMakeFiles/Lime.dir/Writer/Writer_finalize.cpp.o CMakeFiles/Lime.dir/Writer/Writer_newRecord.cpp.o CMakeFiles/Lime.dir/Writer/Writer_reserveHeader.cpp.o 
-/usr/bin/ranlib libLime.a 

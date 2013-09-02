@@ -1,9 +1,0 @@
-template< typename Element, size_t D >
-SpinorField< Element, D >::SpinorField(typename Weave< D >::DimArray const &dims)
-{
-  for (size_t idx = 0; idx < SpinorDim< D >::value; ++idx)
-  {
-    d_phase[idx] = static_cast< std::complex< int > >(idx + 1);
-    d_fields[idx] = new Core::Field< Element, D >(dims);
-  }
-}

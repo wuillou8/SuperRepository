@@ -1,6 +1,0 @@
-ADD_SUBDIRECTORY(IO)
-SET(Sources_ILDG   IO/ILDGinfo_ILDGinfo.cpp)
-SET(Sources_Scidac IO/Scidacinfo_Scidacinfo.cpp)
-SET(Sources_IO     IO/load.cpp IO/save.cpp)
-ADD_LIBRARY(IO $ {Sources_ILDG} $ {Sources_Scidac} $ {Sources_IO})
-TARGET_LINK_LIBRARIES(IO Tool Lime)

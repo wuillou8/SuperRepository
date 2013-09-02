@@ -1,7 +1,0 @@
-template< size_t Dim >
-typename Clifford< Dim >::GMatrix const *Clifford< Dim >::chiral()
-{
-  if (!s_chiral)
-    generateChiral();
-  return s_chiral;
-}
