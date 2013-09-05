@@ -26,6 +26,8 @@ class SVM:
 	self.dat1 = self.row_dat[self.row_dat[:][0] == 1. ]
 	self.dat2 =  [ tmp of  self.row_dat[self.row_dat[:][0] == -1. ]
 	#self.y_dat = loadtxt(InfileY)
+	#{x for x in 'maintenance' if x not in vowels }
+	
 
 ################################################################################
 def main():
