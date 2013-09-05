@@ -2,10 +2,10 @@
 # Name:        module1
 # Purpose:
 #
-# Author:      wuiljai
+# Author:      wuillou8
 #
 # Created:     03/09/2013
-# Copyright:   (c) wuiljai 2013
+# Copyright:   (c) wuillou8 2013
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import io, os, csv, string, re, sys
