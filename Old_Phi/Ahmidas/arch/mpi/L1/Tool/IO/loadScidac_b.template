@@ -1,0 +1,92 @@
+template< typename Element >
+void Tool::IO::loadScidac(Core::Field< Element > *field, std::string const &filename, size_t const precision)
+{
+  assert(precision == 32 || precision == 64);
+  Base::Weave weave(field->L(), field->T());
+
+  (weave.d_grid.grid()).Barrier();
+
+  if (weave.dim(Base::idx_X) > 1 ||
+      weave.dim(Base::idx_Y) > 1 ||
+      weave.dim(Base::idx_Z) > 1)
+  {
+    std::cerr << "parallel reading does not work for parallalization in spatial directions" << std::endl;
+    exit(1);
+  }
+
+  int nprocs((weave.d_grid.grid()).Get_size());
+  int rank((weave.d_grid.grid()).Get_rank());
+
+  assert (nprocs == int(weave.dim(Base::idx_T)));
+
+  unsigned long elem_offset(weave.globalVolume());
+
+  // each node has to find his own offset
+  for (size_t my_offset = 0; my_offset < weave.globalVolume();
+       my_offset += weave.localVolume())
+  {
+    //if (rank == 0)
+    //  std::cout << "rank(" << my_offset << ") = " << weave.d_grid.rank(my_offset) << std::endl;
+    if ((unsigned int)(rank) == weave.d_grid.rank(my_offset))
+    {
+      elem_offset = (unsigned long)(my_offset);
+      break;
+    }
+  }
+  assert(elem_offset < weave.globalVolume());
+
+
+  Lime::Reader reader(filename);
+
+
+  // since this is causing problems in massive parallelization, the following block is
+  // processed serially
+  for (int irank=0; irank<nprocs; irank++)
+  {
+    if (rank == irank)
+    {
+      reader.retrieveRecord(reader.findRecord("scidac-binary-data"));
+      if (reader.fail())
+      {
+        std::cerr << "Lime reader could not find the record, check path and file, and check lime contents of file.\nField unchanged!.\n";
+        exit(EXIT_FAILURE);
+        return;
+      }
+      assert(reader.good());
+
+      //go to position from which the data is supposed to be read
+      if (precision == 64)
+        reader.seekg(elem_offset*sizeof(Element), reader.findRecord("scidac-binary-data"));
+      else
+        reader.seekg(elem_offset*sizeof(Element)/2, reader.findRecord("scidac-binary-data"));
+    }
+    (weave.d_grid.grid()).Barrier();
+  }
+
+  assert(reader.good());
+
+  Element *dataPtr = field->raw(); //Starting memory address of the field.
+
+  if (precision == 64)
+  {
+    reader.read(dataPtr, field->size());
+    if (!Base::bigEndian)
+      Base::swapEndian(dataPtr, dataPtr + field->size(), sizeof(double));
+
+    return;
+  }
+
+  size_t const elSize = sizeof(Element) / sizeof(double);
+  uint32_t elem32[elSize];
+
+  for (size_t ctr = 0; ctr < field->size(); ++ctr, ++dataPtr)
+  {
+    reader.read(elem32, elSize);
+    if (!Base::bigEndian)
+      Base::swapEndian(elem32, elem32 + elSize);
+    std::copy(reinterpret_cast< float* >(elem32), reinterpret_cast< float* >(elem32) + elSize,
+              reinterpret_cast< double* >(dataPtr));
+  }
+
+  (weave.d_grid.grid()).Barrier();
+}

@@ -1,0 +1,9 @@
+namespace Base
+    namespace IO
+  {
+  template< typename IOClass, typename Element, size_t L, size_t T >
+  Bridge< IOClass, Element, L, T >::Bridge(IOClass &io, Core::Field< Element, L, T > &field)
+    : d_io(io), d_field(field)
+  {}
+  }
+}

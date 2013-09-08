@@ -1,0 +1,78 @@
+template< typename Element >
+void Tool::IO::saveILDG(Core::Field< Element > const &field, std::string const &filename)
+{
+//   //  under construction
+//   assert(false);
+
+  Base::Weave weave(field.L(), field.T());
+
+  weave.barrier();
+
+  if (weave.dim(Base::idx_X) > 1 ||
+      weave.dim(Base::idx_Y) > 1 ||
+      weave.dim(Base::idx_Z) > 1)
+  {
+    std::cerr << "parallel writing does not work for parallalization in spatial directions" << std::endl;
+    exit(1);
+  }
+
+  int const nprocs((weave.d_grid.grid()).Get_size());
+  int const rank((weave.d_grid.grid()).Get_rank());
+
+  // the main work has to be done by the writer holding the element at the origin
+  int const root_rank = weave.d_grid.rank(size_t(0));
+
+  assert (nprocs == int(weave.dim(Base::idx_T)));
+
+  unsigned long elem_offset(weave.globalVolume());
+
+  // each node has to find his own offset
+  for (size_t my_offset = 0; my_offset < weave.globalVolume();
+       my_offset += weave.localVolume())
+  {
+    if ((unsigned int)(rank) == weave.d_grid.rank(my_offset))
+    {
+      elem_offset = (unsigned long)(my_offset);
+      break;
+    }
+  }
+  assert(elem_offset < weave.globalVolume());
+
+  // 2nd argument is boolean and determines whether the writer is allowed to write the header,
+  // which only the writer of the process holding the Element(s) to be written first may do
+  Lime::Writer writer(filename, rank == root_rank);
+  assert(writer.good());
+
+  writer.newRecord("ildg-data-lfn", 0, 0); //NOTE incomplete header for now
+  writer.finishMessage();
+
+  size_t pos = writer.closeRecord();
+
+  // all processes should know where we are
+  weave.broadcast(&pos, 1, root_rank);
+  writer.newRecord("ildg-binary-data", pos, weave.globalVolume() * sizeof(Element));
+
+  weave.barrier();
+  assert(writer.good());
+
+  size_t const elements = sizeof(Element) / sizeof(double);
+
+  // each writer jumps to the position it is supposed to start writing at
+  writer.seekp(elem_offset * sizeof(Element));
+
+  assert(writer.good());
+
+  double buffer[elements];
+  for (size_t siteIdx = 0; siteIdx < field.size(); ++siteIdx)
+  {
+    std::copy(reinterpret_cast< double const* >(&(field.constPhysicalIndex(siteIdx))),
+              reinterpret_cast< double const* >(&(field.constPhysicalIndex(siteIdx))) + elements, buffer);
+    if (!Base::bigEndian)
+    {
+      Base::swapEndian(buffer, buffer + elements, sizeof(double));
+    }
+    writer.write(buffer, elements);
+  }
+
+  weave.barrier();
+}

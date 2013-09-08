@@ -1,0 +1,5 @@
+template <typename DataType >
+void Base::IO::Lime::Writer::write(DataType *buffer, uint64_t elements)
+{
+  d_stream.write(reinterpret_cast< const char* >(buffer), elements * sizeof(DataType));
+}

@@ -1,0 +1,40 @@
+template< >
+inline void SUN::reunitarize(SUN::MatrixU1 &mat)
+{
+  mat.normalize();
+}
+
+template< typename Mat >
+inline void SUN::randomize(Mat &mat)
+{ 
+  mat.setRandom();
+  reunitarize(mat);
+}
+
+namespace SUN
+{
+template< >
+inline void randomize< MatrixU1 >(MatrixU1 &mat)
+{
+  double numb = 2 * pi * Base::Random::fastUniform();
+  mat << std::complex< double >(std::cos(numb),std::sin(numb));
+}
+}
+
+template< typename Mat >
+inline Mat SUN::hc(Mat const &mat)
+{
+  return mat.conjugate().transpose();
+}
+
+template< typename Mat >
+inline Mat SUN::rightMultiply(Mat &rmat)
+{
+return SUN::rightMultiply*rmat;
+}
+
+template< typename Mat >
+inline void SUN::leftMultiply(Mat &lmat)
+{
+return SUN::rightMultiply*lmat; 
+}

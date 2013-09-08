@@ -1,0 +1,11 @@
+template< typename Scalar, size_t Dim, size_t Rank >
+template< size_t Value1, size_t Value2 >
+Tensor< Scalar, Dim, Rank - 2 > Tensor< Scalar, Dim, Rank >::trace(Index< Value1 >, Index< Value2 >) const
+{
+  Eigen::Map< Eigen::Matrix< Scalar, Dim, Power< Dim, Rank - 2 >::value >, 0, Eigen::Stride< Dim, 1 >, TIter< Scalar, Dim, Rank, Value1, Value2 > > rearranged(d_data.data());
+  Tensor< Scalar, Dim, Rank - 2 > result;
+  // Note that a sum over columns appears to malfunction, possibly as a consequence of the modifications made.
+  // This should only be an issue when using the tensor represntation mechanism, however, and not interfere with the usual Eigen routines.
+  result.linear() = Eigen::Matrix< Scalar, 1, Dim >::Ones() * rearranged;
+  return result;
+}

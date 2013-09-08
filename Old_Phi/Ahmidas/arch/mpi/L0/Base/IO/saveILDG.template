@@ -1,0 +1,18 @@
+template< typename Element, size_t L, size_t T >
+void Base::IO::saveILDG(Core::Field< Element, L, T > *field, std::string const &filename)
+{
+//  Placeholder
+  /*  Lime::Writer writer(filename);
+
+    writer.newRecord("ildg-data-lfn"); //NOTE incomplete for now
+    writer.finishMessage();
+    writer.newRecord("ildg-binary-data");
+
+    //Poor man's parser for reading the precision should be inserted here, beyond we now assume double as input
+
+    if (!bigEndian())
+      swapEndian(field->d_field, field->d_field + L * L * L * T, sizeof(double));
+    writer.write(field->d_field, L * L * L * T);
+    if (!bigEndian())
+      swapEndian(field->d_field, field->d_field + L * L * L * T, sizeof(double)); */
+}

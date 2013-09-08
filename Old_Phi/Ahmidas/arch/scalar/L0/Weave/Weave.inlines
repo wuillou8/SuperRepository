@@ -1,0 +1,65 @@
+template < size_t D >
+inline Weave< D >::Weave(Weave< D > const &other)
+  : d_dims(other.d_dims), d_surf(other.d_surf), d_off(other.d_off)
+{}
+
+template < size_t D >
+inline size_t Weave< D >::dim(size_t const &idx) const
+{
+  return d_dims[idx];
+}
+
+template < size_t D >
+inline typename Weave< D >::DimArray const &Weave< D >::dims() const
+{
+  return d_dims;
+}
+
+template < size_t D >
+inline size_t Weave< D >::localSurface(size_t const &idx) const
+{
+  return d_surf[idx];
+}
+
+template < size_t D >
+inline size_t Weave< D >::localVolume() const
+{
+  return d_surf[D];
+}
+
+template < size_t D >
+inline size_t Weave< D >::volume() const
+{
+  return d_surf[D];
+}
+
+template < size_t D >
+template< typename Element >
+inline void Weave< D >::fieldShift(size_t const &along, Base::Direction dir, Element *)
+{
+  d_off[along] += (dir == Base::dir_UP) ? 1 : -1;
+}
+
+template < size_t D >
+inline size_t Weave< D >::rank() const
+{
+  return 0;
+}
+
+template < size_t D >
+inline size_t Weave< D >::rank(size_t) const
+{
+  return 0;
+}
+
+template < size_t D >
+inline size_t Weave< D >::rank(typename Weave< D >::DimArray const &) const
+{
+  return 0;
+}
+
+template < size_t D >
+inline size_t Weave< D >::physIdx(size_t const &index) const
+{
+  return coordToIndex(Weave< D >::DimArray::Constant(index) / d_surf.head(D));
+}

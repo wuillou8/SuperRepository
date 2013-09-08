@@ -1,0 +1,2 @@
+/usr/bin/ar cr libIO.a  CMakeFiles/IO.dir/IO/ILDGinfo_ILDGinfo.cpp.o CMakeFiles/IO.dir/IO/loadILDG.cpp.o CMakeFiles/IO.dir/IO/ScidacChecksum/ScidacChecksum_createTable.cpp.o CMakeFiles/IO.dir/IO/ScidacChecksum/ScidacChecksum_parse.cpp.o CMakeFiles/IO.dir/IO/ScidacChecksum/ScidacChecksum_aggregate.cpp.o CMakeFiles/IO.dir/IO/ScidacChecksum/ScidacChecksum_crc32.cpp.o 
+/usr/bin/ranlib libIO.a 

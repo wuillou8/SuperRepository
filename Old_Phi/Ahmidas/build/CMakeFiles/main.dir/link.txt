@@ -1,0 +1,1 @@
+/usr/bin/c++   -O3   CMakeFiles/main.dir/src/main.cpp.o  -o main -rdynamic arch/scalar/L1/libIO.a src/L0/Base/libBase.a arch/scalar/L1/IO/Lime/libLime.a arch/scalar/L1/libIO.a arch/scalar/L1/IO/Lime/libLime.a 

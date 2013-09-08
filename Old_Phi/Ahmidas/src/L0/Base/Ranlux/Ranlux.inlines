@@ -1,0 +1,9 @@
+inline Base::Ranlux::Ranlux(int const seed)
+  : d_delta_b(1.0 / 0x20000000000000), d_period(24), d_delta_s(13), d_index(0),
+    d_carry(0.0), d_lux(223)
+{
+  initialize(seed);
+}
+
+inline Base::Ranlux::~Ranlux()
+{}

@@ -1,0 +1,4 @@
+/* Initialization of the singleton before it is initialized */
+
+template< size_t L, size_t T >
+Base::Weave< L, T >* Base::Weave< L, T >::s_Weave = 0;

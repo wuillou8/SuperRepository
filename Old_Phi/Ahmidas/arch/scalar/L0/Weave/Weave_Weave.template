@@ -1,0 +1,7 @@
+template < size_t D >
+Weave< D >::Weave(DimArray const &dims)
+  : d_dims(dims), d_surf(d_surf.Constant(1)), d_off(d_off.Constant(0))
+{
+  for (size_t idx = 0; idx < D; ++idx)
+    d_surf[idx + 1] = d_surf[idx] * d_dims[idx];
+}

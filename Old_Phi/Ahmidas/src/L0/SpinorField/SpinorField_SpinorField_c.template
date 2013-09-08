@@ -1,0 +1,7 @@
+template< typename Element, size_t D >
+SpinorField< Element, D >::SpinorField(SpinorField< Element, D > const &other)
+  : d_phase(other.d_phase)
+{
+  for(size_t idx = 0; idx < SpinorDim< D >::value; ++idx)
+    d_fields[idx] = new Core::Field< Element, D >(*other.d_fields[idx]);
+}
