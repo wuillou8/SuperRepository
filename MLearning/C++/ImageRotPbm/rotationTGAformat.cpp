@@ -60,7 +60,7 @@ int main(int argc,char **argv)
 	vector<Byte> bytes;
 	Byte tmp; 
 
-	//Basic IO Error handling
+	// Basic IO Error handling
 	if(argc != 3+1)
 	{	cout << "!!!expected input: <program> <input_image.tga> <output_image.tga> left|right " << argc << endl; 
 	 	exit (EXIT_FAILURE);
