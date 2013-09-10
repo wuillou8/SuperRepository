@@ -2,7 +2,7 @@
 # Name:        module1
 # Purpose:
 #
-# Author:      wuiljai
+# Author:      wuillou8
 #
 # Created:     09/09/2013
 # Copyright:   (c) wuiljai 2013
