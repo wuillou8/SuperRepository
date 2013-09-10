@@ -53,7 +53,6 @@ class NaiveBayesian:
 	dirTested = os.getcwd()+"//DATA//ex6DataEmails//"+testDir
 
 	fff = open(testDir+".txt", 'w')
-	fff.write('hi there\n') 
 	for tfile in [f for f in os.listdir(dirTested)]:
             	fileName= dirTested+"//"+tfile
 		PSpam = 0. 
