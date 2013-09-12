@@ -1,0 +1,22 @@
+Program compiled from diferent progrs picked up on the internet and 
++/- C++ redisigned. 
+It generates a random sample and applying the LLoyd algo to determine "subsets".
+It is an ~C++ adaptation of a C code I found on the internet.
+
+--Number of points and of cluster are hard-coded.
+--LLoyd Algorithm starts by an initial placement of K points sites in the input domain.
+
+	Steps:
+	1) The Voronoi diagram is computed:
+		This corresponds to a disection of the space into regions, based on a distance.
+	2) The centroids are computed.
+	3) --> new Voronoi cells defined, back to 1)
+
+Running:
+g++ -o kmean kmean.cpp
+./kmean.out 1000 3 > pic.eps
+epstopdf pic.eps
+echo "it's done...."
+
+
+
