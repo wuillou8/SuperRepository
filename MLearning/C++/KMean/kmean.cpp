@@ -21,8 +21,7 @@ using namespace std;
 KMean::point KMean::gen_xy(int count, double radius)
 {
 	double ang, r;
-	point p, pt = (point)malloc(sizeof(point_t)*count);
-	//(point)new point[count];//   (point)malloc(sizeof(point_t)*count);
+	point p, pt = (point)new point[count];//   (point)malloc(sizeof(point_t)*count);
  
 	/* note: this is not a uniform 2-d distribution */
 	for (p = pt + count; p-- > pt;) {
