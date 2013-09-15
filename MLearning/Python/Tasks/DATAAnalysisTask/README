@@ -1,0 +1,7 @@
+One can run the python code running on a unix terminal:
+time python task1.py > output.csv
+
+my code need the files Data.csv and Coefs.csv in the directory where it is run. I have never used rpython and my main is a bit strange but I had to handle a few special cases and I wanted to be done as quickly as possible.
+please, read the SO1Challenge.pdf document for further comments.
+
+CODE is a subdirectory containing my implementation of a few method mentioned in my solution of task2.
