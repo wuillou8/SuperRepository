@@ -1,3 +1,5 @@
+!!!Prototype(sketch of)!!!
+
 Toy Pricer, requires the installation of Eigen lib.
 Does MC for basical products and does basic experiments with a generalised class for the fin. products using template classes as well as gives a struct. for nice parallelisation.
 
