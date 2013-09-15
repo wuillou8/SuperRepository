@@ -21,7 +21,7 @@ typedef struct
     unsigned char imageDescr;
 } TGAFILE;
 
-std::ifstream& ReadTGAHeader(std::ifstream& in, const TGAFILE& tgaFile)
+/*std::ifstream&*/void ReadTGAHeader(std::ifstream& in, const TGAFILE& tgaFile)
 {
 	in.read ((char*)(&tgaFile.IDLength), 1);
 	in.read ((char*)(&tgaFile.ColMType), 1);
@@ -33,10 +33,10 @@ std::ifstream& ReadTGAHeader(std::ifstream& in, const TGAFILE& tgaFile)
 	in.read ((char*)(&tgaFile.imageHeight), 2);
 	in.read ((char*)(&tgaFile.pixSize), 1);
 	in.read ((char*)(&tgaFile.imageDescr), 1);
-	return in;
+	//return in;
 }
 
-std::ofstream& WriteTGAHeader(std::ofstream& out, const TGAFILE& tgaFile)
+/*std::ofstream&*/void WriteTGAHeader(std::ofstream& out, const TGAFILE& tgaFile)
 {
 	out.write ((char*)(&tgaFile.IDLength), 1);
 	out.write ((char*)(&tgaFile.ColMType), 1);
@@ -49,7 +49,7 @@ std::ofstream& WriteTGAHeader(std::ofstream& out, const TGAFILE& tgaFile)
 	out.write ((char*)(&tgaFile.imageWidth), 2); //*
 	out.write ((char*)(&tgaFile.pixSize), 1);
 	out.write ((char*)(&tgaFile.imageDescr), 1);
-	return out;
+	//return out;
 }
 
 int main(int argc,char **argv)
@@ -72,9 +72,8 @@ int main(int argc,char **argv)
 	out.open (argv[2], ios::out | ios::binary);
 
 	cout << "---------------------- Handle Header ---------------------"<< endl;
-	ReadTGAHeader(in, tgaFile);
+	ReadTGAHeader(in, tgaFile); 
 	WriteTGAHeader(out, tgaFile);
-
 	cout << "---------------------- Handle Figure ----------------------"<< endl;
 	// Initialisation
 	nxGrid = (int)tgaFile.imageWidth;
