@@ -1,5 +1,6 @@
+#include "NeuronesInSchool.h"
 
-
+//class NeuronesInSchool;
 
 
 class Neurones
@@ -25,8 +26,9 @@ public:
 	{};
 	~Neurones();
 
+	//friend /*class*/ NeuronesInSchool;
 
 public:
-	Neurones NeuronalBuild(  );
+	Neurones NeuronalBuild();
 
 };

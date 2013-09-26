@@ -8,6 +8,7 @@
 */
 #include "IO.cpp"
 #include "Neurones.cpp"
+#include "NeuronesInSchool.cpp"
 
 using namespace std; 
 
@@ -25,6 +26,9 @@ int main(int argc,char **argv)
 	int AnalysisSize = 1000;
 
 	IO* input = readIN("letter-recognition.data2", 0, 1000);
+	
+	Neurones myNeurones(2,2,2);
+	myNeurones.NeuronalBuild();
 	
 	delete[] input;
 }
