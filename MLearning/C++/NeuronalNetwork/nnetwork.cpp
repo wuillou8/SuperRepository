@@ -1,10 +1,13 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+/*
 #include <string>
 #include <sstream> 
 #include <stdlib.h>
-
+*/
+#include "IO.cpp"
+#include "Neurones.cpp"
 
 using namespace std; 
 
@@ -16,55 +19,12 @@ std::istream& delim(std::istream& in)
   return in;
 }*/
 
-typedef struct {
-	string letter;
-	string numbers[16];
-} IO;
-
-
-bool parseIO(istream &in, IO &io)
-{	if (!getline(in, io.letter, ',')) { return false; }  
-	for(int i = 0; i < 16;++i)
-	{	if (!getline(in, io.numbers[i], ',')) { return false; }
-	}
-	return true;
-}
-
-
-IO* readIN(std::ifstream &in, int AnalysisStart, int AnalysisSize)
-{
-	istringstream iss;
-	string tmp_line;
-	IO * input = new IO[(AnalysisSize-AnalysisStart)];
-	
-	int i =  AnalysisStart;
-	while( getline(in, tmp_line) && (i < ( AnalysisSize + AnalysisStart ) ) )
-	{	
-		IO tmp;
-		iss.str (tmp_line);
-		if(parseIO(iss,tmp))
-		{	
-			input[i] = tmp;	
-		}
-		else
-		{	cout << "FAIL" << endl;	
-		}
-	++i;
-	}
-	
-	return input;
-}
-
-
-
 int main(int argc,char **argv)
 {
 	int AnalysisStart = 0;
 	int AnalysisSize = 1000;
 
-	ifstream infile( "letter-recognition.data2", ios::in | ios::binary );
-	IO* input = readIN(infile, 0, 1000);
-	infile.close();
-
+	IO* input = readIN("letter-recognition.data2", 0, 1000);
+	
 	delete[] input;
 }
