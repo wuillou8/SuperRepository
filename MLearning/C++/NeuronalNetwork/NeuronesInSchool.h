@@ -24,6 +24,8 @@ class NeuronesInSchool
 	NeuronesInSchool(Neurones* unSchooledNeurone);
 	~NeuronesInSchool();
 
+	void setTrainingParameters( double lR, double m); //, bool batch );
+
 
 	void GetWeights();
 

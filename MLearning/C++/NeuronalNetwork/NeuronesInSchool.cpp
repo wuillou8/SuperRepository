@@ -34,6 +34,13 @@ void GetWeights()
 	
 }
 
+void NeuronesInSchool::setTrainingParameters( double lR, double m) //, bool batch )
+{
+	learningRate = lR;
+	momentum = m;
+	//bool useBatch = batch;
+}
+
 inline double NeuronesInSchool::OutputErrGrad( double desiredValue, double outputValue )
 {	//return delta_k = y_k*(1.-y_k)*(d_k-y_k)
 	return outputValue * ( 1 - outputValue ) * ( desiredValue - outputValue );

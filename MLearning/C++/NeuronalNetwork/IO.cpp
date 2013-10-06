@@ -18,7 +18,8 @@ bool ParseIO(istream &in, IO &io)
 
 	for(int i = 0; i < 16;++i)	
 	{	
-	if (!getline(in, io.numbers[i], ',')) { return false; }	
+		if (!getline(in, io.numbers[i], ',')) 
+		{ return false; }	
 	}	
 	return true;
 }
