@@ -23,8 +23,10 @@ bool ParseIO(istream &in, IO &io)
 	return true;
 }
 
+//	ReadIN
+//	Read in elements file between Start and Size.
 IO* readIN(const char* infileName, int AnalysisStart, int AnalysisSize)
-{	
+{		
 	istringstream iss;	
 	string tmp_line;
 	IO * input = new IO[(AnalysisSize-AnalysisStart)];

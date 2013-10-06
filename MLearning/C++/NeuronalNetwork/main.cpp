@@ -1,7 +1,6 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
-/*#include <string> #include <sstream> #include <stdlib.h>*/
 #include "IO.cpp"
 #include "Neurones.cpp"
 #include "NeuronesInSchool.cpp"
@@ -18,5 +17,4 @@ int main(int argc,char **argv)
 	Neurones myNeurones(2,2,2);	
 	myNeurones.NeuronalBuild();	
 	delete[] input;
-
 }

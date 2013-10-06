@@ -1,4 +1,7 @@
+#include <math.h>
 #include "Neurones.h"
+
+using namespace std; 
 
 Neurones Neurones::NeuronalBuild()
 {	
@@ -31,6 +34,58 @@ Neurones Neurones::NeuronalBuild()
 
 		for ( int j=0; j < Noutput; j++ ) wHiddenOutput[i][j] = 0;			
 	}	
+
+	InitWeights();
+}
+
+inline double Neurones::sigmoid( double x )
+{
+	//sigmoid fct°
+	return 1./(1.+exp(-x));
+}	
+
+// feedForward
+// generate hidden and output layers from the weights and data's Input 
+void Neurones::feedForward(double* pattern)
+{
+	//set input neurons to input values
+	for(int i = 0; i < Ninput; i++) inputNrs[i] = pattern[i];
+	
+	//Calculate Layers values - include bias neuron
+	for(int j=0; j < Nhidden; j++)
+	{	hiddenNrs[j] = 0.;				
+		//sigmoid ( sum_k w_jk Nrs_k )
+		for( int i=0; i <= Ninput; i++ ) hiddenNrs[j] += inputNrs[i] * wInputHidden[i][j];		
+		hiddenNrs[j] = sigmoid( hiddenNrs[j] );			
+	}
+	
+	for(int k=0; k < Noutput; k++)
+	{	outputNrs[k] = 0.;				
+		//sigmoid ( sum_k w_jk Nrs_k )
+		for( int j=0; j <= Nhidden; j++ ) outputNrs[k] += hiddenNrs[j] * wHiddenOutput[j][k];
+		outputNrs[k] = sigmoid( outputNrs[k] );
+	}
+}
+
+void Neurones::InitWeights( )
+{
+	//set range
+	double rH = 1/sqrt( (double) Ninput);
+	double rO = 1/sqrt( (double) Nhidden);
+	
+	//set weights: input and hidden 		
+	for(int i = 0; i <= Ninput; i++)
+	{	for(int j = 0; j < Nhidden; j++) 
+		{	//set weights to random values
+			wInputHidden[i][j] = ( ( (double)(rand()%100)+1)/100  * 2. * rH ) - rH;			
+		}	
+	}
+	for(int i = 0; i <= Nhidden; i++)
+	{	for(int j = 0; j < Noutput; j++) 
+		{	//set weights to random values
+			wHiddenOutput[i][j] = ( ( (double)(rand()%100)+1)/100 * 2. * rO ) - rO;
+		}	
+	}
 }
 
 Neurones::~Neurones()

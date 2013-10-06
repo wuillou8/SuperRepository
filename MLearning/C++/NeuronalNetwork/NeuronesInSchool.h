@@ -1,6 +1,7 @@
-//#include "Neurones.h"
-
 #include <vector>
+
+#define LEARNINGRATE 0.001
+#define MOMENTUM 0.9
 
 class NeuronesInSchool
 {
@@ -20,9 +21,21 @@ class NeuronesInSchool
 	double* e_OutputGradients;
 
 	public:		
-	NeuronesInSchool( Neurones* unSchooledNeurone);
+	NeuronesInSchool(Neurones* unSchooledNeurone);
 	~NeuronesInSchool();
 
+
 	void GetWeights();
+
+	private:
+	double momentum; // = 0.9;
+	double learningRate; // = 0.001;
+
+
+	void BackPropagate( double* Outputs );
+	inline double OutputErrGrad( double desiredValue, double outputValue );
 	
+	double HiddenErrGrad( int j );
+	void updateWeights();
+
 };

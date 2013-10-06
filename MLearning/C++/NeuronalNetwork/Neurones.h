@@ -1,27 +1,41 @@
 //#include "NeuronesInSchool.h"
 
 class Neurones	{
-	private:	
-	// "Neural grid" with three layers 	
-	double* inputNrs; 	
-	double* hiddenNrs; 	
-	double* outputNrs;	
+	
+	friend class NeuronesInSchool;	
+	
+	public:
 
-	//weights	
-	double** wInputHidden;	
-	double** wHiddenOutput;
-
-	public:		
 	// Nb of Els	
-	int Ninput, Nhidden, Noutput;	
+	int Ninput, Nhidden, Noutput;
 
+	// Creat. / Destr.
 	Neurones(int inputLay, int hiddenLay, int outputLay) : 	
 		Ninput(inputLay),
 		Nhidden(hiddenLay),
-		Noutput(outputLay)	{};	
-	~Neurones();	
-	//friend /*class*/ NeuronesInSchool;public:	
+		Noutput(outputLay)
+	{};	
+	~Neurones();
+	
+	private:
+
+	// "Neural grid" with three layers 	
+	double* inputNrs; // input neurones 	
+	double* hiddenNrs;
+	double* outputNrs;	
+
+	//weights	
+	double** wInputHidden;
+	double** wHiddenOutput;
+
+	public:
+
 	Neurones NeuronalBuild();
-}; 
+	inline double sigmoid(double x);
+
+	private:
+	void InitWeights();
+	void feedForward(double* pattern);
+};
 
 
