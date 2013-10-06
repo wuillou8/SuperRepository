@@ -14,7 +14,7 @@ int main(int argc,char **argv)
 	int AnalysisStart = 0;	
 	int AnalysisSize = 1000;
 
-	IO* input = readIN( "letter-recognition.data2" , 0 , 1000 );	
+	IOdbl* input = readIN( "letter-recognition.data2" , 0 , 1000 );	
 	
 	Neurones myNeurones( 4 , 4 , 4 );	
 	myNeurones.NeuronalBuild();
