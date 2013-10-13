@@ -16,6 +16,7 @@ int main(int argc,char **argv)
 
 	IOdbl* input = readIN( "letter-recognition.data2" , 0 , 1000 );	
 	
+	// set neurones grid
 	Neurones myNeurones( 4 , 4 , 4 );	
 	myNeurones.NeuronalBuild();
 	NeuronesInSchool myNeuronesInSchool( &myNeurones );

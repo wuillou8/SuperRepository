@@ -8,11 +8,13 @@
 #include <stdlib.h>
 #include "P0/Random.cpp"
 
-#include "EIGEN/Dense"
+#include "EIGEN/Eigen/Dense"
 #include "P0/EigenFcts.cpp"
 
 #include "P0/GaussianVec.cpp"
 #include "P0/BMotion.cpp"
+
+#include "P2/RunSimulation.cpp"
 
 
 using namespace std;

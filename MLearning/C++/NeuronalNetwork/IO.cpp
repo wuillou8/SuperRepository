@@ -23,9 +23,8 @@ bool ParseIO(istream &in, IOdbl &io)
 {	string tmp;
 
 	if (!getline(in, tmp, ',')) 
-	{	return false;	}  	
+	{	return false;	}  
 	io.letter = atof(tmp.c_str());  //io.letter;
-
 	for(int i = 0; i < 16;++i)	
 	{	
 		if (!getline(in, tmp, ',')) 
@@ -44,9 +43,9 @@ IOdbl* readIN(const char* infileName, int AnalysisStart, int AnalysisSize)
 	IOdbl * input = new IOdbl[(AnalysisSize-AnalysisStart)];
 
 	int i =  AnalysisStart;	ifstream infile( infileName, ios::in | ios::binary );	
-
 	while( getline(infile, tmp_line) && (i < ( AnalysisSize + AnalysisStart ) ) )	
-	{		
+	{
+
 		IOdbl tmp;
 		iss.str (tmp_line);
 

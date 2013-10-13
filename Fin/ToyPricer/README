@@ -11,4 +11,8 @@ Ideas played with:
 	-filtration or infos should ported through time --> filtration class
 	-MC simulated generating vector/matrices i.e Multi-trajectories
 	(therefore, a random flow obj ios built up)  
-	
+
+Structure:
+PO is the simple layer, contains simple objects
+P1 contains more elaborated items
+P2 contains the complexes ones	

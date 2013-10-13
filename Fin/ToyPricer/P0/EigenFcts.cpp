@@ -1,8 +1,8 @@
 #pragma once
 #include <math.h>
-#include "../EIGEN/Dense"
-#include "../EIGEN/Core"
-#include "../EIGEN/Cholesky"
+#include "../EIGEN/Eigen/Dense"
+#include "../EIGEN/Eigen/Core"
+#include "../EIGEN/Eigen/Cholesky"
 
 using namespace std;
 using namespace Eigen;
