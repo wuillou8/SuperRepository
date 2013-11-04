@@ -1,289 +1,188 @@
 #-------------------------------------------------------------------------------
-# Name:        PLotforMFB
+# Name:        module1
 # Purpose:
 #
-# Author:      wuillou8
+# Author:      wuiljai
 #
-# Created:     28/10/2013
+# Created:     18/10/2013
 # Copyright:   (c) wuiljai 2013
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-#-Std Packages------------------------------------------------------------------
-
 import sys
 import numpy as np
-from pandas import DataFrame
 import pandas as pd
-
-
 import pylab as P
+
 import matplotlib
 matplotlib.rcParams['legend.fancybox'] = True
 import matplotlib.pyplot as plt
-import math
 
 from matplotlib.backends.backend_pdf import PdfPages
 
-#-My own Packages --------------------------------------------------------------
-
-import myPandaUtilities
-import myPlotUtilities
-#import PlotforMFB
-#-------------------------------------------------------------------------------
+def plotGraph(X,Y):
+      fig = plt.figure()
+      ### Plotting arrangements ###
+      return fig
 
 
-
-################################################################################
-##               Utilities                                                    ##
-################################################################################
-
-def mydispl_dfr(dframe):
-    print dframe.head(2)
-    print "...  ...  ...  ...  ...  ..."
-    print dframe.tail(2)
-
-def WhichPower2(number):
-    for i in range(0,7):
-        if np.power( 2, i ) == number :
-            return int(i + 1)
-    print "Error: root not found"
-    sys.exit(0)
-
-class  const:
-    DayShift = 5
-
-def GetDays(array):
-    GetDays = []
-    for n_i in array:
-        GetDays.append(WhichPower2(n_i))
-    return  [ np.mod(tmp+2,const.DayShift)+1 for tmp in GetDays ]
-
-def fctChgDays(x):
-    return np.mod(WhichPower2(x)+const.DayShift,7)+1
-
-################################################################################
-##            Classes                                                         ##
-################################################################################
 
 class DataAnalysis:
 #
-#   Basic Analysis SuperClass:
+#   Basic Analysis Class:
 #   Reading main parameters.
        def __init__(self,dataFile):
                 # read in files and pass it into a numpy vector (first line/column removed)
                 self.data = pd.read_csv(dataFile)
                 self.DaysList = np.sort(self.data['DayOfWeek'].unique())
                 self.LineIdList = np.sort(self.data['Line_id'].unique())
-                self.TripIdList = np.sort(self.data['Trip_id'].unique())
                 self.DatDescr = self.data.describe()
-                print "--------------------------------------------------------"
-                print "Reading in: ", str(dataFile)
-                print "--------------------------------------------------------"
-                print self.DatDescr
-
-
-#########################################################################
-
-class PlotforMFB(DataAnalysis):
-    # plot Attribute against DayOfWeek
-    def __init__(self,dataFile,list1, title):
-            DataAnalysis.__init__(self,dataFile)
-            self.title = title
-            self.AttrList1 = np.sort(self.data[list1].unique())
-            self.AttrList2 = np.sort(self.data['Line_id'].unique())
-
-            self.Init_plot()
-            
-	    self.ComputMode = 0 # 0 or 1 or 2
-            if self.ComputMode == 0:
-                self.plotAttrVSDays()
-            elif self.ComputMode == 1:
-                self.plot2AttrVSDays() #AttrList)
-            elif self.ComputMode == 2:
-                self.plot2AttrVSDaysHisto()
-
-            self.Finalize_plot()
-
-    #---------------------------------------------------------------------------
-    def Init_plot(self):
-        plt.figure()
-        params = {'legend.fontsize': 6,
-        'legend.linewidth': 2}
-        plt.rcParams.update(params)
-
-        plt.title(' Ride_load vs DayOfWeek ' )
-        plt.xlim([-0.25,7.5])
-        plt.xlabel(' DayOfWeek (1=monday, ... , 7=sunday) ')
-        plt.ylabel(' Ride_load ')
-
-    #---------------------------------------------------------------------------
-    def plotAttrVSDays( self ):
-        tmp0 =[]
-        for tmp in self.AttrList1:
-            tmp0.append(str(tmp)+'_'+str(self._line))
-            dff = []
-            for tmp1 in self.DaysList:
-                df = myPandaUtilities.myfilter(self.data,['Line_id',self._line,'Trip_id',tmp,'DayOfWeek',tmp1],['DayOfWeek','Ride_load'])
-                dff.append(df)
-
-            dff = pd.concat(dff)
-            dff['DayOfWeek'] = dff['DayOfWeek'].apply( fctChgDays )
-            dff=dff.sort('DayOfWeek')
-            if (dff.shape[0] != 0) & (len(dff['DayOfWeek'].unique()) > 5):
-                dfave = dff.groupby('DayOfWeek').mean() #
-                dfvar = dff.groupby('DayOfWeek').std() #
-                dfave.rename(columns={'Ride_load': 'mean'}, inplace=True) #
-                dfvar.rename(columns={'Ride_load': 'std'}, inplace=True) #
-                df = dfave.join(dfvar)
-                df = df.fillna(0.00000001)
-                print ' ---df--- ', df, dff['DayOfWeek'].unique()
-                print "tmp0=============", tmp0
-                plt.errorbar( dff['DayOfWeek'].unique(), df['mean'], df['std'], linestyle="dashed", marker="o",zorder=1)
-                plt.legend(tmp0, loc='upper left') #'lower left'
-                plt.draw()
-
-    #---------------------------------------------------------------------------
-    def plot2AttrVSDays( self ):
-        tmp0 =[]
-        for tmp in self.AttrList1:
-            for line in self.AttrList2:
-                tmp0.append(str(tmp)+'_'+str(line))
-                dff = []
-                for tmp1 in self.DaysList:
-                    df = myPandaUtilities.myfilter(self.data,['Line_id',line,'Trip_id',tmp,'DayOfWeek',tmp1],['DayOfWeek','Ride_load'])
-                    dff.append(df)
-
-                dff = pd.concat(dff)
-                dff['DayOfWeek'] = dff['DayOfWeek'].apply( fctChgDays )
-                dff=dff.sort('DayOfWeek')
-                if (dff.shape[0] != 0) & (len(dff['DayOfWeek'].unique()) > 5):
-                    dfave = dff.groupby('DayOfWeek').mean() #
-                    dfvar = dff.groupby('DayOfWeek').std() #
-                    dfave.rename(columns={'Ride_load': 'mean'}, inplace=True) #
-                    dfvar.rename(columns={'Ride_load': 'std'}, inplace=True) #
-                    df = dfave.join(dfvar)
-                    df = df.fillna(0.00000001)
-                    plt.errorbar( dff['DayOfWeek'].unique(), df['mean'], df['std'], linestyle="dashed", marker="o",zorder=1)
-                    plt.legend(tmp0, loc='upper left') #'lower left'
-                    plt.draw()
-
-                    #print tmp, line
-
-    #---------------------------------------------------------------------------
-    #def analysisData( self ):
-    def plot2AttrVSDaysHisto( self ):
-        dff = []
-        for tmp1 in self.DaysList:
-            df = myPandaUtilities.myfilter(self.data,['DayOfWeek',tmp1],['DayOfWeek','Ride_load'])
-            dff.append(df)
-
-        dff = pd.concat(dff)
-        dff['DayOfWeek'] = dff['DayOfWeek'].apply( fctChgDays )
-        dff=dff.sort('DayOfWeek')
-        myPandaUtilities.myLazyDispl(dff)
-        dfave = dff.groupby('DayOfWeek').mean() #
-        dfvar = dff.groupby('DayOfWeek').std() #
-        dfave.rename(columns={'Ride_load': 'mean'}, inplace=True) #
-        dfvar.rename(columns={'Ride_load': 'std'}, inplace=True) #
-        df = dfave.join(dfvar)
-        df = df.fillna(0.00000001)
-        myPandaUtilities.myLazyDispl(df) #Dframe)
-        print df.head(10)
-        plt.errorbar( dff['DayOfWeek'].unique(), df['mean'], df['std'], linestyle="dashed", marker="o",zorder=1)
-        plt.legend(loc='upper left') #'lower left'
-        plt.draw()
-
-    #---------------------------------------------------------------------------
-    def Finalize_plot(self):
-        pp = PdfPages(str(self.title)+str(self._line)+'.pdf') #'multipage.pdf')
-        pp.savefig()
-        pp.close()
-        P.show()
-
-
-################################################################################
-#	OLD Classes
-################################################################################
-
+                ##self.Ride_load = np.sort(self.data['Ride_load'].unique())
 
 
 class LoadQuestionAnalysis(DataAnalysis):
 
-        def __init__(self,dataFile):
+        def __init__(self):
                 #super(BayesSimple,self).__init__(testsample,featsSub)
-                DataAnalysis.__init__(self,dataFile)
-                self.rideLoad = np.sort(self.data['Ride_load'])
-                x = self.rideLoad
-                n, bins, patches = P.hist(x, 50, normed=1, histtype='stepfilled')
-                #fig = P.setp(patches, 'facecolor', 'grey', 'alpha', 0.75)
-                fig = P.setp(patches)
-                P.title('ride_load Distribution')
-                P.xlabel('ride_load')
-                P.ylabel('% distribution')
-                fig = P.draw() #figure()
-                pp = PdfPages('foo.pdf')
-                pp.savefig(fig)
-                P.show()
+                DataAnalysis.__init__(self)
 
 
-def update_line(hl, new_data):
-    hl.set_xdata(numpy.append(hl.get_xdata(), new_data))
-    hl.set_ydata(numpy.append(hl.get_ydata(), new_data))
-    plt.draw()
+
+def main():
+    pass
+
+if __name__ == '__main__':
+    main()
 
 
-class PaxLAnalysisine(DataAnalysis):
+dAnalys = DataAnalysis('q_result2.csv')
 
-    def __init__(self,dataFile):
-            DataAnalysis.__init__(self,dataFile)
+s = pd.Series([1,3,5,np.nan,6,8])
 
-            tmp=self.filter(1)
+dates = pd.date_range('20130101',periods=6)
+df = pd.DataFrame(np.random.randn(6,4),index=dates,columns=list('ABCD'))
+print df
 
-            days = [float(row[0]) for row in tmp]
-            avs = [float(row[1]) for row in tmp]
-            vars = [float(row[2]) for row in tmp]
+df2 = pd.DataFrame({ 'A' : 1.,
+                'B' : pd.Timestamp('20130102'),
+                'C' : pd.Series(1,index=range(4),dtype='float32'),
+                'D' : np.array([3] * 4,dtype='int32'),
+                'E' : 'foo' })
 
-            plt.plot(days, avs, linestyle="dashed")#, marker="o") #, color="green")
-            plt.plot(days, avs, linestyle="dashed")#, marker="o") #, color="green")
+print df2
 
-            plt.xticks(days)
-            plt.xlim(0.5,7.5)
-            plt.errorbar(days, avs, yerr=vars, linestyle="None", marker="None") #, color="green")
-            pl1=plt.draw()
-            P.show(pl1)
-            pl1 = self.run()
-            P.show(pl1)
 
-    def filter(self, lineId):
-        tmp = list()
-        for n_days,days in enumerate(self.DaysList):
-            val = self.data[(self.data.Trip_id==1) & (self.data.Line_id==lineId) & (self.data.DayOfWeek==days)]['Ride_load']
-            print "val.L", val
-            av = np.average(val)
-            var = np.average((val-av)**2)
-            tmp.append([n_days+1,av,math.sqrt(var)])
-        return tmp
+dff = pd.read_csv('query_result.csv', index_col=False, header=0)
+serie = dff.transpose()[0]
 
-    def run(self):
-        t_mp = list()
-        days = list()
-        avs = list()
+#print serie
+#print dff
+#**************************************************
 
-        hl, = plt.plot([], [])
-        for Num, line in enumerate([1,2]):
-            print Num, line
-            P.figure(Num)
-            P.title('ride_load Distribution'+str(Num+1))
-            P.xlabel('ride_load')
-            P.ylabel('% distribution')
-            tmp = self.filter(line)
-            days.append([float(row[0]) for row in tmp])
-            avs.append([float(row[1]) for row in tmp])
-            vars = [float(row[2]) for row in tmp]
+dfff = pd.read_csv('q_result2.csv')
+DaysList = np.sort(dfff['DayOfWeek'].unique())
+LineIdList = np.sort(dfff['Line_id'].unique())
 
-            plt.plot(days, avs, linestyle="dashed", marker="o", color="green")
-            #plt.xticks(days)
-            #plt.xlim(0.5,7.5)
-            #plt.errorbar(days, avs, yerr=vars, linestyle="None", marker="None", color="green")
-        return plt.draw()
+Ride_load = np.sort(dfff['Ride_load'].unique())
+
+#**************************************************
+
+
+
+
+print dfff.head()
+
+print "jakoub"
+print dfff[dfff['Trip_id']==16]
+print dfff[dfff['Trip_id']==16]['Reven']
+
+print "--------------------------------------------------------------"
+print dfff['Line_id']
+
+for i in dfff['Line_id'].unique():
+    print "iii", i
+
+print dfff['Line_id'].unique()[0]
+
+
+print dfff[(dfff.Line_id==1) & (dfff.DayOfWeek==8)] [['Reven','Rev_km']]
+
+print "jaja"
+#print dfff['DayOfWeek'].unique(), type(dfff['DayOfWeek'].unique())[['Reven','Rev_km']]
+
+
+DaysList = np.sort(dfff['DayOfWeek'].unique())
+
+for days in DaysList:
+    print dfff[(dfff.Line_id==1) & (dfff.DayOfWeek==days)]
+
+ddf = dfff[(dfff.Line_id==1) & (dfff.DayOfWeek==days)]
+print ddf[['Reven','Rev_km']].head()
+
+print "print---------------------------------------------"
+
+for days in DaysList:
+    print dfff[(dfff.Line_id==1) & (dfff.DayOfWeek==days)].head()
+
+print "***********************************************************"
+
+
+Ride_load = np.sort(dfff['Ride_load'])
+print Ride_load
+
+#ts = pd.Series(Ride_load)
+##ts = ts.cumsum()
+#ts.plot()
+#P.show()
+
+
+
+
+x=Ride_load
+
+# the histogram of the data with histtype='step'
+n, bins, patches = P.hist(x, 50, normed=1, histtype='stepfilled')
+P.setp(patches, 'facecolor', 'grey', 'alpha', 0.75)
+#P.figure()
+
+fig = P.figure()
+
+#with backend.backend_pdf.PdfPages('foo.pdf') as pdf:
+    # As many times as you like, create a figure fig and save it:
+    # When no figure is specified the current figure is saved
+#    pdf.savefig(fig)
+#    pdf.savefig()
+pp = PdfPages('foo.pdf')
+pp.savefig(fig)
+P.show()
+
+
+
+
+#print dfff.describe()
+
+
+    #[['Reven','Rev_km']]:
+    # print tmp
+#print dfff.Line_id[110]
+# Most operations in pandas can be accomplished with operator chaining (groupby, aggregate, apply, etc)
+# df.apply(lambda x: x.max() - x.min())
+
+#print dfff.dtypes
+#print dfff.describe()
+#print dfff.sort(columns='line_id')  #dfff.sort_index(axis=2, ascending=False)
+#print dfff.sort('line_id') #['line_id']
+
+#-------------------------------------------------------------------------------
+
+#print "dfff[0:3]",dfff[0:3]
+#print "dfff.iloc[Rev_km]",dfff['Rev_km']    #[:] #,1:5]  #.iloc[:,0:2]
+
+#s = pd.Series(np.random.randint(0,7,size=10))
+#print s
+#s.value_counts()
+
+#ddd = pd.DataFrame(np.random.randn(10, 4))
+#print ddd
+
+#-------------------------------------------------------------------------------

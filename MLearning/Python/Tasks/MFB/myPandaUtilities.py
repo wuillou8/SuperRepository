@@ -15,11 +15,14 @@ import pandas as pd
 
 def myLazyDispl(dframe):
     # Displays 10 els of the DataFrame head & tail
-    print dframe.head(5)
-    print "   ...  ...  ...   "
-    print dframe.tail(5)
+    if (dframe.shape[0] >= 10):
+        print dframe.head(5)
+        print "   ...  ...  ...   "
+        print dframe.tail(5)
+    else:
+        print dframe.head()
 
-def myfilter(df,arrFilter,arrFields):
+def myfilter(df,arrFilter,arrFields = []):
     # Filters the data frame:
     # Args:
     #   arg1: [arg1_00, arg1_01, ... , arg1_N0, arg1_N1] == the conditions on the fields (pairs are expected).
@@ -45,3 +48,9 @@ def myfilter(df,arrFilter,arrFields):
         return df
     else:
         return df[arrFields]
+
+def FilterInput(In, Range):
+    # check Input content against array of expected values
+    if (In not in Range):
+        sys.exit( "Comput Mode must be in " + str(Range))
+    return In
