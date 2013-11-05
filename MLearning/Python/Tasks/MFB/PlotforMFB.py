@@ -5,7 +5,7 @@
 # Author:      wuillou8
 #
 # Created:     28/10/2013
-# Copyright:   (c) wuiljai 2013
+# Copyright:   (c) wuillou8 2013
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
