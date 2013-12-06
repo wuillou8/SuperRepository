@@ -15,6 +15,7 @@ import sys, time
 
 import numpy as np
 from pandas import DataFrame
+import io.
 import pandas as pd
 
 
@@ -26,14 +27,15 @@ import math
 
 from matplotlib.backends.backend_pdf import PdfPages
 
-#-My own Packages --------------------------------------------------------------
 
+
+#-My own Packages --------------------------------------------------------------
 import myPandaUtilities
 import myPlotUtilities
 import PlotforMFB
 import myDataStudy
-import myNewAnalysis
 #-------------------------------------------------------------------------------
+
 
 
 def main():
@@ -44,16 +46,22 @@ if __name__ == '__main__':
 
 start = time.clock()
 
+#data = pd.read_hdf('MktDataTesting_Price_0.sdostest')
+
+#store = pd.io.pytables.HDFStore('MktDataTesting_Price_0.sdostest')
+
+
+print data.head()
+
 for run in ['Pax','Ride_load','Reven','Rev_km']:
     #myPlot = PlotforMFB.newPlotforMFB('q_result2.csv',run,'totRideLoadVSDayOfWeek','All Data: ','normal')
     #myPLot = PlotforMFB.newPlotforMFB('q_result2.csv',run,'totRideLoadVSDayOfWeek','Averaged Data: ','average')
     #myPLot = PlotforMFB.newPlotforMFB('q_result2.csv',run,'totRideLoadVSDayOfWeek','line: ','runline')
     print 'Run %s over' % run
 
-myStudyFiltered = myDataStudy.DataStudy('q_result2.csv','lineRel', 100)
-myNewAnalysis = myNewAnalysis.NewAnalysis(myStudyFiltered)
+#myStudy = myDataStudy.DataStudy('q_result2.csv','lineRel')
 
 #print PlotforMFB.fctChgDays(1)
-print( "---*-Run took %s seconds " % ( time.clock() - start ) )
+#print( "---*-Run took %s seconds " % ( time.clock() - start ) )
 #P.show()
 sys.exit(0)

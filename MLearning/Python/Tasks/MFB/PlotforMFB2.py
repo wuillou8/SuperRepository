@@ -29,7 +29,8 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 import myPandaUtilities
 import myPlotUtilities
-#------------------------------------------------------
+#import PlotforMFB
+#-------------------------------------------------------------------------------
 
 
 
@@ -97,8 +98,8 @@ class DataAnalysis:
 class newPlotforMFB(DataAnalysis):
     # plot Attribute against DayOfWeek
     def __init__( self,dataFile,TestedAttr,title,titleCompl, compumode ):
-            DataAnalysis.__init__( self, dataFile )
-            self.testAttr = myPandaUtilities.FilterInput( TestedAttr, ['Pax','Ride_load','Reven','Rev_km'] ) # Attribute plotted
+            DataAnalysis.__init__( self,dataFile )
+            self.testAttr = myPandaUtilities.FilterInput( TestedAttr, ['Pax','Ride_load','Reven','Rev_km'] ) #['Line_id','Trip_id',] )  # Attribute plotted
             self.title = title # plot title
             self.titleCompl = titleCompl # plot title complement
 
@@ -196,7 +197,7 @@ class newPlotforMFB(DataAnalysis):
             dfave = dframe.groupby('DayOfWeek').mean() #
             dfvar = dframe.groupby('DayOfWeek').std() #
             dfave.rename(columns={str(self.testAttr): 'mean'}, inplace=True) #
-            dfvar.rename(columns={str(self.testAttr): 'std'}, inplace=True)
+            dfvar.rename(columns={str(self.testAttr): 'std'}, inplace=True) #
             df = dfave.join(dfvar)
             df = df.fillna(0.00000001)
             plt.errorbar( dframe['DayOfWeek'].unique(), df['mean'], df['std'], linestyle="dashed", marker="o", zorder=1 )

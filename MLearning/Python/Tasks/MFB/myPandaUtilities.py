@@ -5,10 +5,9 @@
 # Author:      wuillou8
 #
 # Created:     25/10/2013
-# Copyright:   (c) wuillou8 2013
+# Copyright:   (c) wuiljai 2013
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
-
 import sys
 import numpy as np
 import pandas as pd
