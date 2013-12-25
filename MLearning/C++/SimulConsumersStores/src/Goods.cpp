@@ -1,4 +1,5 @@
 #include <assert.h>
+
 #include "Goods.h"
 #include "Random.h"
 
@@ -9,8 +10,15 @@ Goods::Goods(double price, size_t categ, size_t label): // Goods(double price, i
 		price(price), categ(categ), label(label)
 {}
 
-/*Goods::~Goods()
-{}*/
+Goods::~Goods()
+{}
+
+void Goods::describeMyself() {
+	cout << "class Goods" << endl;
+	cout << "price " << price << endl;
+	cout << "categ " << categ << endl;
+	cout << "label " << label << endl;
+}
 
 Market::Market(size_t Ngoods): 
 	Ngoods(Ngoods)
@@ -18,8 +26,17 @@ Market::Market(size_t Ngoods):
 	market = MakeMarket(Ngoods);
 }
 
-/*Market::~Market()
- {}*/
+Market::~Market()
+{}
+
+void Market::describeMyself() {
+	cout << "class Market" << endl;
+	cout << "Ngoods " << Ngoods << endl;
+	for (size_t i = 0; i < market.size(); ++i) {
+		cout << "market " << i;
+		market[i].describeMyself();
+	}
+}
 
 const Goods randGoods(size_t label, double var = 0.)
 {

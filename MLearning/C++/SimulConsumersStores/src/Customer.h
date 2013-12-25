@@ -1,32 +1,57 @@
 #pragma once 
 
 #include <vector>
+#include <cstddef>
+#include <vector>
 
 #include "LocTimeGrid.h"
 #include "Random.h"
+#include "Goods.h"
+#include "Stores.h"
 
-namespace Customers
-{
-//const size_t NHPars = 2; //number hidden paramters
+namespace Customers {
+//number hidden parameters characterising a customer Util. function
+const size_t NHPars = 1;
 
-class Customer
-{
+class Customer {
 public:
-	Customer(LocTimeGrid::Space loc, std::vector<double> utilparams);
+	Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, std::vector<double> utilparams);
+	Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, std::vector<double> utilparams, double priceresist,  double cons_threshold);
 	virtual ~Customer();
-	
-	//double Money;
-	LocTimeGrid::Space locSpace;
+
+	LocTimeGrid::Space posSpace;
+	LocTimeGrid::Time posTime;
 	std::vector<double> utilparams;
-	
+	double priceresist;
+	double cons_threshold;
+	void describeMyself();
+};
+
+class Customers {
+public:
+	Customers(size_t Ncustomers, std::vector<Customer> customers);
+	virtual ~Customers();
+
+	size_t Ncustomers;
+	std::vector<Customer> customers;
+	void describeMyself();
 };
 
 /*template <LocTimeGrid::Space locSpace,int Nb>
-class CustomerClusters
-{};*/
+ class CustomerClusters
+ {};*/
 
-Customer randCustomer( size_t NHparms ); 
-inline double logit( double x );
-//inline double utilityFct( , double x );
-//I have been listening while working to the radio today and I focussed about the decline of the western civilization, from both french an american sides.
+Customer randCustomer(bool timedOrNot, size_t NHparms);
+Customers MakeCustomers(size_t Ncustos, const Goods::Market& market);
+
+inline double logit(double x);
+inline double distanceFct(double x);
+inline double utilityFct(const Customer& custo, const Goods::Goods& good,
+		const Supply::Store& store);
+
+std::vector<Supply::Store> findGoodInStore(int& label,
+		const Supply::Stores& stores);
+void CustomerPickAStore(int& label, const Customer& custo,
+		const Supply::Stores& stores);
+
 }

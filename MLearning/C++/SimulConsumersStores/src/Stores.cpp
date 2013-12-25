@@ -1,4 +1,6 @@
 #include <assert.h>
+#include <stdlib.h>
+
 #include "Stores.h"
 
 using namespace std;
@@ -7,39 +9,67 @@ namespace Supply
 {
 
 Store::Store(LocTimeGrid::Space posSpace):
-	posSpace(posSpace)
+	posSpace(posSpace), Nstock(), thresholds(), prices(),\
+	stocks(), labels(), storeGoods(), storelabel()
 {}
 
 Store::Store(LocTimeGrid::Space posSpace, size_t Nstock):
-	posSpace(posSpace), Nstock(Nstock)
+	posSpace(posSpace), Nstock(Nstock), thresholds(), prices(),\
+	stocks(), labels(), storeGoods(), storelabel()
 {}
 
 Store::Store(LocTimeGrid::Space posSpace, size_t thresholds, std::vector<double> prices):
-	posSpace(posSpace), thresholds(thresholds), prices(prices)
+	posSpace(posSpace), Nstock(), thresholds(thresholds), prices(prices),\
+	stocks(), labels(), storeGoods(), storelabel()
 {}
 
-Store::Store(LocTimeGrid::Space posSpace, size_t thresholds, std::vector<double> prices,\
-				std::vector<size_t> stocks, std::vector<int> labels, std::vector<Goods::Goods> storeGoods):
-			posSpace(posSpace), thresholds(thresholds), prices(prices),\
-						stocks(stocks), labels(labels), storeGoods(storeGoods)
+Store::Store(LocTimeGrid::Space posSpace, size_t Nstock, size_t thresholds, std::vector<double> prices,\
+				std::vector<size_t> stocks, std::vector<int> labels, std::vector<Goods::Goods> storeGoods, size_t storelabel):
+			posSpace(posSpace), Nstock(Nstock), thresholds(thresholds), prices(prices),\
+						stocks(stocks), labels(labels), storeGoods(storeGoods), storelabel(storelabel)
 {}
 
 Store::~Store()
 {}
 
-Stores::Stores(size_t NStores):
-	NStores(NStores)
+void Store::describeMyself() {
+	cout << "class Store" << endl;
+	posSpace.describeMyself();
+	cout << "Nstock " << Nstock << endl;
+	cout << "thresholds " << thresholds << endl;
+	cout << "storelabel " << storelabel << endl;
+	for (size_t i = 0; i < prices.size(); ++i) {
+		cout << "prices " << i << " " << prices[i] << endl;
+		cout << "stocks " << i << " " << stocks[i] << endl;
+		cout << "labels " << i << " " << labels[i] << endl;
+	}
+	for (size_t i = 0; i < storeGoods.size(); ++i) {
+		cout << "objs " << i << endl;
+		storeGoods[i].describeMyself();
+	}
+}
+
+Stores::Stores(size_t Nstores):
+	Nstores(Nstores)
 {}
 
-Stores::Stores(size_t NStores, std::vector<Store> stores):
-	NStores(NStores), stores(stores)
+Stores::Stores(size_t Nstores, std::vector<Store> stores) :
+	Nstores(Nstores), stores(stores)
 {}
 
 Stores::~Stores()
 {}
 
-const Store randStore(const Goods::Market& market) //, double percentage) //size_t label, double var = 0.)
-{
+void Stores::describeMyself() {
+	cout << "class Stores" << endl;
+	cout << "Nstores" << Nstores << endl;
+	for (size_t i = 0; i < stores.size(); ++i) {
+		cout << "stores " << i << endl;
+		stores[i].describeMyself();
+	}
+}
+
+const Store randStore(const Goods::Market& market, size_t& label) {
 	
 	size_t Ngoods = market.Ngoods;
 	Random<int> shopSize(Ngoods); 										//ngoods < Ngoods
@@ -53,32 +83,40 @@ const Store randStore(const Goods::Market& market) //, double percentage) //size
 						Goods::GetStore(market, (size_t)shopSize.random[0]);
 	std::vector<int> labels;
 	
-	for (size_t i = 0 ; i < storeGoods.size(); ++i)
-	{
+	for (size_t i = 0 ; i < storeGoods.size(); ++i)	{
 		cout << i << " " << /*storeGoods.<<*/ endl;
 		deltaprices.push_back( pricesVar.random[i] - 0.5 );
 		labels.push_back( storeGoods[i].label );
 	}
 	
-	return Store( pos, threshold, deltaprices, stocks, labels, storeGoods);
+	return Store( pos, shopSize.random[0], threshold, deltaprices, stocks, labels, storeGoods, label);
 }
 
-inline bool findinStore(int& label, Store& store)
-{
-	for (size_t i = 0 ; i < store.Nstock; ++i)
-	{
-		if ( label  == store.storeGoods[i].label )
-		{return true; break;}
+bool findInStore(int& label, Store& store) {
+	for (size_t i = 0 ; i < store.Nstock; ++i) {
+		if ( label  == store.storeGoods[i].label ) {
+			return true;
+			break;
+		}
 	}
 	return false;
 }	
 
-Stores MakeSupply(const Goods::Market& market, size_t Nstores)
-{
+double priceInStore(int& label, Store& store) {
+	for (size_t i = 0 ; i < store.Nstock; ++i) {
+		if ( label  == store.storeGoods[i].label ) {
+			return store.storeGoods[i].price;
+			break;
+		}
+	}
+	cout << " ERROR from Supply::priceInStore : goods with label expected" << endl;
+	exit (EXIT_FAILURE);
+}
+
+Stores MakeSupply(size_t Nstores, const Goods::Market& market) {
 	std::vector<Store> stores;
-	for (size_t i = 0; i < Nstores; ++i)
-	{
-		stores.push_back( randStore(market) );
+	for (size_t i = 0; i < Nstores; ++i) {
+		stores.push_back( randStore(market, i) );
 	}
 	return Stores(Nstores, stores);
 }
