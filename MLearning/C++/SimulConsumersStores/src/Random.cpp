@@ -9,12 +9,12 @@ namespace QuickRandom
 {
 //Generates random double between [0,m]
 double randf(double m)
-{        return m * rand() / (RAND_MAX - 1.);
+{        return (double)m * rand() / (RAND_MAX - 1.);
 }
 
 //Generates random int between [0,m]
 size_t randi(size_t m)
-{        return m * rand() / (RAND_MAX - 1.);
+{        return round( (size_t)m * rand() / (RAND_MAX - 1.) );
 }
 
 double Gaussian(double m, double sigma)

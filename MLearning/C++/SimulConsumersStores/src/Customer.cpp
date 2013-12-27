@@ -76,8 +76,8 @@ inline double distanceFct(double x) {
 
 inline double utilityFct( const Customer& custo, const Goods::Goods& good, const Supply::Store& store ) {
 	double utilFct = -custo.priceresist*good.price;
-	const double dist = LocTimeGrid::distance(store.posSpace, custo.posSpace);
-	for (size_t i = 0; i < NHPars; ++i) {
+	const double dist = LocTimeGrid::distance( store.posSpace, custo.posSpace );
+	for ( size_t i = 0; i < NHPars; ++i ) {
 		utilFct += distanceFct( custo.utilparams[i]*dist );
 	}
 	return utilFct;
@@ -85,33 +85,33 @@ inline double utilityFct( const Customer& custo, const Goods::Goods& good, const
 
 std::vector<Supply::Store> findGoodInStore( const Goods::Goods& good, const Supply::Stores& stores ) {
 	std::vector<Supply::Store> foundInStores;
-	LocTimeGrid::Space space(0,0);
-	Supply::Store store(space);
+	LocTimeGrid::Space space( 0, 0 );
+	Supply::Store store( space );
 	int label = good.label;
 	double found;
 	for (size_t i = 0; i < stores.Nstores; ++i) {
 		store = stores.stores[i];
-		found = Supply::findInStore(label, store);
+		found = Supply::findInStore( label, store );
 		if( found ) {
-			foundInStores.push_back(stores.stores[i]);
+			foundInStores.push_back( stores.stores[i] );
 		}
 	}
 	return foundInStores;
 }
 
-void CustomerPickAStore( const Goods::Goods& good /*int& goodlabel*/ , const Customer& custo, const Supply::Stores& stores ) {
+size_t CustomerPickAStore( const Customer& custo, const Goods::Goods& good, const Supply::Stores& stores ) {
 	std::vector<Supply::Store> found = findGoodInStore( good, stores );
 	double util = 0., tmp;
-	Random<double> randnoise(found.size(),0.5); //approx iid values
+	Random<double> randnoise( found.size(), 0.5 ); //approx iid values
 	size_t whichOne = 0;
 	for (size_t i = 0 ; i < found.size(); ++i ) {
-		tmp = utilityFct(custo, good, found[i]) + randnoise.random[i];
+		tmp = utilityFct( custo, good, found[i] ) + randnoise.random[i];
 		if ( tmp > util ) {
 			util = tmp;
 			whichOne = i;
 		}
 	}
-	std::cout << "this one " << whichOne << std::endl;
+	return whichOne;
 }
 
 }

@@ -1,7 +1,4 @@
-#include <assert.h>
-
 #include "Goods.h"
-#include "Random.h"
 
 namespace Goods
 {
@@ -38,29 +35,25 @@ void Market::describeMyself() {
 	}
 }
 
-const Goods randGoods(size_t label, double var = 0.)
-{
+const Goods randGoods(size_t label, double var = 0.) {
 	size_t categ = 1;
 	Random<double> randPrice(1.*label);
 	double price = var * ( randPrice.random[0] - 0.5 ) + label;
-	return Goods( price, categ, label);
+	return Goods( fabs(price), categ, label);
 }
 
-std::vector<Goods> MakeMarket(size_t NGoods)
-{
+std::vector<Goods> MakeMarket(size_t NGoods) {
 	std::vector<Goods> market;
 	Goods good = randGoods(1);
-	for(size_t i = 0; i < NGoods; ++i)
-	{
-		good = randGoods(i);
+	for(size_t i = 0; i < NGoods; ++i) {
+		good = randGoods(i, 0.5);
 		market.push_back(good);
 	}
 	return market;
 }
 
-std::vector<Goods> GetStore(const Market& market, size_t nGoods)
-{
-	assert(nGoods < market.Ngoods); // check that the Nb goods_store < Nb Goods_market
+std::vector<Goods> GetStore(const Market& market, size_t nGoods) {
+	//assert(nGoods < market.Ngoods); // check that the Nb goods_store < Nb Goods_market
 	std::vector<Goods> GetStore;
 	std::vector<Goods> my_market = market.market;
 	Random<int> rando(nGoods,nGoods);

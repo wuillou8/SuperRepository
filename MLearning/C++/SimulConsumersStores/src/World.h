@@ -28,8 +28,9 @@ public:
 	Customers::Customers customs;
 	Supply::Stores stores;
 	void describeMyself();
+	size_t t;
 
 };
 const World MakeMyWorld(size_t NgridT, size_t NgridX, size_t NgridY, size_t Ngoods, size_t Ncustoms, size_t Nstores);
-
+World& TimeSweep(World& world);
 }

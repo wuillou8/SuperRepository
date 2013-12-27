@@ -2,6 +2,10 @@
 
 #include <cstddef> 
 #include <vector>
+#include <assert.h>
+#include <math.h>
+
+#include "Random.h"
 
 namespace Goods {
 //const size_t NNgoods = 10;
@@ -15,8 +19,7 @@ public:
 	int categ;
 	int label;
 	void describeMyself();
-	//int complements, substuitutes;
-	//latency
+	//int complements, substitutes;	//latency
 };
 
 class Market {

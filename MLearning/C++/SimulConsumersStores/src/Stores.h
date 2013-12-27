@@ -45,10 +45,13 @@ public:
 	void describeMyself();
 };
 
-// create store positions
+//create store positions
 const Store randStore(const Goods::Market& market, size_t& label);
+Stores MakeSupply(size_t Nstores, const Goods::Market& market);
+void ShoppingInStore(int& label, Store& store);
+//"shopping" functionalities
 bool findInStore(int& label, Store& store);
 double priceInStore(int& label, Store& store);
-Stores MakeSupply(size_t Nstores, const Goods::Market& market);
+
 
 }

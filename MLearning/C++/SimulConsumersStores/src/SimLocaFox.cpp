@@ -17,7 +17,7 @@ using namespace std;
 int main() {
 
 	WORLD::World world = WORLD::MakeMyWorld( 100/*size_t NgridT*/, 100/*size_t NgridX*/, 100/*size_t NgridY*/, \
-													1/*size_t Ngoods*/, 10/*size_t Ncustoms*/, 3/*size_t Nstores*/);
+													1 /*size_t Ngoods*/, 10/*size_t Ncustoms*/, 3/*size_t Nstores*/);
 	world.describeMyself();
 
 	return 0;

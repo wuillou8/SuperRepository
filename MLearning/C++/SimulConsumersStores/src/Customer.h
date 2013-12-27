@@ -49,9 +49,8 @@ inline double distanceFct(double x);
 inline double utilityFct(const Customer& custo, const Goods::Goods& good,
 		const Supply::Store& store);
 
-std::vector<Supply::Store> findGoodInStore(int& label,
-		const Supply::Stores& stores);
-void CustomerPickAStore(int& label, const Customer& custo,
-		const Supply::Stores& stores);
+std::vector<Supply::Store> findGoodInStore(int& label, const Supply::Stores& stores);
+//bool GoShopping?(const Customrer& custo);
+size_t CustomerPickAStore( const Customer& custo, int& label, const Supply::Stores& stores );
 
 }
