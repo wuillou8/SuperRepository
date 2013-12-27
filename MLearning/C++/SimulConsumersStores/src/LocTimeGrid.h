@@ -1,16 +1,18 @@
 #pragma once 
 
-#include <cstddef> 
+#include <cstddef>
+#include <stdlib.h>
+#include <fstream>
 
 #include "Random.h"
 
 namespace LocTimeGrid {
 //Space-Time
-static size_t NgridT;
-static size_t NgridX;
-static size_t NgridY;
-
-
+	const static size_t NgridX = 100;
+	const static size_t NgridY = 100;
+	const static size_t NgridT = 100;
+	
+//template < size_t NgridX, size_t NgridY >
 class Space {
 public:
 	Space(size_t posX, size_t posY);
@@ -20,6 +22,7 @@ public:
 	// space-time grid 
 	size_t posX, posY;
 	void describeMyself();
+	void IOout( ofstream& ostream );
 };
 
 class Time {
@@ -30,25 +33,13 @@ public:
 	// space-time grid 
 	size_t time;
 	void describeMyself();
-};
-
-
-class SpaceTime {
-public:
-	SpaceTime( size_t gridT, size_t gridX, size_t gridY );
-	virtual ~SpaceTime();
-
-	size_t gridT;
-	size_t gridX;
-	size_t gridY;
-	/*Space space;
-	Time time;*/
+	void IOout( ofstream& ostream );
 };
 
 //spatial dist
 const double distance(const Space& guy1, const Space& guy2);
 //inline const double distance(const Space& guy1,const Space& guy2);
-const Time randTime(size_t shift);
-const Space randSpace(size_t shiftX, size_t shiftY);
 
+const Space randSpace(size_t shiftX, size_t shiftY);
+Time randTime(size_t shift);
 }

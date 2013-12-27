@@ -17,6 +17,10 @@ void Goods::describeMyself() {
 	cout << "label " << label << endl;
 }
 
+void Goods::IOout( ofstream& ostream ) {
+	ostream << label << " "<< price << " " ;
+}
+
 Market::Market(size_t Ngoods): 
 	Ngoods(Ngoods)
 {

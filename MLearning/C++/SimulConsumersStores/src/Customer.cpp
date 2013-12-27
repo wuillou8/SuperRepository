@@ -11,6 +11,10 @@ Customer::Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, std::vector<d
 		posSpace(loc), posTime(time), utilparams(utilparams), priceresist(priceresist), cons_threshold(cons_threshold)
 {}
 
+Customer::Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, std::vector<double> utilparams, double priceresist, double cons_threshold, size_t customer_number) :
+		posSpace(loc), posTime(time), utilparams(utilparams), priceresist(priceresist), cons_threshold(cons_threshold), customer_number(customer_number)
+{}
+
 Customer::~Customer()
 {}
 
@@ -23,6 +27,12 @@ void Customer::describeMyself() {
 	}
 	cout << "priceresist " << priceresist << endl;
 	cout << "cons_threshold " << cons_threshold << endl;
+	cout << "customer_number " << customer_number << endl;
+}
+
+void Customer::IOout( ofstream& ostream ) {
+	ostream << customer_number <<" ";
+	posSpace.IOout( ostream );
 }
 
 Customers::Customers(size_t Ncustomers, std::vector<Customer> customers) :
@@ -45,7 +55,7 @@ void Customers::describeMyself() {
  *	 		namespace Customers Functions
  */
 
-Customer randCustomer(  bool timedOrNot, size_t NHparms = NHPars ) {
+Customer randCustomer(  bool timedOrNot, size_t custo_number, size_t NHparms = NHPars ) {
 	LocTimeGrid::Space pos = LocTimeGrid::randSpace(0,0);
 	if(!timedOrNot) {
 		LocTimeGrid::Time time = LocTimeGrid::randTime(0);
@@ -55,13 +65,13 @@ Customer randCustomer(  bool timedOrNot, size_t NHparms = NHPars ) {
 	double priceresist = QuickRandom::randf(1.);
 	double consthreshold = QuickRandom::randf(1.);
 
-	return Customer(pos, time, utilparams.random, priceresist, consthreshold);
+	return Customer(pos, time, utilparams.random, priceresist, consthreshold, custo_number);
 }
 
 Customers MakeCustomers(size_t Ncustos, const Goods::Market& market) {
 	std::vector<Customer> custos;
 	for (size_t i = 0; i < Ncustos; ++i) {
-	custos.push_back( randCustomer(  true /*, Npars*/ ) );
+	custos.push_back( randCustomer(  true, i /*, Npars*/ ) );
 	}
 	return Customers(Ncustos, custos);
 }

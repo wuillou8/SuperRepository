@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <cstddef>
-#include <vector>
+#include <fstream>
 
 #include "LocTimeGrid.h"
 #include "Random.h"
@@ -17,6 +17,7 @@ class Customer {
 public:
 	Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, std::vector<double> utilparams);
 	Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, std::vector<double> utilparams, double priceresist,  double cons_threshold);
+	Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, std::vector<double> utilparams, double priceresist,  double cons_threshold, size_t customer_number);
 	virtual ~Customer();
 
 	LocTimeGrid::Space posSpace;
@@ -24,7 +25,9 @@ public:
 	std::vector<double> utilparams;
 	double priceresist;
 	double cons_threshold;
+	size_t customer_number;
 	void describeMyself();
+	void IOout( ofstream& ostream );
 };
 
 class Customers {
@@ -41,7 +44,7 @@ public:
  class CustomerClusters
  {};*/
 
-Customer randCustomer(bool timedOrNot, size_t NHparms);
+Customer randCustomer(bool timedOrNot, size_t custo_number, size_t NHparms);
 Customers MakeCustomers(size_t Ncustos, const Goods::Market& market);
 
 inline double logit(double x);
@@ -51,6 +54,6 @@ inline double utilityFct(const Customer& custo, const Goods::Goods& good,
 
 std::vector<Supply::Store> findGoodInStore(int& label, const Supply::Stores& stores);
 //bool GoShopping?(const Customrer& custo);
-size_t CustomerPickAStore( const Customer& custo, int& label, const Supply::Stores& stores );
+size_t CustomerPickAStore( const Customer& custo, const Goods::Goods& good, const Supply::Stores& stores );
 
 }

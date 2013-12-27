@@ -1,6 +1,8 @@
 #pragma once
 
+#include <iostream>
 #include <cstddef>
+#include <stdlib.h>
 
 #include "LocTimeGrid.h"
 #include "Random.h"
@@ -8,12 +10,17 @@
 #include "Stores.h"
 #include "Customer.h"
 
+using namespace std;
+
 namespace WORLD {
 
 class World {
 public:
 	World(size_t NgridT, size_t NgridX, size_t NgridY, size_t Ngoods, size_t Ncustoms, size_t Nstores, \
-				const Goods::Market& market, const Customers::Customers& customs, const Supply::Stores& stores);
+				Goods::Market& market, Customers::Customers& customs, Supply::Stores& stores,\
+						ofstream& DBcustomers, ofstream& DBstores);
+	/*World( const World& world, const ofstream& DBcustomers, const ofstream& DBstores );*/
+	World( const World& other );
 	virtual ~World();
 
 	//SpaceTime grid
@@ -27,10 +34,14 @@ public:
 	Goods::Market market;
 	Customers::Customers customs;
 	Supply::Stores stores;
-	void describeMyself();
+	ofstream DBcustomers;
+	ofstream DBstores;
 	size_t t;
-
+	void describeMyself();
 };
-const World MakeMyWorld(size_t NgridT, size_t NgridX, size_t NgridY, size_t Ngoods, size_t Ncustoms, size_t Nstores);
+
+const World MakeMyWorld(size_t NgridT, size_t NgridX, size_t NgridY, size_t Ngoods, size_t Ncustoms, size_t Nstores, ofstream& DBcustomers, ofstream& DBstores);
+const World MakeMyDBase( World& world, ofstream& DBcustomers, ofstream& DBstores );
+void RunWorldStory( World& world ); //, ofstream& DBcustomers, ofstream& DBstores );
 World& TimeSweep(World& world);
 }

@@ -4,6 +4,7 @@
 #include <vector>
 #include <assert.h>
 #include <math.h>
+#include <fstream>
 
 #include "Random.h"
 
@@ -19,6 +20,7 @@ public:
 	int categ;
 	int label;
 	void describeMyself();
+	void IOout( ofstream& ostream );
 	//int complements, substitutes;	//latency
 };
 
