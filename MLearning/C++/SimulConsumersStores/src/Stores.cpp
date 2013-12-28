@@ -22,7 +22,7 @@ Store::Store(LocTimeGrid::Space posSpace, size_t thresholds, std::vector<double>
 {}
 
 Store::Store(LocTimeGrid::Space posSpace, size_t Nstock, size_t thresholds, std::vector<double> prices,\
-				std::vector<size_t> stocks, std::vector<int> labels, std::vector<Goods::Goods> storeGoods, size_t storelabel):
+				std::vector<size_t> stocks, std::vector<int> labels, std::vector<Goods::Goods> storeGoods, size_t store_number):
 			posSpace(posSpace), Nstock(Nstock), thresholds(thresholds), prices(prices),\
 						stocks(stocks), labels(labels), storeGoods(storeGoods), store_number(store_number)
 {}
@@ -47,11 +47,10 @@ void Store::describeMyself() {
 	}
 }
 
-void Store::IOout( ofstream& ostream, size_t time ) {
-	for (size_t i = 0; i < Nstock /*prices.size()*/; ++i) {
-		ostream << time << " " << store_number << " " << labels[i] << " " << prices[i] << " " << stocks[i] << " ";
+void Store::IOout( ofstream& ostream ) {
+	for (size_t i = 0; i < Nstock; ++i) {
+		ostream << store_number /*<< " " << i*/ << ", " << labels[i] << ", " << prices[i] << ", " << stocks[i] << ", ";
 		posSpace.IOout(ostream); 
-		ostream << endl;
 	}
 }
 

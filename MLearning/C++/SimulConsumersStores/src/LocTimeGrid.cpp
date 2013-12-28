@@ -24,7 +24,7 @@ void Space::describeMyself(  ) {
 }
 
 void Space::IOout( ofstream& ostream ) {
-	ostream << posX<<" "<<posY<<" ";
+	ostream << posX<<", "<<posY<<", ";
 }
 
 Time::Time(size_t time) :
@@ -41,7 +41,7 @@ void Time::describeMyself() {
 }
 
 void Time::IOout( ofstream& ostream ) {
-	ostream << time << " ";
+	ostream << time << ", ";
 }
 
 const double distance( const Space& guy1, const Space& guy2) {
@@ -50,15 +50,9 @@ const double distance( const Space& guy1, const Space& guy2) {
 
 const Space randSpace(size_t shiftX = 0, size_t shiftY = 0) {
 	//if squared grid
-	/*Random<int> randSpaceX((int)NgridX);
-	Random<int> randSpaceY((int)NgridY);*/
-	size_t randSpaceX = QuickRandom::randi(NgridX);
-	size_t randSpaceY = QuickRandom::randi(NgridY);
-	/*cout << "randSpaceX_ " << randSpaceX.random[0] << endl;
-	cout << "randSpaceY_ " << randSpaceY.random[0] << endl;
-	cout << "randSpaceX__ " << (size_t)randSpaceX.random[0] << endl;
-	cout << "randSpaceY__ " << (size_t)randSpaceY.random[0] << endl;*/
-	cout << "rand__________________" << randSpaceX << " " << randSpaceY << endl;
+	size_t randSpaceX = QuickRandom::randi( NgridX );
+	size_t randSpaceY = QuickRandom::randi( NgridY );
+	//cout << NgridX <<" rand__________________" << randSpaceX << " " << randSpaceY << endl;
 	return Space( (randSpaceX + shiftX) % NgridX, (randSpaceY + shiftY) % NgridX );
 	/*else
 	Random<size_t> randSpaceX(Nxgrid);

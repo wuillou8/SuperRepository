@@ -17,9 +17,9 @@ using namespace std;
 
 int main() {
 
-	ifstream myInfile ("example.txt");
-	ofstream myfileStore ("DBstore.txt");
-	ofstream myfileCustoms ("DBcustoms.txt");
+	ifstream myInfile ("InitializeSim.txt");
+	ofstream myfileStore ("../DBases/Data/DBstore.txt");
+	ofstream myfileCustoms ("../DBases/Data/DBcustoms.txt");
 /*	 if (myfile.is_open())
 	  {
 	    while ( getline (myfile,line) )
@@ -34,14 +34,14 @@ int main() {
 	LocTimeGrid::NgridY = 100;*/
 	
 	WORLD::World world = WORLD::MakeMyWorld( 100/*size_t NgridT*/, 100/*size_t NgridX*/, 100/*size_t NgridY*/, \
-												1 /*size_t Ngoods*/, 10/*size_t Ncustoms*/, 5/*size_t Nstores*/, \
-													myfileCustoms, myfileStore);
+													1 /*size_t Ngoods*/, 10/*size_t Ncustoms*/, 5/*size_t Nstores*/);
+															//myfileCustoms, myfileStore);
 	world.describeMyself();
 	
 	cout << "-----------------------" << endl;
 	//WORLD::MakeMyDBase( world, myfileCustoms, myfileStore );
 	//world = WORLD::TimeSweep(world);
-	WORLD::RunWorldStory( world );
+	WORLD::RunWorldStory( world, myfileCustoms, myfileStore );
 
 	myInfile.close();
 	myfileStore.close();

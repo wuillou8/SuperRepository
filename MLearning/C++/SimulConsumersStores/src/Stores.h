@@ -34,7 +34,7 @@ public:
 	size_t store_number;
 	
 	void describeMyself(); // not complete yet
-	void IOout( ofstream& ostream, size_t time );
+	void IOout( ofstream& ostream );
 	
 };
 

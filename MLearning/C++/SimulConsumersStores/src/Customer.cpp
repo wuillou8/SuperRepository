@@ -31,7 +31,7 @@ void Customer::describeMyself() {
 }
 
 void Customer::IOout( ofstream& ostream ) {
-	ostream << customer_number <<" ";
+	ostream << customer_number <<", ";
 	posSpace.IOout( ostream );
 }
 
