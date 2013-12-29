@@ -3,16 +3,16 @@
 
 namespace Customers {
 
-Customer::Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, std::vector<double> utilparams) :
-		posSpace(loc), posTime(time), utilparams(utilparams), priceresist(), cons_threshold()
+Customer::Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, double utilparam) :
+		posSpace(loc), posTime(time), utilparam(utilparam), priceresist(), cons_threshold(), customer_number()
 {}
 
-Customer::Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, std::vector<double> utilparams, double priceresist, double cons_threshold) :
-		posSpace(loc), posTime(time), utilparams(utilparams), priceresist(priceresist), cons_threshold(cons_threshold)
+Customer::Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, double utilparam, double priceresist, double cons_threshold) :
+		posSpace(loc), posTime(time), utilparam(utilparam), priceresist(1.), cons_threshold(cons_threshold), customer_number()
 {}
 
-Customer::Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, std::vector<double> utilparams, double priceresist, double cons_threshold, size_t customer_number) :
-		posSpace(loc), posTime(time), utilparams(utilparams), priceresist(priceresist), cons_threshold(cons_threshold), customer_number(customer_number)
+Customer::Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, double utilparam, double priceresist, double cons_threshold, size_t customer_number) :
+		posSpace(loc), posTime(time), utilparam(utilparam), priceresist(1.), cons_threshold(cons_threshold), customer_number(customer_number)
 {}
 
 Customer::~Customer()
@@ -22,9 +22,7 @@ void Customer::describeMyself() {
 	cout << "class Customer" << endl;
 	posSpace.describeMyself();
 	posTime.describeMyself();
-	for (size_t i = 0; i < utilparams.size(); ++i) {
-		cout << "utilparams " << i << " " << utilparams[i] << endl;
-	}
+	cout << "utilparam " << utilparam << endl;
 	cout << "priceresist " << priceresist << endl;
 	cout << "cons_threshold " << cons_threshold << endl;
 	cout << "customer_number " << customer_number << endl;
@@ -61,11 +59,11 @@ Customer randCustomer(  bool timedOrNot, size_t custo_number, size_t NHparms = N
 		LocTimeGrid::Time time = LocTimeGrid::randTime(0);
 	}
 	LocTimeGrid::Time time(0);
-	Random<double> utilparams(NHparms,1.);
+	double utilparam = QuickRandom::randf(1.);
 	double priceresist = QuickRandom::randf(1.);
-	double consthreshold = QuickRandom::randf(1.);
+	double const_threshold = QuickRandom::randf(1.);
 
-	return Customer(pos, time, utilparams.random, priceresist, consthreshold, custo_number);
+	return Customer(pos, time, utilparam, priceresist, const_threshold, custo_number);
 }
 
 Customers MakeCustomers(size_t Ncustos, const Goods::Market& market) {
@@ -76,8 +74,8 @@ Customers MakeCustomers(size_t Ncustos, const Goods::Market& market) {
 	return Customers(Ncustos, custos);
 }
 
-inline double logit( double x ) {
-	return exp(-x)/(1.+exp(-x));
+inline double logitFct( double x, double factor = 1. ) {
+	return exp(factor*x)/(1.+exp(factor*x));
 }
 
 inline double distanceFct(double x) {
@@ -85,12 +83,15 @@ inline double distanceFct(double x) {
 }
 
 inline double utilityFct( const Customer& custo, const Goods::Goods& good, const Supply::Store& store ) {
-	double utilFct = -custo.priceresist*good.price;
-	const double dist = LocTimeGrid::distance( store.posSpace, custo.posSpace );
-	for ( size_t i = 0; i < NHPars; ++i ) {
-		utilFct += distanceFct( custo.utilparams[i]*dist );
-	}
-	return utilFct;
+
+	double dist = LocTimeGrid::distance( store.posSpace, custo.posSpace );
+	double distNN = LocTimeGrid::distance( LocTimeGrid::Space( 0, 0 ), \
+							LocTimeGrid::Space( LocTimeGrid::NgridX, LocTimeGrid::NgridY ) );
+
+	double epsilon = QuickRandom::Gaussian( 1., 0.1 );
+	double priceInStore = store.getPriceWithLabel( good.label );
+	return custo.utilparam*(1-dist/distNN) - custo.priceresist*good.price*priceInStore \
+					+ epsilon;
 }
 
 std::vector<Supply::Store> findGoodInStore( const Goods::Goods& good, const Supply::Stores& stores ) {
@@ -110,18 +111,35 @@ std::vector<Supply::Store> findGoodInStore( const Goods::Goods& good, const Supp
 }
 
 size_t CustomerPickAStore( const Customer& custo, const Goods::Goods& good, const Supply::Stores& stores ) {
-	std::vector<Supply::Store> found = findGoodInStore( good, stores );
-	double util = 0., tmp;
-	Random<double> randnoise( found.size(), 0.5 ); //approx iid values
-	size_t whichOne = 0;
-	for (size_t i = 0 ; i < found.size(); ++i ) {
-		tmp = utilityFct( custo, good, found[i] ) + randnoise.random[i];
-		if ( tmp > util ) {
-			util = tmp;
-			whichOne = i;
-		}
+	std::vector<Supply::Store> storesfound = findGoodInStore( good, stores );
+	std::vector<double> storeweights;
+	for ( size_t i = 0 ; i < storesfound.size(); ++i ) {
+		storeweights.push_back( logitFct( utilityFct( custo, good, storesfound[i] ) ) );
 	}
-	return whichOne;
+	return decision( storeweights );
+
+}
+
+inline size_t decision( const std::vector<double>& storeweights ) {
+	double proba = 0.;
+	double wNorm = weightNorm( storeweights );
+	double choice = QuickRandom::randf(1.);
+	for ( size_t i = 0 ; i < storeweights.size(); ++i ) {
+			proba += storeweights[i]/wNorm;
+			//cout <<i<<" "<<storeweights[i]/wNorm<<" check proba"<<choice<<" "<<proba<<" "<<storeweights.size()<< endl;
+			if( choice < proba )
+			{	return i;	}
+		}
+	cout << " ERROR from Costumers::decision : probability not correclty handed" << endl;
+	exit (EXIT_FAILURE);
+}
+
+inline double weightNorm( const std::vector<double>& storeweights ) {
+	double wNorm = 0.;
+	for ( size_t i = 0 ; i < storeweights.size(); ++i ) {
+		wNorm += storeweights[i];
+	}
+	return wNorm;
 }
 
 }

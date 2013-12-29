@@ -54,6 +54,16 @@ void Store::IOout( ofstream& ostream ) {
 	}
 }
 
+const double Store::getPriceWithLabel( int label ) const {
+	for( size_t i = 0; i < labels.size(); ++i ) {
+		if ( labels[i] == label ) {
+			return prices[i];
+		}
+	}
+	cout<<" ERROR from Supply::Store::getPriceWithLabel : label not found"<<endl;
+	exit (EXIT_FAILURE);
+}
+
 Stores::Stores(size_t Nstores):
 	Nstores(Nstores)
 {}
@@ -74,26 +84,26 @@ void Stores::describeMyself() {
 	}
 }
 
-const Store randStore(const Goods::Market& market, size_t& label) {
+const Store randStore(const Goods::Market& market, size_t& storeNumber) {
 	//threshold fixed ...
 	//stockInit fixed ...
 	size_t Ngoods = market.Ngoods;
 	size_t shopSize = QuickRandom::randi(Ngoods);			//ngoods <= Ngoods
 	shopSize = 1;  /* to be changged later ... current simulation only */
 	LocTimeGrid::Space pos = LocTimeGrid::randSpace( LocTimeGrid::NgridX, LocTimeGrid::NgridY ); 	//location
-	size_t threshold = 4; 	//Random<int> threshold(4);		//threshold
+	size_t threshold = QuickRandom::randi(4);				//threshold
 	Random<double> pricesVar(Ngoods,1.);					//prices changes
-	std::vector<double> deltaprices;
 	size_t stockNb = 20;									//init stocks
-	std::vector<size_t> stocks(shopSize,stockNb);			//stocks
+	std::vector<size_t> stocks((int)shopSize,(int)stockNb);			//stocks
 	std::vector<Goods::Goods> storeGoods = Goods::GetStore(market, shopSize);
+	std::vector<double> deltaprices;
 	std::vector<int> labels;
-	
 	for (size_t i = 0 ; i < storeGoods.size(); ++i)	{
-		deltaprices.push_back( pricesVar.random[i] - 0.5 );
+		// simulating price variations of 10%
+		deltaprices.push_back( QuickRandom::GaussianHull( pricesVar.random[i], 1, 0.1 ) );
 		labels.push_back( storeGoods[i].label );
 	}
-	return Store( pos, shopSize, threshold, deltaprices, stocks, labels, storeGoods, label);
+	return Store( pos, shopSize, threshold, deltaprices, stocks, labels, storeGoods, storeNumber);
 }
 
 Stores MakeSupply( size_t Nstores, const Goods::Market& market ) {
@@ -102,6 +112,13 @@ Stores MakeSupply( size_t Nstores, const Goods::Market& market ) {
 		stores.push_back( randStore(market, i) );
 	}
 	return Stores( Nstores, stores );
+}
+
+Stores AddStoreInMarket( Store& store, Stores& stores ) {
+	stores.Nstores++;
+	store.store_number = stores.Nstores;
+	stores.stores.push_back( store );
+	return stores;
 }
 
 void ShoppingInStore( int& label, Store& store ) {

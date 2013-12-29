@@ -15,8 +15,7 @@ namespace Supply {
 class Store {
 public:
 	Store( LocTimeGrid::Space posSpace );
-	Store( LocTimeGrid::Space posSpace, size_t thresholds,
-			std::vector<double> prices );
+	Store( LocTimeGrid::Space posSpace, size_t thresholds, std::vector<double> prices );
 	Store( LocTimeGrid::Space posSpace, size_t Nstock );
 	Store( LocTimeGrid::Space posSpace, size_t Nstock, size_t thresholds,
 			std::vector<double> prices, std::vector<size_t> stocks,
@@ -35,13 +34,14 @@ public:
 	
 	void describeMyself(); // not complete yet
 	void IOout( ofstream& ostream );
+	const double getPriceWithLabel( int label ) const;
 	
 };
 
 class Stores {
 public:
-	Stores(size_t Nstores);
-	Stores(size_t Nstores, std::vector<Store> stores);
+	Stores( size_t Nstores );
+	Stores( size_t Nstores, std::vector<Store> stores );
 	virtual ~Stores();
 
 	size_t Nstores;
@@ -50,11 +50,12 @@ public:
 };
 
 //create store positions
-const Store randStore(const Goods::Market& market, size_t& label);
-Stores MakeSupply(size_t Nstores, const Goods::Market& market);
-void ShoppingInStore(int& label, Store& store);
+const Store randStore( const Goods::Market& market, size_t& storeNumber );
+Stores MakeSupply( size_t Nstores, const Goods::Market& market );
+Stores AddStoreInMarket( Stores& stores );
+void ShoppingInStore( int& label, Store& store );
 //"shopping" functionalities
-bool findInStore(int& label, Store& store);
-double priceInStore(int& label, Store& store);
+bool findInStore( int& label, Store& store );
+double priceInStore( int& label, Store& store );
 
 }

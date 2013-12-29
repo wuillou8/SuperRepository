@@ -11,6 +11,7 @@ namespace QuickRandom {
 double randf(double m);
 size_t randi(size_t m);
 double Gaussian(double m, double sigma);
+double GaussianHull(double val, double m, double sigma);
 double ExpLaw(double m);
 }
 

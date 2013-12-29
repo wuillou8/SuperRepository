@@ -4,7 +4,7 @@ namespace Goods
 {
 
 Goods::Goods(double price, size_t categ, size_t label): // Goods(double price, int categ):
-		price(price), categ(categ), label(label)
+		price(1./*price*/), categ(categ), label(label)
 {}
 
 Goods::~Goods()
@@ -18,7 +18,7 @@ void Goods::describeMyself() {
 }
 
 void Goods::IOout( ofstream& ostream ) {
-	ostream << label << ", "<< price << ", " ;
+	ostream << label << ", "<< price << ", ";
 }
 
 Market::Market(size_t Ngoods): 
@@ -43,6 +43,7 @@ const Goods randGoods(size_t label, double var = 0.) {
 	size_t categ = 1;
 	Random<double> randPrice(1.*label);
 	double price = var * ( randPrice.random[0] - 0.5 ) + label;
+	//cout <<"DBG "<<price<<endl;
 	return Goods( fabs(price), categ, label);
 }
 

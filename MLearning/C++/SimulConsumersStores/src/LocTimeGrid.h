@@ -8,8 +8,8 @@
 
 namespace LocTimeGrid {
 //Space-Time
-	const static size_t NgridX = 100;
-	const static size_t NgridY = 100;
+	const static size_t NgridX = 1000;
+	const static size_t NgridY = 1000;
 	const static size_t NgridT = 100;
 	
 //template < size_t NgridX, size_t NgridY >

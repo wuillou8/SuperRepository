@@ -45,7 +45,7 @@ void Time::IOout( ofstream& ostream ) {
 }
 
 const double distance( const Space& guy1, const Space& guy2) {
-	return sqrt( (double)guy1.posX*guy2.posX + (double)guy1.posY*guy2.posY );
+	return	sqrt( pow((double)guy1.posX-(double)guy2.posX, 2) + pow((double)guy1.posY-(double)guy2.posY, 2) );
 }
 
 const Space randSpace(size_t shiftX = 0, size_t shiftY = 0) {

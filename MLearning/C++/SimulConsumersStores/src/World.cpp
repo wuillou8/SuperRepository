@@ -65,11 +65,12 @@ const World MakeMyWorld( size_t NgridT, size_t NgridX, size_t NgridY, \
 
 void RunWorldStory( World& world, ofstream& DBcustomers, ofstream& DBstores) {
 	//make headers
-	Utilities::printheaderDBCustomers( DBcustomers );
-	Utilities::printheaderDBCustomers( DBstores );
+	IO::printheaderDBCustomers( DBcustomers );
+	IO::printheaderDBCustomers( DBstores );
 	//run
 	for (size_t i = 0; i < LocTimeGrid::NgridT; ++i){
 		world = TimeSweep( world, DBcustomers, DBstores );
+		cout << "world pulse " << world.t << endl;
 	}
 	cout << "end: world pulse " << world.t << endl;
 }
