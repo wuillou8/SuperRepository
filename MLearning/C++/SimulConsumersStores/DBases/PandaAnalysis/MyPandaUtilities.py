@@ -41,15 +41,12 @@ def myfilter(df,arrFilter,arrFields = []):
         Usage:
         df = myfilter( dfff, ["Line_id",1,"Trip_id",1] == VOID, ['field1', 'field2'] == VOID) '''
 
-
     sizeFilter = len(arrFilter)
     sizeFields = len(arrFields)
-
 
     if np.mod(sizeFilter, 2) != 0:
         print ' wrong argument number passed '
         sys.exit(0)
-
 
     if sizeFilter != 0:
         #iterative filtering
@@ -57,7 +54,6 @@ def myfilter(df,arrFilter,arrFields = []):
             field1 = arrFilter[2*n_i]
             field2 = arrFilter[2*n_i+1]
             df = df[ df[field1] == field2 ]
-
 
     if sizeFields == 0:
         return df

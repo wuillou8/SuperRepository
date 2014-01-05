@@ -2,17 +2,23 @@
 
 #include <math.h>
 #include <cstdlib>
+#include <stdlib.h>
 #include <vector>
 #include <iostream>
+#include <time.h>
 
 using namespace std;
 
 namespace QuickRandom {
+
+void INITQuickRandom();
 double randf(double m);
 size_t randi(size_t m);
 double Gaussian(double m, double sigma);
 double GaussianHull(double val, double m, double sigma);
 double ExpLaw(double m);
+float box_mueller(float m, float s);
+
 }
 
 /*
@@ -55,3 +61,18 @@ Random<T>::Random(T range) :
 template<typename T>
 Random<T>::~Random() {
 }
+/*
+struct Ranbyte {
+
+	int s[256], i,j,ss;
+	size_t v;
+	Ranbyte(int u) {
+		v = pow(2244614371, u);
+		for (size_t i = 0; i < 256, i++) {s[i] = i;}
+		for (size_t i = 0; i < 256, i++) {
+			ss = s[i];
+			j = ( j + ss + (v >> 24)) & 
+		}
+		
+	}
+};*/

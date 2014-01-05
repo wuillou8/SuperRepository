@@ -21,17 +21,11 @@ void PrintOut(T bla) {
 }
 
 void printheaderDBCustomers( ofstream& ostream ) {
-	ostream<<"Time, GoodsNb, price, CustoNb, PosX_cust, PosY_cust, PosX_stor, PosY_stor, Dist"<<endl;
+	ostream<<"T, GoodsNb, price, categ, CustoNb, PosX_cust, PosY_cust, Nstore, PosX_stor, PosY_stor, Dist"<<endl;
 }
 
 void printheaderDBstores( ofstream& ostream ) {
-	ostream<<"Time, StoreNb, Label_good, Prices_stor, posX, posY"<<endl;
+	ostream<<"T, StoreNb, Label_good, Prices_stor, NInstock, PosX_stor, PosY_stor, buff"<<endl;
 }
 
 }
-/*
-IO::IO()
-{}
-IO::~IO()
-{}
-*/

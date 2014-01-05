@@ -9,21 +9,24 @@
 #include "Goods.h"
 #include "Stores.h"
 
+using namespace std;
+
 namespace Customers {
 //number hidden parameters characterising a customer Util. function
 const size_t NHPars = 1;
 
 class Customer {
 public:
-	Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, double utilparam);
-	Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, double utilparam, double priceresist,  double cons_threshold);
-	Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, double utilparam, double priceresist,  double cons_threshold, size_t customer_number);
+	Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time);
+	Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, double alpha);
+	Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, double alpha, double beta,  double cons_threshold);
+	Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, double alpha, double beta,  double cons_threshold, size_t customer_number);
 	virtual ~Customer();
 
 	LocTimeGrid::Space posSpace;
 	LocTimeGrid::Time posTime;
-	double utilparam;//std::vector<double>
-	double priceresist;
+	double alpha;
+	double beta; //priceresist;
 	double cons_threshold;
 	size_t customer_number;
 	void describeMyself();

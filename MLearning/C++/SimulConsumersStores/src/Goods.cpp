@@ -4,7 +4,7 @@ namespace Goods
 {
 
 Goods::Goods(double price, size_t categ, size_t label): // Goods(double price, int categ):
-		price(1./*price*/), categ(categ), label(label)
+		price( 1.*pow(5,categ) )/*price*/, categ(categ), label(label)
 {}
 
 Goods::~Goods()
@@ -18,13 +18,14 @@ void Goods::describeMyself() {
 }
 
 void Goods::IOout( ofstream& ostream ) {
-	ostream << label << ", "<< price << ", ";
+	ostream << label << ", "<< price << ", "<< categ << ", ";
 }
 
-Market::Market(size_t Ngoods): 
-	Ngoods(Ngoods)
+Market::Market( size_t Ngoods, size_t Ncategs = 1 ) :
+	Ngoods(Ngoods), Ncategs(Ncategs)
 {
-	market = MakeMarket(Ngoods);
+	market = MakeMarket( Ngoods, Ncategs );
+	Ngoods = Ngoods*Ncategs;
 }
 
 Market::~Market()
@@ -39,25 +40,25 @@ void Market::describeMyself() {
 	}
 }
 
-const Goods randGoods(size_t label, double var = 0.) {
-	size_t categ = 1;
-	Random<double> randPrice(1.*label);
+const Goods randGoods ( size_t label, size_t categ = 1, double var = 0. ) {
+	Random<double> randPrice( 1.*label );
 	double price = var * ( randPrice.random[0] - 0.5 ) + label;
-	//cout <<"DBG "<<price<<endl;
-	return Goods( fabs(price), categ, label);
+	return Goods( fabs(price), categ, label );
 }
 
-std::vector<Goods> MakeMarket(size_t NGoods) {
+std::vector<Goods> MakeMarket( size_t NGoods, size_t Ncategs = 1 ) {
 	std::vector<Goods> market;
 	Goods good = randGoods(1);
-	for(size_t i = 0; i < NGoods; ++i) {
-		good = randGoods(i, 0.5);
-		market.push_back(good);
+	for( size_t i = 0; i < NGoods; ++i ) {
+		for( size_t j = 0; j < Ncategs ; ++j ) {
+			good = randGoods( i, j, 0.5 );
+			market.push_back(good);
+		}
 	}
 	return market;
 }
 
-std::vector<Goods> GetStore(const Market& market, size_t nGoods) {
+std::vector<Goods> GetStore( const Market& market, size_t nGoods ) {
 	//assert(nGoods < market.Ngoods); // check that the Nb goods_store < Nb Goods_market
 	std::vector<Goods> GetStore;
 	std::vector<Goods> my_market = market.market;

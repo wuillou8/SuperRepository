@@ -27,7 +27,7 @@ public:
 	size_t Nstock;
 	size_t thresholds;
 	std::vector<double> prices;
-	std::vector<size_t> stocks; //nb of els in stock
+	std::vector<size_t> stocks; //Nb of Els in stock
 	std::vector<int> labels;
 	std::vector<Goods::Goods> storeGoods;
 	size_t store_number;
@@ -47,12 +47,15 @@ public:
 	size_t Nstores;
 	std::vector<Store> stores;
 	void describeMyself();
+	void AddStore( Store& store );
 };
 
 //create store positions
 const Store randStore( const Goods::Market& market, size_t& storeNumber );
+const Store MakeStore( LocTimeGrid::Space posSpace, size_t Nstock, size_t thresholds, \
+					   	   	   std::vector<double> prices, std::vector<size_t> stocks, std::vector<int> labels, \
+							   	   	   std::vector<Goods::Goods> storeGoods, size_t store_number );
 Stores MakeSupply( size_t Nstores, const Goods::Market& market );
-Stores AddStoreInMarket( Stores& stores );
 void ShoppingInStore( int& label, Store& store );
 //"shopping" functionalities
 bool findInStore( int& label, Store& store );

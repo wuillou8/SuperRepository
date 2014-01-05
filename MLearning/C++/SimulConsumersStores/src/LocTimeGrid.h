@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <stdlib.h>
 #include <fstream>
+#include <cmath>
 
 #include "Random.h"
 
@@ -10,13 +11,14 @@ namespace LocTimeGrid {
 //Space-Time
 	const static size_t NgridX = 1000;
 	const static size_t NgridY = 1000;
-	const static size_t NgridT = 100;
+	const static size_t NgridT = 100;//10
+	const static size_t distNN = sqrt( 2.*pow(1000,2) );
 	
-//template < size_t NgridX, size_t NgridY >
 class Space {
 public:
 	Space(size_t posX, size_t posY);
 	Space(Space const &other);
+	Space& operator=(const Space& rhs);
 	virtual ~Space();
 
 	// space-time grid 
@@ -24,6 +26,8 @@ public:
 	void describeMyself();
 	void IOout( ofstream& ostream );
 };
+
+bool operator==( const Space& lhs, const Space& rhs );
 
 class Time {
 public:

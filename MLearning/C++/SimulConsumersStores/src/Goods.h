@@ -26,17 +26,18 @@ public:
 
 class Market {
 public:
-	Market(size_t Ngoods);
+	Market(size_t Ngoods, size_t Ncategs );
 	virtual ~Market();
 
 	size_t Ngoods;
+	size_t Ncategs;
 	std::vector<Goods> market;
 	void describeMyself();
 };
 
 //used in Goods
-const Goods randGoods(size_t label, double var);
-std::vector<Goods> MakeMarket(size_t NGoods);
+const Goods randGoods(size_t label, size_t categ, double var);
+std::vector<Goods> MakeMarket(size_t NGoods, size_t Ncategs);
 //used in Stores
 std::vector<Goods> GetStore(const Market& market, size_t nGoods);
 

@@ -3,16 +3,20 @@
 
 namespace Customers {
 
-Customer::Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, double utilparam) :
-		posSpace(loc), posTime(time), utilparam(utilparam), priceresist(), cons_threshold(), customer_number()
+Customer::Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time) :
+		posSpace(loc), posTime(time), alpha(), beta(), cons_threshold(), customer_number()
 {}
 
-Customer::Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, double utilparam, double priceresist, double cons_threshold) :
-		posSpace(loc), posTime(time), utilparam(utilparam), priceresist(1.), cons_threshold(cons_threshold), customer_number()
+Customer::Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, double alpha) :
+		posSpace(loc), posTime(time), alpha(alpha), beta(), cons_threshold(), customer_number()
 {}
 
-Customer::Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, double utilparam, double priceresist, double cons_threshold, size_t customer_number) :
-		posSpace(loc), posTime(time), utilparam(utilparam), priceresist(1.), cons_threshold(cons_threshold), customer_number(customer_number)
+Customer::Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, double alpha, double beta, double cons_threshold) :
+		posSpace(loc), posTime(time), alpha(alpha), beta(1.), cons_threshold(cons_threshold), customer_number()
+{}
+
+Customer::Customer(LocTimeGrid::Space loc, LocTimeGrid::Time time, double alpha, double beta, double cons_threshold, size_t customer_number) :
+		posSpace(loc), posTime(time), alpha(alpha), beta(1.), cons_threshold(cons_threshold), customer_number(customer_number)
 {}
 
 Customer::~Customer()
@@ -22,8 +26,8 @@ void Customer::describeMyself() {
 	cout << "class Customer" << endl;
 	posSpace.describeMyself();
 	posTime.describeMyself();
-	cout << "utilparam " << utilparam << endl;
-	cout << "priceresist " << priceresist << endl;
+	cout << "alpha " << alpha << endl;
+	cout << "beta " << beta << endl;
 	cout << "cons_threshold " << cons_threshold << endl;
 	cout << "customer_number " << customer_number << endl;
 }
@@ -55,15 +59,15 @@ void Customers::describeMyself() {
 
 Customer randCustomer(  bool timedOrNot, size_t custo_number, size_t NHparms = NHPars ) {
 	LocTimeGrid::Space pos = LocTimeGrid::randSpace(0,0);
-	if(!timedOrNot) {
-		LocTimeGrid::Time time = LocTimeGrid::randTime(0);
-	}
+	//if(!timedOrNot) {
+	//	LocTimeGrid::Time time = LocTimeGrid::randTime(0);
+	//}
 	LocTimeGrid::Time time(0);
-	double utilparam = QuickRandom::randf(1.);
-	double priceresist = QuickRandom::randf(1.);
+	double alpha = QuickRandom::box_mueller( 1., 0.2 );
+	double beta = QuickRandom::box_mueller( 1., 0.2 );
 	double const_threshold = QuickRandom::randf(1.);
 
-	return Customer(pos, time, utilparam, priceresist, const_threshold, custo_number);
+	return Customer(pos, time, alpha, beta, const_threshold, custo_number);
 }
 
 Customers MakeCustomers(size_t Ncustos, const Goods::Market& market) {
@@ -75,23 +79,30 @@ Customers MakeCustomers(size_t Ncustos, const Goods::Market& market) {
 }
 
 inline double logitFct( double x, double factor = 1. ) {
-	return exp(factor*x)/(1.+exp(factor*x));
+	return exp( factor*x )/( 1. + exp( factor*x ) );
 }
 
 inline double distanceFct(double x) {
 	return x;
 }
 
+inline double weightNorm( const std::vector<double>& storeweights ) {
+	double wNorm = 0.;
+	for ( size_t i = 0 ; i < storeweights.size(); ++i ) {
+		wNorm += storeweights[i];
+	}
+	return wNorm;
+}	
+
 inline double utilityFct( const Customer& custo, const Goods::Goods& good, const Supply::Store& store ) {
-
+	/*
+	 *	U = alpha*dist - beta*price + epsilon
+	 */
 	double dist = LocTimeGrid::distance( store.posSpace, custo.posSpace );
-	double distNN = LocTimeGrid::distance( LocTimeGrid::Space( 0, 0 ), \
-							LocTimeGrid::Space( LocTimeGrid::NgridX, LocTimeGrid::NgridY ) );
 
-	double epsilon = QuickRandom::Gaussian( 1., 0.1 );
-	double priceInStore = store.getPriceWithLabel( good.label );
-	return custo.utilparam*(1-dist/distNN) - custo.priceresist*good.price*priceInStore \
-					+ epsilon;
+	double epsilon = QuickRandom::box_mueller( 0., 1. );
+	double pInStore = store.getPriceWithLabel( good.label );
+	return	custo.alpha * ( 4. - 8. * dist/LocTimeGrid::distNN )  - custo.beta * good.price * pInStore * good.categ + epsilon;
 }
 
 std::vector<Supply::Store> findGoodInStore( const Goods::Goods& good, const Supply::Stores& stores ) {
@@ -114,10 +125,13 @@ size_t CustomerPickAStore( const Customer& custo, const Goods::Goods& good, cons
 	std::vector<Supply::Store> storesfound = findGoodInStore( good, stores );
 	std::vector<double> storeweights;
 	for ( size_t i = 0 ; i < storesfound.size(); ++i ) {
-		storeweights.push_back( logitFct( utilityFct( custo, good, storesfound[i] ) ) );
+		storeweights.push_back( logitFct( utilityFct( custo, good, storesfound[i] ) ) ); 
+		if ( storeweights[i] != storeweights[i] ) {
+			cout <<"in Customers::CustomerPickAStore: "<< storeweights[i]<<endl;
+			exit (EXIT_FAILURE);
+		}
 	}
 	return decision( storeweights );
-
 }
 
 inline size_t decision( const std::vector<double>& storeweights ) {
@@ -126,20 +140,11 @@ inline size_t decision( const std::vector<double>& storeweights ) {
 	double choice = QuickRandom::randf(1.);
 	for ( size_t i = 0 ; i < storeweights.size(); ++i ) {
 			proba += storeweights[i]/wNorm;
-			//cout <<i<<" "<<storeweights[i]/wNorm<<" check proba"<<choice<<" "<<proba<<" "<<storeweights.size()<< endl;
 			if( choice < proba )
 			{	return i;	}
-		}
+	}
 	cout << " ERROR from Costumers::decision : probability not correclty handed" << endl;
 	exit (EXIT_FAILURE);
-}
-
-inline double weightNorm( const std::vector<double>& storeweights ) {
-	double wNorm = 0.;
-	for ( size_t i = 0 ; i < storeweights.size(); ++i ) {
-		wNorm += storeweights[i];
-	}
-	return wNorm;
 }
 
 }

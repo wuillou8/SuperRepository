@@ -11,10 +11,11 @@ import numpy as np
 from pandas import DataFrame
 import pandas as pd
 
-#import pylab as P
-#import matplotlib
-#matplotlib.rcParams['legend.fancybox'] = True
-#import matplotlib.pyplot as plt
+import matplotlib
+import pylab as P
+
+matplotlib.rcParams['legend.fancybox'] = True
+import matplotlib.pyplot as plt
 
 #from matplotlib.backends.backend_pdf import PdfPages
 #-My own Packages -------------------------------------------------------------
@@ -28,6 +29,47 @@ class DataStudy(MyIO.DataAnalysis):
     '''
     def __init__( self, dataFile ):
         MyIO.DataAnalysis.__init__( self, dataFile )
+        print "store", self.headers
+        MyPandaUtilities.myLazyDispl(self.dframe)
+        self.coordsStores = self.GetCoordsStores()
+        print self.coordsStores
+        '''        
+        print type(self.coordsStores)
+        print self.coordsStores.index([90, 836])
+        
+        print type(MyPandaUtilities.uniq(self.coordsStores))
+        self.save = MyPandaUtilities.uniq(self.coordsStores)
+        print self.save
+        #([811, 645])        
+        '''
+        self.plotStoresCustos()
+        print 
+        
 
-        #You can get the values as a list by doing:
-        #list(my_dataframe.columns.values)
+
+    def GetCoordsStores(self):
+        ''' Get customers coordinates '''
+        tmp = MyPandaUtilities.myfilter( self.dframe,['T',1],[' PosX_stor',' PosY_stor'] )
+        MyPandaUtilities.myLazyDispl(tmp)
+        GetCoordsStores = []
+        [ GetCoordsStores.append( [tmp[' PosX_stor'][idx], tmp[' PosY_stor'][idx]] ) for idx in range(tmp.shape[0]) ]
+        del tmp
+        return MyPandaUtilities.uniq(GetCoordsStores)
+        
+        
+    def plotStoresCustos(self):
+        
+        plt.figure()
+        plt.title(' Geographical distribution ')
+        plt.xlim([0,1000])
+        plt.ylim([0,1000])
+        plt.xlabel(' X coordinates ')
+        plt.ylabel(' Y coordinates ')        
+
+        
+        
+        plt.plot( [tmp[0] for tmp in self.coordsStores], [tmp[1] for tmp in self.coordsStores], 'o', color='k')
+        plt.draw()
+        plt.show()
+
+        return 1
