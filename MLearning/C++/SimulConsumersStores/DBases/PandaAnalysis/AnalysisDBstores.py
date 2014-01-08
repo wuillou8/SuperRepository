@@ -33,19 +33,7 @@ class DataStudy(MyIO.DataAnalysis):
         MyPandaUtilities.myLazyDispl(self.dframe)
         self.coordsStores = self.GetCoordsStores()
         print self.coordsStores
-        '''        
-        print type(self.coordsStores)
-        print self.coordsStores.index([90, 836])
-        
-        print type(MyPandaUtilities.uniq(self.coordsStores))
-        self.save = MyPandaUtilities.uniq(self.coordsStores)
-        print self.save
-        #([811, 645])        
-        '''
         self.plotStoresCustos()
-        print 
-        
-
 
     def GetCoordsStores(self):
         ''' Get customers coordinates '''
@@ -65,11 +53,8 @@ class DataStudy(MyIO.DataAnalysis):
         plt.ylim([0,1000])
         plt.xlabel(' X coordinates ')
         plt.ylabel(' Y coordinates ')        
-
-        
         
         plt.plot( [tmp[0] for tmp in self.coordsStores], [tmp[1] for tmp in self.coordsStores], 'o', color='k')
         plt.draw()
         plt.show()
-
-        return 1
+        return 0

@@ -27,11 +27,6 @@ adressDBstore = '../Data/DBstore.txt'
 
 start = time.clock()
 
-#bla = MyIO.DataAnalysis( '../../Debug/test.data' ) 
-
-#myDBcustoms = MyIO.DataAnalysis( adressDBcustoms )
-#myDBstores = MyIO.DataAnalysis( adressDBstore )
-
 #myDBstores = AnalysisDBstores.DataStudy( adressDBstore ) 
 myDBcustoms = AnalysisDBcustoms.DataStudy( adressDBcustoms )
 

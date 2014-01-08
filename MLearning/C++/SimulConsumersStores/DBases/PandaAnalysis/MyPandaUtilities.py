@@ -70,8 +70,6 @@ def FilterInput(In, Range):
 
 def dframesDiff( dffrom, dfto ):
     ''' get differences beetween 2 dframes '''
-    #print dffrom.head(10)
-    #print dfto.head(10)
     ne_stacked = (dffrom != dfto).stack()
     changed = ne_stacked[ne_stacked]
     changed.index.names = ['id', 'col']
@@ -92,11 +90,9 @@ class myDframe:
         self.__Size = len(args)
         self.__inArr = [ [] for tmp in range(self.__Size) ]
 
-
     def Append(self, arr):
         self.__Check(arr)
         [ self.__inArr[idx].append(arr[idx]) for idx in range(self.__Size) ]
-
 
     def DoFrame(self):
         DoFrame = {}
@@ -105,8 +101,6 @@ class myDframe:
         del self.__inArr
         del DoFrame
 
-
     def __Check(self, lst):
         if (len(lst) != self.__Size):
             sys.exit( 'error: Load PDaDFrame Failed (myPandaUtilities::myDframe)' )
-

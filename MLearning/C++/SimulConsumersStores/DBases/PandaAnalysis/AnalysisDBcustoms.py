@@ -37,38 +37,36 @@ class DataStudy(MyIO.DataAnalysis):
         self.coordsStores = self.GetCoordsStores()
         self.plotStoresCustos()
         self.N = len( self.coordsCustos )
+        self.Ncategs = len(self.dframe[' categ'].unique())
         
-        print 'centered data ',0, 100.*self.GetNbCustomsForStore(0,0)/self.N
-        print 'centered data ',1, 100.*self.GetNbCustomsForStore(0,1)/self.N
-        print 'centered data ',2, 100.*self.GetNbCustomsForStore(0,2)/self.N
-        '''        
-        for i in range( len(self.coordsStores) ): 
-            print i, 100.*self.GetNbCustomsForStore(i)/self.N
-        print len( self.coordsCustos )
-        '''
+        for categ in range(self.Ncategs):
+            print '__centered_data__ ', categ, self.GetNbCustomsForStore( 0, categ )
+            #print 'centered data ',1,  self.GetNbCustomsForStore(1,categ)
+            #print 'centered data ',2,  self.GetNbCustomsForStore(2,categ)        
         
     def GetCoordsCustomers(self):
         ''' Get customers coordinates '''
-        self.dframe['T'] = self.dframe['T'].map(lambda x: x < 3) 
-        tmp=self.dframe[[' PosX_cust',' PosY_cust']]
-        #tmp = MyPandaUtilities.myfilter( self.dframe,['T',1],[' PosX_cust',' PosY_cust'] )
+        tmp = MyPandaUtilities.myfilter( self.dframe, ['T',1], [' PosX_cust',' PosY_cust'] ) )
+        #tmp=self.dframe[[' PosX_cust',' PosY_cust']]
         GetCoordsCustomers = []
         [ GetCoordsCustomers.append( [tmp[' PosX_cust'][idx], tmp[' PosY_cust'][idx]] ) for idx in range(tmp.shape[0]) ]
         del tmp
-        return GetCoordsCustomers
+        return  MyPandaUtilities.uniq( GetCoordsCustomers )
         
     def GetCoordsStores(self):
         ''' Get stores coordinates '''
-        tmp = MyPandaUtilities.myfilter( self.dframe,['T',1],[' PosX_stor',' PosY_stor'] )
+        tmp = MyPandaUtilities.myfilter( self.dframe, ['T',1], [' PosX_stor',' PosY_stor'] )
         GetCoordsStores = []
         [ GetCoordsStores.append( [tmp[' PosX_stor'][idx], tmp[' PosY_stor'][idx]] ) for idx in range(tmp.shape[0]) ]
         del tmp
-        return MyPandaUtilities.uniq(GetCoordsStores)
+        return MyPandaUtilities.uniq( GetCoordsStores )
         
         
     def GetNbCustomsForStore(self, storeNb, categ = 0):
-        tmp = MyPandaUtilities.myfilter( self.dframe,[' categ',categ,' Nstore',storeNb] )
-        return tmp.shape[0]
+        tmp = MyPandaUtilities.myfilter( self.dframe, [' categ',categ] )
+        fact = tmp.shape[0]/self.N
+        tmp = MyPandaUtilities.myfilter( self.dframe, [' categ',categ,' Nstore',storeNb] )
+        return  100.*tmp.shape[0]/(fact*self.N*1.) #1.* fact * tmp.shape[0]/self.N
         
         
     def plotStoresCustos(self,printname=0):
@@ -82,11 +80,10 @@ class DataStudy(MyIO.DataAnalysis):
         legend = []
         legend.append(' Customers ')
         legend.append(' Stores ')
-        #legend.append(' My Store ')
 
         plt.plot( [tmp[0] for tmp in self.coordsCustos], [tmp[1] for tmp in self.coordsCustos],'*', color='r', markersize=5)
         plt.plot( [tmp[0] for tmp in self.coordsStores], [tmp[1] for tmp in self.coordsStores],'o', color='b', markersize=10)
-        #plt.plot( 500, 500,'o', color='r', markersize=10)
+        plt.plot( 500, 500,'o', color='r', markersize=15)
         plt.legend( legend, loc='upper right' )
         
         plt.draw()
