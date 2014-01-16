@@ -122,3 +122,5 @@ for i = 1:end_step
     print(",")
     println(foxes_over_time[i])
 end
+
+
