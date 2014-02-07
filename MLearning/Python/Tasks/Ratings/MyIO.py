@@ -31,17 +31,3 @@ class DataAnalysis:
         print "---------------------------------------------------------------"
         print self.DatDescr
         print self.headers
-        
-        #MyPandaUtilities.myLazyDispl( self.dframe )
-        
-        for n,i in enumerate(self.headers):
-            print n, i #, self.dframe[u+i]
-        
-
-        
-        #MyPandaUtilities.myLazyDispl( tmp )
-        '''
-        tmp = self.dframe[u'field_id'] #,u'sub_field_id']
-        MyPandaUtilities.myLazyDispl( tmp )
-        '''
-        #sys.exit(1)
