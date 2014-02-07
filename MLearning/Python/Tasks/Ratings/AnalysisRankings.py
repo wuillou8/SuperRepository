@@ -42,14 +42,13 @@ class DataStudy( MyIO.DataAnalysis ):
                         'is_berlin']
                         
         MyIO.DataAnalysis.__init__( self, dataFile, self.headers )
-        
+        '''
         print 'area_id', self.dframe[u'area_id']
         print 'field_id', self.dframe[u'field_id']
         print 'sub_field_id', self.dframe[u'sub_field_id']
         print 'oem_type', self.dframe[u'oem_type']
         print 'rank', self.dframe[u'rank']
         print 'OEM', self.dframe[u'Name'] #[u'OEM']
-        '''
         print 'FAI', self.dframe[u'FAI']
         print 'MC', self.dframe[u'MC']
         print 'TR', self.dframe[u'TR']
