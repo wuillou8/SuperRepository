@@ -21,8 +21,6 @@ def filter ( string ):
 ##############
 
 
-start = datetime.datetime(2010, 1, 1)
-end = datetime.datetime(2014, 2, 6)
 
 
 DAXFile = "..//DAXData//DAXIndicesList.dat"
@@ -30,12 +28,15 @@ with open(DAXFile, 'r') as f:
     read_Symbols = f.read()
 f.closed 
 
-xlist = ImportFile(DAXFile)
+DAXlist = ImportFile(DAXFile)
+
+start = datetime.datetime(2010, 1, 1)
+end = datetime.datetime(2014, 2, 6)
 
 '''
 Importing rates time-series
 '''
-for i in xlist:
+for i in DAXlist:
     print i, type(i)
     f=web.DataReader( i, 'yahoo', start, end)
     print 'rate : ', i
