@@ -60,27 +60,4 @@ class DataStudy( MyIO.DataAnalysis ):
         '''
         
         MyPandaUtilities.myLazyDispl( self.dframe )
-        
-        #self.rank = [u'area_id', u'field_id', u'sub_field_id', u'rank', u'FAI', u'MC', u'TR', u'PS', u'FC', u'PC', u'is_berlin']
-        #tmp = MyPandaUtilities.myfilter( self.dframe[' rank',1] ,)
-        '''
-        tmp = self.dframe[self.dframe[u'rank'] == 1]
-        print 'ici', type(tmp)
-        print 'la'
-        MyPandaUtilities.myLazyDispl( tmp )
-        '''
-        #self.coordsCustos = self.GetCoordsCustomers()
-        #self.coordsStores = self.GetCoordsStores()
-        #self.plotStoresCustos()
-        #self.N = len( self.coordsCustos )
-        #self.Ncategs = len(self.dframe[' categ'].unique())
-        
-        #for categ in range(self.Ncategs):
-        #    print '__centered_data__ ', categ, self.GetNbCustomsForStore( 0, categ )
-            #print 'centered data ',1,  self.GetNbCustomsForStore(1,categ)
-            #print 'centered data ',2,  self.GetNbCustomsForStore(2,categ) 
-        
-    def filter(self):
-        tmp = self.dframe[u'field_id', u'sub_field_id']
-        MyPandaUtilities.myLazyDispl( tmp )
   

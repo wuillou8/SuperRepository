@@ -35,6 +35,5 @@ class DataStudy( MyIO.DataAnalysis ):
                         'Last Trade',\
                         'Change',\
                         'Volume']   
-        #MyIO.DataAnalysis.__init__( self, dataFile, self.headers )
         MyIO.DataAnalysis.__init__( self, dataFile, self.headers )
         MyPandaUtilities.myLazyDispl( self.dframe )
