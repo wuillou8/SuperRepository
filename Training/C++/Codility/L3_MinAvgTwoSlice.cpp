@@ -2,16 +2,16 @@
 // #include <algorithm>
 int solution(vector<int> &A) {
    // write your code in C++98
-   // 90% 
+   // 100% 
    int count = 0;
     float min = 100000.0;
-    //vector<double> copy;
     for ( size_t i = 1; i < A.size()-1; ++i ) {
+	// simple ugly casuistic...
         if( min >  (float)(A[i-1] + A[i])/2.0 ) {
             min = (float)(A[i-1] + A[i])/2.0;
             count = i-1;
         }
-        else if ( min >  (float)(A[i] + A[i+1])/2.0 ) {
+        if ( min >  (float)(A[i] + A[i+1])/2.0 ) {
             min = (float)(A[i] + A[i+1])/2.0;
             count = i;
         }
