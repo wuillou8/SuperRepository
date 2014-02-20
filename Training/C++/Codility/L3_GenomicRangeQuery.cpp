@@ -18,16 +18,3 @@ vector<int> solution(string &S, vector<int> &P, vector<int> &Q) {
     }
     return fin;
 }
-    // write your code in C++98
-    vector<int> init1,init2,init3;
-    for ( size_t i = 0; i < S.size(); ++i ) {
-        if ( S[i] == 'A' ){ init1.push_back(i); }
-        else if ( S[i] == 'C' ){ init2.push_back(i); }
-        else if ( S[i] == 'G' ){ init3.push_back(i); }
-    }
-    return init1; 
-    for ( size_t i = 0; i < P.size(); ++i ) {
-        
-    
-
-
