@@ -1,8 +1,3 @@
-#include <algorithm>
- 
-bool myfunction (int i,int j) { return (i<j); }
- 
-int solution(const vector<int> &A) {
 // write your code in C++98
 #include <algorithm>
  
