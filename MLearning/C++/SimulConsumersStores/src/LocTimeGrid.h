@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <stdlib.h>
+#include <iostream>
 #include <fstream>
 #include <cmath>
 
@@ -23,8 +24,7 @@ public:
 
 	// space-time grid 
 	size_t posX, posY;
-	void describeMyself();
-	void IOout( ofstream& ostream );
+	friend ostream& operator<<(ostream& os, const Space& space);
 };
 
 bool operator==( const Space& lhs, const Space& rhs );
@@ -36,8 +36,7 @@ public:
 
 	// space-time grid 
 	size_t time;
-	void describeMyself();
-	void IOout( ofstream& ostream );
+	friend ostream& operator<<(ostream& os, const Time& time);
 };
 
 //spatial dist

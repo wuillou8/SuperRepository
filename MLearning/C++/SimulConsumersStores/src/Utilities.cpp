@@ -4,42 +4,30 @@ namespace Starts {
 
 // Function placing 5 stores in the 4 corners + in the middle.
 const Supply::Stores Init5StoresCross( const Goods::Market& market ) {
-	
+	std::vector<double> prices (3,1.);
 	//store in the center
 	size_t nstores(0);
 	Supply::Stores stores( 0 );
 	Supply::Store rand_store = Supply::randStore( market, nstores );
-	rand_store.prices[0] = 1.0;
+	rand_store.prices = prices;
 	rand_store.posSpace.posX = LocTimeGrid::NgridX/2;
 	rand_store.posSpace.posY = LocTimeGrid::NgridY/2;
+	cout<<stores;
 	stores.AddStore( rand_store );
-	
-	//stores in the corners
-	/*rand_store = Supply::randStore( market, ++nstores );
-	rand_store.prices[0] = 1.0;
-	rand_store.posSpace.posX = 0;
-	rand_store.posSpace.posY = 0;
-	stores.AddStore( rand_store );
-	*/
+
 	rand_store = Supply::randStore( market, ++nstores );
-	rand_store.prices[0] = 1.0;
+	rand_store.prices = prices;
 	rand_store.posSpace.posX = LocTimeGrid::NgridX;
 	rand_store.posSpace.posY = 0;
 	stores.AddStore( rand_store );
 	
 	rand_store = Supply::randStore( market, ++nstores );
-	rand_store.prices[0] = 1.0;
+	rand_store.prices = prices;
 	rand_store.posSpace = LocTimeGrid::Space( 0, LocTimeGrid::NgridY );
 	rand_store.posSpace.posX = 0;
 	rand_store.posSpace.posY = LocTimeGrid::NgridY;
 	stores.AddStore( rand_store );
-	/*
-	rand_store = Supply::randStore( market, ++nstores );
-	rand_store.prices[0] = 1.0;
-	rand_store.posSpace.posX = LocTimeGrid::NgridX;
-	rand_store.posSpace.posY = LocTimeGrid::NgridY;
-	stores.AddStore( rand_store );*/
-	//stores.describeMyself();
+
 	return stores;
 }
 

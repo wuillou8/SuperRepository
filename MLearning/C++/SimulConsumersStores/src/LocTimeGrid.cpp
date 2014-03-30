@@ -26,14 +26,11 @@ bool operator==( const Space& lhs, const Space& rhs ) {
 Space::~Space()
 {}
 
-void Space::describeMyself(  ) {
-	cout << "class Space" << endl;
-	cout << "posX " << posX << endl;
-	cout << "posY " << posY << endl;
-}
-
-void Space::IOout( ofstream& ostream ) {
-	ostream << posX<<", "<<posY<<", ";
+ostream& operator<<(ostream& os, const Space& space) {
+    os << "class Space" << endl;
+	os << "posX " << space.posX << endl;
+	os << "posY " << space.posY << endl;
+    return os;
 }
 
 Time::Time(size_t time) :
@@ -43,14 +40,11 @@ Time::Time(size_t time) :
 Time::~Time()
 {}
 
-void Time::describeMyself() {
-	cout << "class Time" << endl;
-	cout << "time " << time << endl;
-	cout << "NgridT " << NgridT << endl;
-}
-
-void Time::IOout( ofstream& ostream ) {
-	ostream << time << ", ";
+ostream& operator<<(ostream& os, const Time& time) {
+    os << "class Time" << endl;
+	os << "time " << time << endl;
+	os << "NgridT " << NgridT << endl;
+    return os;
 }
 
 const double distance( const Space& guy1, const Space& guy2) {

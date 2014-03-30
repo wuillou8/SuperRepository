@@ -29,8 +29,7 @@ public:
 	double beta; //priceresist;
 	double cons_threshold;
 	size_t customer_number;
-	void describeMyself();
-	void IOout( ofstream& ostream );
+	friend ostream& operator<<(ostream& os, const Customer& customer);
 };
 
 class Customers {
@@ -40,7 +39,7 @@ public:
 
 	size_t Ncustomers;
 	std::vector<Customer> customers;
-	void describeMyself();
+	friend ostream& operator<<(ostream& os, const Customers& customers);
 };
 
 /*template <LocTimeGrid::Space locSpace,int Nb>

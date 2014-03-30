@@ -9,7 +9,7 @@ namespace QuickRandom
 {
 
 void INITQuickRandom() {
-	srand (NULL);
+	srand (0); //(NULL);
 }
 
 //Generates random double between [0,m]

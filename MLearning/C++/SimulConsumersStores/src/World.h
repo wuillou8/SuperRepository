@@ -39,7 +39,7 @@ public:
 	Customers::Customers customs;
 	Supply::Stores stores;
 	size_t t;
-	void describeMyself();
+	friend ostream& operator<<(ostream& os, const World& world);
 	void printIO( ostream& ostream );
 	void readIO2( ifstream istream );
 	void readIO( ifstream& istream );

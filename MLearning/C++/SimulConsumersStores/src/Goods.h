@@ -19,9 +19,8 @@ public:
 	double price;
 	int categ;
 	int label;
-	void describeMyself();
-	void IOout( ofstream& ostream );
 	//int complements, substitutes;	//latency
+	friend ostream& operator<<(ostream& os, const Goods& goods);
 };
 
 class Market {
@@ -32,7 +31,7 @@ public:
 	size_t Ngoods;
 	size_t Ncategs;
 	std::vector<Goods> market;
-	void describeMyself();
+	friend ostream& operator<<(ostream& os, const Market& market);
 };
 
 //used in Goods

@@ -73,6 +73,5 @@ struct Ranbyte {
 			ss = s[i];
 			j = ( j + ss + (v >> 24)) & 
 		}
-		
 	}
 };*/

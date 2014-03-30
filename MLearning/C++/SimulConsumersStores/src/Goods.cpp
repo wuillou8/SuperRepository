@@ -10,34 +10,32 @@ Goods::Goods(double price, size_t categ, size_t label): // Goods(double price, i
 Goods::~Goods()
 {}
 
-void Goods::describeMyself() {
-	cout << "class Goods" << endl;
-	cout << "price " << price << endl;
-	cout << "categ " << categ << endl;
-	cout << "label " << label << endl;
-}
-
-void Goods::IOout( ofstream& ostream ) {
-	ostream << label << ", "<< price << ", "<< categ << ", ";
+ostream& operator<<(ostream& os, const Goods& goods) {
+	os << "class Goods" << endl;
+	os << "price " << goods.price << endl;
+	os << "categ " << goods.categ << endl;
+	os << "label " << goods.label << endl;
+	return os;
 }
 
 Market::Market( size_t Ngoods, size_t Ncategs = 1 ) :
 	Ngoods(Ngoods), Ncategs(Ncategs)
 {
 	market = MakeMarket( Ngoods, Ncategs );
-	Ngoods = Ngoods*Ncategs;
 }
 
 Market::~Market()
 {}
 
-void Market::describeMyself() {
-	cout << "class Market" << endl;
-	cout << "Ngoods " << Ngoods << endl;
-	for (size_t i = 0; i < market.size(); ++i) {
-		cout << "market " << i;
-		market[i].describeMyself();
+ostream& operator<<(ostream& os, const Market& market)
+{
+	os << "class Market" << endl;
+	os << "Ngoods " << market.Ngoods << endl;
+	for (size_t i = 0; i < market.market.size(); ++i) {
+		os << "market " << i;
+		os << market.market[i]; //.describeMyself();
 	}
+	return os;
 }
 
 const Goods randGoods ( size_t label, size_t categ = 1, double var = 0. ) {

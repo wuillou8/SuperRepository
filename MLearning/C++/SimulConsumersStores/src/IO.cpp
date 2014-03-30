@@ -21,7 +21,8 @@ void PrintOut(T bla) {
 }
 
 void printheaderDBCustomers( ofstream& ostream ) {
-	ostream<<"T, GoodsNb, price, categ, CustoNb, PosX_cust, PosY_cust, Nstore, PosX_stor, PosY_stor, Dist"<<endl;
+	ostream<<"T, GoodsNb, price, categ, "
+			"CustoNb, PosX_cust, PosY_cust, Nstore, PosX_stor, PosY_stor, Dist"<<endl;
 }
 
 void printheaderDBstores( ofstream& ostream ) {
