@@ -10,41 +10,8 @@ using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using MongoDB.Driver.GridFS;
 using MongoDB.Driver.Linq;
-/*
-using MongoDB.Bson.IO;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson.Serialization.Conventions;
-using MongoDB.Bson.Serialization.IdGenerators;
-using MongoDB.Bson.Serialization.Options;
-using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Driver.Wrappers;
 
-using NUnit;
-*/
-
-
-/*
-namespace DATABASE
-{
-    static class MongoDB
-    {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        static void Main()
-        {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
-        }
-    }
-}*/
-
-
-
-namespace DBMONGO//BTCEAPIWRAPPER
+namespace DBMONGO
 {
     public class Entity
     {
@@ -55,7 +22,7 @@ namespace DBMONGO//BTCEAPIWRAPPER
  
     public class Program
     {
-        public static int Main/*MyDB*/(/*string[] args*/)
+        public static int Main( )
         {
 
             var connectionString = "mongodb://localhost";
@@ -77,7 +44,6 @@ namespace DBMONGO//BTCEAPIWRAPPER
             var update = Update<Entity>.Set(e => e.Name, "Harry");
             collection.Update(query, update);
             collection.Remove(query);
-            return 2;
         }
     }
 }
