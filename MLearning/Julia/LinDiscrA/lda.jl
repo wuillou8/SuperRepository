@@ -25,9 +25,7 @@ module LDA
 
         # function computing the x,y-averages
         function f_mean (m_clus::MyCluster)
-
                 f_mean = Array{Float64, (m_clus.dim,1)}
-
                 for d in 1:m_clus.dim
                         for x = m_clus.disp[:, d]
                                 f_mean[d] += x
