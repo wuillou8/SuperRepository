@@ -25,8 +25,7 @@ include("lda.jl")
 
         #compute cluster centerd
         mu1= Array{Float64, 1}
-        LDA.f_mean(clust1))
-        #mu1 = LDA.f_mean(clust1)
+        mu1 = LDA.f_mean(clust1)
         #mu2_x, mu2_y = LDA.f_mean(clust2)
         #mu3_x, mu3_y = LDA.f_mean(clust3)
         #mu4_x, mu4_y = LDA.f_mean(clust4)
