@@ -19,9 +19,7 @@ class DataIO:
         # read in data and put it into a dframe
         ls = [] 
         with open(dataFile) as f:
-            for line in f:
-                ls.append(json.loads(line))
-                #print line, type(line), type(json.loads(line))
+		[ ls.append(json.loads(line)) for line in f ]
         self.dframe = pd.DataFrame( ls )
         del ls
         # produce dframe summary

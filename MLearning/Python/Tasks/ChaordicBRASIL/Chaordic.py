@@ -13,7 +13,7 @@ import MyIO
 import MyChaordicAnalysis
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-infile = 'input-challenge.json'
+infile = 'inputtest.json'
 outfile = 'testout.json'
 
 analysis = MyChaordicAnalysis.MyChaordicAnalysis( infile )
