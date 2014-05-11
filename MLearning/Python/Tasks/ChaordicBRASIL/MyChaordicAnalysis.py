@@ -4,8 +4,6 @@ Created on Fri May 09 15:30:52 2014
 
 @author: jair
 """
-import pandas as pd
-import json
 
 import MyIO
 import MyPandaUtilities
@@ -13,17 +11,35 @@ import MyPandaUtilities
 
 class MyChaordicAnalysis( MyIO.DataIO ):
     '''
-    Analysis in DBcustoms
+    Analysis of customers
     '''
     def __init__( self, dataFile ):
         MyIO.DataIO.__init__( self, dataFile )
         MyPandaUtilities.myLazyDispl( self.dframe )
-        print self.headers
-        print type(self.dframe['userId'])
-        
         self.users = self.dframe['userId'].unique()
-        print 'lem:', len(self.users)
+
     
-    def Analysis(self):        
-        #df = MyPandaUtilities.myfilter(self.dframe,['userId']) #,line,'Trip_id',trip])
-        #for i in 
+    def Analysis(self):    
+        dframeheaders = [ 'userId','NbEntries','PercentBuy' ] 
+        mydf = MyPandaUtilities.myDframe( dframeheaders )
+        for n,idx in enumerate(self.users):
+            df = MyPandaUtilities.myfilter(self.dframe,['userId',idx],['buyer'])   
+            mydf.Append( [ idx, len(df), df.applymap(int)['buyer'].mean() ] )
+
+        mydf.DoFrame()
+        print '-----Quick Summary------'
+        print mydf.PDFrame.head()
+        print mydf.PDFrame.tail()
+        print '------------------------'
+        self.AnalysisDframe = mydf.PDFrame
+        del mydf.PDFrame
+        return 1
+    
+    
+    def AnalysisOutput(self):
+        #for i in self.users:
+        for i in self.AnalysisDframe:
+            print i
+        #print json.dumps({'4': 5, '6': 7})
+        
+        
