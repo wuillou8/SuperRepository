@@ -25,9 +25,9 @@ class MyChaordicAnalysis( MyIO.DataIO ):
         for n,idx in enumerate(self.users):
             df = MyPandaUtilities.myfilter(self.dframe,['userId',idx],['buyer'])   
             mydf.Append( [ idx, len(df), df.applymap(int)['buyer'].mean() ] )
-
         mydf.DoFrame()
-        print '-----Quick Summary------'
+        
+	print '-----Quick Summary------'
         print mydf.PDFrame.head()
         print mydf.PDFrame.tail()
         print '------------------------'
