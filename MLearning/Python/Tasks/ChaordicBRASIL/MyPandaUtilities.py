@@ -14,6 +14,7 @@ import pandas as pd
 
 
 def uniq(input):
+  ''' filters and print out unique els in a list '''
   output = []
   for x in input:
     if x not in output:
@@ -107,6 +108,9 @@ class myDframe:
 
 
     def __Check(self, lst):
-        if (len(lst) != self.__Size):
-            sys.exit( 'error: Load PDaDFrame Failed (myPandaUtilities::myDframe)' )
+        #try:
+        if( len(lst) != self.__Size ):
+        #except:
+        #if (len(lst) != self.__Size):
+            sys.exit( 'error: Load PdaDFrame Failed (myPandaUtilities::myDframe)' )
 

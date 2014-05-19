@@ -19,13 +19,14 @@ class DataIO:
         # read in data and put it into a dframe
         ls = [] 
         with open(dataFile) as f:
-		[ ls.append(json.loads(line)) for line in f ]
-        self.dframe = pd.DataFrame( ls )
+            [ ls.append(json.loads(line)) for line in f ]
+        self._dframe = pd.DataFrame( ls )
         del ls
+        
         # produce dframe summary
-        self.DatDescr = self.dframe.describe()
-        self.headers = self.DatDescr.columns
+        self._DatDescr = self._dframe.describe()
+        self._headers = self._DatDescr.columns
         print "---------------------------------------------------------------"
         print "Reading file: ", str(dataFile)
         print "---------------------------------------------------------------"
-        print self.DatDescr
+        print self._DatDescr
