@@ -23,11 +23,20 @@ reset = time.time()
 print "Analysis Time:", ( time.time() - reset )
 analytime = ( time.time() - reset )
 
-analysis.Train()
+#analysis.Train()
 #analysis.fit()
 #analysis.fit2()
-analysis.bla()
-analysis.ModelConstr()
+analysis.fitting()
+
+
+#analysis.ModelConstr2() #ModelConstr2(self)
+
+#sys.exit()
+#analysis.RunROCAUConModel('OUT')
+
+#for j in np.arange(0,1.1,0.2):
+#    for i in np.arange(0,1.1,0.2):
+#        analysis.ModelConstr(i,j)
 
 
 traintime = time.time() - analytime
