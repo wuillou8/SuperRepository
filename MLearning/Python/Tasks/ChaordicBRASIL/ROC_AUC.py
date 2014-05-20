@@ -64,27 +64,7 @@ class ROC_AUC_1:
 				self.N += 1
 				
 
-#def main():
 '''
-if len(sys.argv) <> 2:
-	sys.stderr.write('Usage: fileName passed as arg #2 ')
-	sys.exit(1)
-'''
-#try:
-#	datalist = InFile(sys.argv[1])
-#	except OSError, error:
-#	print >> sys.stderr, error.value
-
-'''
-a_roc = ROC_AUC_1(sys.argv[1]) #"test100000")
-a_roc.counting()
-print a_roc.P, a_roc.N
-a_roc.auc()
-
-print "output: "
-for tmp in a_roc.curve:
-	print "roc curve", tmp[0], tmp[1]
-
 print "area fawcett", a_roc.area
 print "area trapezoid:", np.trapz([tmp[1] for tmp in a_roc.curve], x=[tmp[0] for tmp in a_roc.curve ])
 print "area Simpson:", scipy.integrate.simps(np.array([tmp[1] for tmp in a_roc.curve]), np.array([tmp[0] for tmp in a_roc.curve]))
