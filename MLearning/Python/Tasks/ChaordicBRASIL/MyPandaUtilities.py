@@ -1,17 +1,9 @@
-#-------------------------------------------------------------------------------
-# Name:        MyPandaUtilities
-# Purpose:
-#
-# Author:      wuillou8
-#
-# Created:     25/10/2013
-# Copyright:   (c) wuiljai 2013
-# Licence:     <your licence>
-#------------------------------------------------------------------------------
+"""
+@author:      jair
+"""
 import sys
 import numpy as np
 import pandas as pd
-
 
 def uniq(input):
   ''' filters and print out unique els in a list '''
@@ -21,9 +13,6 @@ def uniq(input):
       output.append(x)
   return output
 
-
-#------------------------------------------------------------------------------
-
 def myLazyDispl(dframe):
     ''' Displays 10 els of the DataFrame head & tail '''
     if (dframe.shape[0] >= 10):
@@ -32,7 +21,6 @@ def myLazyDispl(dframe):
         print dframe.tail(5)
     else:
         print dframe.head()
-
 
 def myfilter(df,arrFilter,arrFields = []):
     ''' Filters the data frame:
@@ -61,13 +49,11 @@ def myfilter(df,arrFilter,arrFields = []):
     else:
         return df[arrFields]
 
-
 def FilterInput(In, Range):
     # check Input content against array of expected values
     if (In not in Range):
         sys.exit( "Comput Mode must be in " + str(Range))
     return In
-
 
 def dframesDiff( dffrom, dfto ):
     ''' get differences beetween 2 dframes '''
@@ -81,8 +67,7 @@ def dframesDiff( dffrom, dfto ):
     changed_to = dfto.values[diff_idxs]
     return changed, changed_from, changed_to
 
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+#------------------------------------------------------------------------------
 
 class myDframe:
     '''
@@ -93,11 +78,9 @@ class myDframe:
         self.__Size = len(args)
         self.__inArr = [ [] for tmp in range(self.__Size) ]
 
-
     def Append(self, arr):
         self.__Check(arr)
         [ self.__inArr[idx].append(arr[idx]) for idx in range(self.__Size) ]
-
 
     def DoFrame(self):
         DoFrame = {}
@@ -106,11 +89,7 @@ class myDframe:
         del self.__inArr
         del DoFrame
 
-
     def __Check(self, lst):
-        #try:
         if( len(lst) != self.__Size ):
-        #except:
-        #if (len(lst) != self.__Size):
             sys.exit( 'error: Load PdaDFrame Failed (myPandaUtilities::myDframe)' )
 

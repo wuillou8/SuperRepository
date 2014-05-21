@@ -1,27 +1,13 @@
-import io, os, csv, sys 
-import math as ma
+"""
+@author: jair
+"""
 import numpy as np
-import scipy
 from scipy.integrate import simps, trapz
-
-
-def InFile( filename ): # read tsv file
-	InFile = []
-	for line in  list( tuple(open(filename, 'r')) ):
-		tmp_line = map( float, line.split(' ') ) 
-		InFile.append(tmp_line)
-	return InFile
-
-def area(x1,x2,y1,y2): # trapezoid area
-	b = ma.fabs(x1-x2) 
-	h = (y1+y2) 
-	return  b*h/2.0 
-
 
 class ROC_AUC_1:
 	#Implementing the ROC AUC Comput from:
-	#Fawcett, 2005, An Introduction to ROC Analysis	
-	def __init__(self,datlist): 
+	#Fawcett, 2005, An Introduction to ROC Analysis
+	def __init__(self,datlist):
 		self.data = datlist
 		# first arg: prevision second arg: 1/0 for (true/false)
 		self.data.sort( key=lambda tup: tup[0], reverse=True)
@@ -33,16 +19,19 @@ class ROC_AUC_1:
 		self.tp_ = 0.0
 		self.fp_ = 0.0
 		self.fprev = -1000
-		self.area = 0.0
+		#self.area = 0.0
 		self.curve = []
 
     	def trapz_area(self):
-         return np.trapz([tmp[1] for tmp in self.curve], x=[tmp[0] for tmp in self.curve])
+         '''
+         compute efficient trapezoid area
+         '''
+         yield np.trapz([tmp[1] for tmp in self.curve], x=[tmp[0] for tmp in self.curve])
 
 	def auc(self):
 		for tmp in self.data:
 			if tmp[0] <> self.fprev:
-				self.area += area(self.fp,self.fp_,self.tp,self.tp_)
+				#self.area += area(self.fp,self.fp_,self.tp,self.tp_)
 				self.curve.append([self.fp/self.N,self.tp/self.P])
 				self.fprev = tmp[0]
 				self.tp_ = self.tp
@@ -51,9 +40,6 @@ class ROC_AUC_1:
 				self.tp += 1
 			else:
 				self.fp += 1
-		# Finalising
-		self.area += area(self.N,self.fp_,self.N,self.tp_)
-		self.area = self.area/(self.P*self.N)
 		self.curve.append([self.fp/self.N,self.tp/self.P])
 
 	def counting(self):
@@ -63,7 +49,6 @@ class ROC_AUC_1:
 			else:
 				self.N += 1
 				
-
 '''
 print "area fawcett", a_roc.area
 print "area trapezoid:", np.trapz([tmp[1] for tmp in a_roc.curve], x=[tmp[0] for tmp in a_roc.curve ])
