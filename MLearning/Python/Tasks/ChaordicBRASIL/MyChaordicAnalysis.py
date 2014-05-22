@@ -255,14 +255,12 @@ class MyChaordicAnalysis( MyIO.DataIO ):
             tm1 = func(tmp['NbEntries'], *self._popt1)
             tm2 = func(tmp['NbMulticlicks'], *self._popt2)
             tm3 = funStep( 1.*tmp['NbMulticlicks']/tmp['NbEntries'], 0.002, *self._popt3) 
-            #0.20450724637681153, 0.51254838709677408 )
             ls.append( [ tm1 ,tm2, tm3, tmp['Buy?'] ] )
         
         #Renormalisation step (corr for model deviations)
         c_f1 = self._Pmean/np.mean( [i[0] for i in ls ] )
         c_f2 = self._Pmean/np.mean( [i[1] for i in ls ] )
         c_f3 = self._Pmean/np.mean( [i[2] for i in ls ] )
-        #return [ [ a1*i[0]*c_f1, i[3] ] for i in ls ]
         #Linear combs. performed the best as well as 100% model 1
         return [ [ (a1*i[0]*c_f1 + a2*i[1]*c_f2 + a3*i[2]*c_f3), i[3] ] for i in ls ]
 
