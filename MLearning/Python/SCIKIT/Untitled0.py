@@ -12,7 +12,7 @@ from sklearn.decomposition import PCA
 get_ipython().magic(u'matplotlib inline')
 
 
-# In[2]:
+# In[7]:
 
 '''
     load data
@@ -24,7 +24,7 @@ dframe = pd.DataFrame( data )
 print dframe.describe()
 
 
-# Out[2]:
+# Out[7]:
 
 #               Earning       Index          X1          X2          X3          X4          X5       Zeta
 #     count  100.000000  100.000000  100.000000  100.000000  100.000000  100.000000  100.000000  26.000000
@@ -97,7 +97,7 @@ pl.plot(X4,X5,"o")
 pl.show()
 
 
-# In[3]:
+# In[56]:
 
 '''
     2D plots Earnings vs X's & fits
@@ -126,11 +126,15 @@ for n, tmp in enumerate(X_headers):
         pl.xlabel('feature'+tmp), pl.ylabel('Earning')
         pl.legend(legend, loc='lower right')
         pl.xticks(()), pl.yticks(())
+        print tmp
         
 pl.show()
 
 
-# Out[3]:
+# Out[56]:
+
+#     X4
+#     
 
 # image file:
 
@@ -167,16 +171,60 @@ for size in xrange(2,5):
 
 #     '\n'
 
-# In[5]:
+# In[12]:
+
+'''
+    Compute correlation
+'''
+def corr(l1, l2):
+    if ( len(l1) != len(l2) ):
+        print 'error in correlation...'
+    corr = 0
+    for i in range(len(l1)):
+        corr+=l1[i]*l2[i]
+    return corr/len(l1)
+'''
+    Compute Student stat value
+'''
+def StudentStat(r, n):
+    return r*( (n - 2) / (1-r**2))**0.5
+    
+
+
+# Out[12]:
+
+#     
+#     
+
+# In[19]:
 
 '''
     Check wether data correlated
     X3, X4 > 80% correlated to Earning
     X2, X3 correlated 70%
 '''
+import sys
+#import sklearn.preprocessing.Normalizer as norma
+from numpy.random import rand
+from sklearn.preprocessing import normalize, scale
+from scipy.sparse import csr_matrix
+#from scipy.linalg import norm
+from scipy.stats import norm
 from scipy.stats.stats import pearsonr   
-X1, X2, X3, X4, X5 = np.array(dframe['X1']), np.array(dframe['X2']), np.array(dframe['X3']), np.array(dframe['X4']), np.array(dframe['X5'])
+#X1, X2, X3, X4, X5 = np.array(dframe['X1']), np.array(dframe['X2']), np.array(dframe['X3']), np.array(dframe['X4']), np.array(dframe['X5'])
+
+X = np.array(dframe[['X1','X2','X3','X4','X5']])
+X_ = scale(X) #'''----normalize(X)----'''
+'''
+    Normalise Data
+'''
+X1, X2, X3, X4, X5 = X_[:,0], X_[:,1], X_[:,2], X_[:,3], X_[:,4]
 Y = np.array(dframe['Earning'])
+Y = scale(Y)
+#print Y[:5]
+#sys.exit()
+
+#Y = np.array(dframe['Earning'])
 print '12',np.sqrt(pearsonr(X1,X2)[0]**2+pearsonr(X1,X2)[1]**2)#, np.corrcoef(X1,X2)
 print '13',np.sqrt(pearsonr(X1,X3)[0]**2+pearsonr(X1,X3)[1]**2)
 print '14',np.sqrt(pearsonr(X1,X4)[0]**2+pearsonr(X1,X4)[1]**2)
@@ -186,6 +234,7 @@ print '24',np.sqrt(pearsonr(X2,X4)[0]**2+pearsonr(X2,X4)[1]**2)
 print '25',np.sqrt(pearsonr(X2,X5)[0]**2+pearsonr(X2,X5)[1]**2)
 print '34',np.sqrt(pearsonr(X3,X4)[0]**2+pearsonr(X3,X4)[1]**2)
 print '35',np.sqrt(pearsonr(X3,X5)[0]**2+pearsonr(X3,X5)[1]**2)
+print '45',np.sqrt(pearsonr(X4,X5)[0]**2+pearsonr(X4,X5)[1]**2)
 
 print 'E1', np.sqrt(pearsonr(Y,X1)[0]**2+pearsonr(Y,X1)[1]**2)
 print 'E2', np.sqrt(pearsonr(Y,X2)[0]**2+pearsonr(Y,X2)[1]**2)
@@ -193,14 +242,32 @@ print 'E3', np.sqrt(pearsonr(Y,X3)[0]**2+pearsonr(Y,X3)[1]**2)
 print 'E4', np.sqrt(pearsonr(Y,X4)[0]**2+pearsonr(Y,X4)[1]**2)
 print 'E5', np.sqrt(pearsonr(Y,X5)[0]**2+pearsonr(Y,X5)[1]**2)
 
-
 for n,x in enumerate([X1, X2, X3, X4, X5]):
     pl.figure(n)
-    pl.plot(x,Y,'o')
-    pl.legend(['Earning vs X'+str(n)])
+    pl.plot(x,Y,'x')
+    pl.legend(['Earning vs X'+str(n+1)])
+
+#print corr(Y,X)corr(Y,X3)
+nu = X1.shape[0]
+for n,x in enumerate([X1, X2, X3, X4, X5]):
+    print n,' Y : X ' ,corr(x,Y), StudentStat(corr(x,Y), nu)
+
+print '12', corr(X1,X2), StudentStat(corr(X1,X2), nu) #np.sqrt(pearsonr(X1,X2)[0]**2+pearsonr(X1,X2)[1]**2)
+print '13', corr(X1,X3), StudentStat(corr(X1,X3), nu) #np.sqrt(pearsonr(X1,X3)[0]**2+pearsonr(X1,X3)[1]**2)
+print '14', corr(X1,X4), StudentStat(corr(X1,X4), nu) #np.sqrt(pearsonr(X1,X4)[0]**2+pearsonr(X1,X4)[1]**2)
+print '15', corr(X1,X5), StudentStat(corr(X1,X5), nu) #np.sqrt(pearsonr(X1,X5)[0]**2+pearsonr(X1,X5)[1]**2)
+print '23', corr(X2,X3), StudentStat(corr(X2,X3), nu) #np.sqrt(pearsonr(X2,X3)[0]**2+pearsonr(X2,X3)[1]**2)
+print '24', corr(X2,X4), StudentStat(corr(X2,X4), nu) #np.sqrt(pearsonr(X2,X4)[0]**2+pearsonr(X2,X4)[1]**2)
+print '25', corr(X2,X5), StudentStat(corr(X2,X5), nu) #np.sqrt(pearsonr(X2,X5)[0]**2+pearsonr(X2,X5)[1]**2)
+print '34', corr(X3,X4), StudentStat(corr(X3,X4), nu) #np.sqrt(pearsonr(X3,X4)[0]**2+pearsonr(X3,X4)[1]**2)
+print '35', corr(X3,X5), StudentStat(corr(X3,X5), nu) #np.sqrt(pearsonr(X3,X5)[0]**2+pearsonr(X3,X5)[1]**2)   
+print '45', corr(X4,X5), StudentStat(corr(X4,X5), nu)
+
+print type(X1), X1.shape
+print 1-norm.cdf(  StudentStat(.21061,600) )
 
 
-# Out[5]:
+# Out[19]:
 
 #     12 0.303496844628
 #     13 0.193780324854
@@ -211,11 +278,29 @@ for n,x in enumerate([X1, X2, X3, X4, X5]):
 #     25 0.263633048883
 #     34 0.490855282513
 #     35 0.203637355099
+#     45 0.643864217983
 #     E1 0.607467043672
 #     E2 0.245329348975
 #     E3 0.883781115475
 #     E4 0.802798595971
 #     E5 0.25014819006
+#     0  Y : X  0.0523145623828 0.518597884462
+#     1  Y : X  0.244926747919 2.50082217655
+#     2  Y : X  -0.0148190188756 -0.14671691297
+#     3  Y : X  -0.802798595971 -13.3287995031
+#     4  Y : X  0.124557158048 1.24273080345
+#     12 -0.10829029602 -1.07836073731
+#     13 0.163613441317 1.64181466351
+#     14 -0.0573566458612 -0.568738108961
+#     15 0.0678086612962 0.672820099636
+#     23 -0.034497666471 -0.341712869449
+#     24 -0.0548236930373 -0.54354433491
+#     25 -0.119887616723 -1.19544906772
+#     34 0.0705056139102 0.699711281581
+#     35 -0.149118339476 -1.49288769087
+#     45 -0.0470359649678 -0.466148231535
+#     <type 'numpy.ndarray'> (100,)
+#     6.87958037204e-08
 #     
 
 # image file:
@@ -228,7 +313,7 @@ for n,x in enumerate([X1, X2, X3, X4, X5]):
 
 # image file:
 
-# In[6]:
+# In[11]:
 
 file_ = 'adsquare_teaser_dataMay2014.json'
 fp = open(file_)
@@ -256,7 +341,7 @@ print pca.get_params(deep=True)
 #print pca.components_
 
 
-# Out[6]:
+# Out[11]:
 
 #     [ 0.43680576  0.24962972  0.19112526  0.11582641  0.00661286]
 #     100
