@@ -12,7 +12,7 @@ from sklearn.decomposition import PCA
 get_ipython().magic(u'matplotlib inline')
 
 
-# In[7]:
+# In[2]:
 
 '''
     load data
@@ -24,7 +24,7 @@ dframe = pd.DataFrame( data )
 print dframe.describe()
 
 
-# Out[7]:
+# Out[2]:
 
 #               Earning       Index          X1          X2          X3          X4          X5       Zeta
 #     count  100.000000  100.000000  100.000000  100.000000  100.000000  100.000000  100.000000  26.000000
@@ -138,7 +138,7 @@ pl.show()
 
 # image file:
 
-# In[9]:
+# In[4]:
 
 '''
     Check for clusters
@@ -167,12 +167,10 @@ for size in xrange(2,5):
             print i, ' -*- ' , n_clusters_
 
 
-# Out[9]:
+# In[50]:
 
-#     '\n'
-
-# In[12]:
-
+from scipy.stats import norm, t
+import math
 '''
     Compute correlation
 '''
@@ -188,15 +186,99 @@ def corr(l1, l2):
 '''
 def StudentStat(r, n):
     return r*( (n - 2) / (1-r**2))**0.5
-    
+'''
+ compute Proba for H_0
+ reads in two lists.
+'''
+def ProbH0( l1, l2 ):
+    r = math.fabs( corr(l1, l2) )
+    n = len(l1)-2
+    return t.cdf( StudentStat(r, n) , n ) #norm.cdf( math.fabs( StudentStat(r, n) ) )
+
+'''
+    Corrects the student test for pearson correlation
+    Pearson correlation is not distributed exactly as a gaussian.
+    FisherZtrafo accounts for that.
+    ***average is then log((1.+\rho)/(1.-\rho))
+    ***std_err is \sqrt(1/(N-3))
+'''
+def fisherZtrafo(r):
+    return .5*math.log((1+r)/(1-r))
+'''
+    test against zero correlation
+'''
+def testH_0( n, r, Zeta = 0 ):
+    # test against H_0: \rho = 0.0
+    testval = ( fisherZtrafo( math.fabs(r) )-fisherZtrafo( math.fabs(Zeta) ) )*( n - 3 )**.5
+    if ( testval > 1.96 ):
+        return False, testval
+    else:
+        return True, testval
 
 
-# Out[12]:
+print fisherZtrafo(0.75) #7469)
+print testH_0(100, .35, .5)
 
+
+# Out[50]:
+
+#     0.972955074528
+#     (True, -1.8108345348254946)
 #     
+
+# In[71]:
+
+import sys
+from numpy.random import rand
+from sklearn.preprocessing import normalize, scale
+from scipy.sparse import csr_matrix
+from scipy.stats import norm
+from scipy.stats.stats import pearsonr   
+'''
+    Normalise Data
+'''
+X = np.array(dframe[['X1','X2','X3','X4','X5']])
+X_ = scale(X) #'''----normalize(X)----'''
+X1, X2, X3, X4, X5 = X_[:,0], X_[:,1], X_[:,2], X_[:,3], X_[:,4]
+Y = np.array(dframe['Earning'])
+Y = scale(Y)
+'''
+    Analysis: against Y and data vs data
+'''
+data = [X1, X2, X3, X4, X5]
+for _n, x in enumerate( data ):
+    R, n = corr(x,Y), len(x)
+    print ' Y : X'+str(_n+1) , R, testH_0( n, R )
+
+for _n, x in enumerate( data ):
+    for _m, y in enumerate( data[(_n+1):] ):
+        R, n = corr(x,y), len(x)
+        print ' X'+str((_n+1))+' : X'+str(_n+_m+2), R, testH_0( n, R )
+
+#R, n = corr(X1,X3), len(X5)
+#print R, testH_0( n, R )
+
+
+# Out[71]:
+
+#      Y : X1 0.0523145623828 (True, 0.5157094966126772)
+#      Y : X2 0.244926747919 (False, 2.46229916534109)
+#      Y : X3 -0.0148190188756 (True, 0.1459610948074279)
+#      Y : X4 -0.802798595971 (False, 10.897120735948178)
+#      Y : X5 0.124557158048 (True, 1.233149565310859)
+#      X1 : X2 -0.10829029602 (True, 1.0707343211276015)
+#      X1 : X3 0.163613441317 (True, 1.626019737905643)
+#      X1 : X4 -0.0573566458612 (True, 0.5655181383821853)
+#      X1 : X5 0.0678086612962 (True, 0.6688642720638669)
+#      X2 : X3 -0.034497666471 (True, 0.33989749047136164)
+#      X2 : X4 -0.0548236930373 (True, 0.540492699942512)
+#      X2 : X5 -0.119887616723 (True, 1.1864623993689758)
+#      X3 : X4 0.0705056139102 (True, 0.695553839800144)
+#      X3 : X5 -0.149118339476 (True, 1.4796786392965162)
+#      X4 : X5 -0.0470359649678 (True, 0.46359261378972033)
 #     
 
-# In[19]:
+# In[34]:
 
 '''
     Check wether data correlated
@@ -221,10 +303,8 @@ X_ = scale(X) #'''----normalize(X)----'''
 X1, X2, X3, X4, X5 = X_[:,0], X_[:,1], X_[:,2], X_[:,3], X_[:,4]
 Y = np.array(dframe['Earning'])
 Y = scale(Y)
-#print Y[:5]
-#sys.exit()
 
-#Y = np.array(dframe['Earning'])
+'''
 print '12',np.sqrt(pearsonr(X1,X2)[0]**2+pearsonr(X1,X2)[1]**2)#, np.corrcoef(X1,X2)
 print '13',np.sqrt(pearsonr(X1,X3)[0]**2+pearsonr(X1,X3)[1]**2)
 print '14',np.sqrt(pearsonr(X1,X4)[0]**2+pearsonr(X1,X4)[1]**2)
@@ -262,56 +342,47 @@ print '25', corr(X2,X5), StudentStat(corr(X2,X5), nu) #np.sqrt(pearsonr(X2,X5)[0
 print '34', corr(X3,X4), StudentStat(corr(X3,X4), nu) #np.sqrt(pearsonr(X3,X4)[0]**2+pearsonr(X3,X4)[1]**2)
 print '35', corr(X3,X5), StudentStat(corr(X3,X5), nu) #np.sqrt(pearsonr(X3,X5)[0]**2+pearsonr(X3,X5)[1]**2)   
 print '45', corr(X4,X5), StudentStat(corr(X4,X5), nu)
+'''
 
-print type(X1), X1.shape
-print 1-norm.cdf(  StudentStat(.21061,600) )
+for n,x in enumerate([X1, X2, X3, X4, X5]):
+    print ' Y : X'+str(n+1) , corr(x,Y), ProbH0(x,Y) #, StudentStat(corr(x,Y), nu)
+
+print '12', corr(X1,X2),  ProbH0(X1,X2) #, StudentStat(corr(X1,X2), nu) #np.sqrt(pearsonr(X1,X2)[0]**2+pearsonr(X1,X2)[1]**2)
+print '13', corr(X1,X3), ProbH0(X1,X3) #, StudentStat(corr(X1,X3), nu) #np.sqrt(pearsonr(X1,X3)[0]**2+pearsonr(X1,X3)[1]**2)
+print '14', corr(X1,X4), ProbH0(X1,X4) #, StudentStat(corr(X1,X4), nu) #np.sqrt(pearsonr(X1,X4)[0]**2+pearsonr(X1,X4)[1]**2)
+print '15', corr(X1,X5), ProbH0(X1,X5) #, StudentStat(corr(X1,X5), nu) #np.sqrt(pearsonr(X1,X5)[0]**2+pearsonr(X1,X5)[1]**2)
+print '23', corr(X2,X3), ProbH0(X2,X3) #, StudentStat(corr(X2,X3), nu) #np.sqrt(pearsonr(X2,X3)[0]**2+pearsonr(X2,X3)[1]**2)
+print '24', corr(X2,X4), ProbH0(X2,X4) #, StudentStat(corr(X2,X4), nu) #np.sqrt(pearsonr(X2,X4)[0]**2+pearsonr(X2,X4)[1]**2)
+print '25', corr(X2,X5), ProbH0(X2,X5) #, StudentStat(corr(X2,X5), nu) #np.sqrt(pearsonr(X2,X5)[0]**2+pearsonr(X2,X5)[1]**2)
+print '34', corr(X3,X4), ProbH0(X3,X4) #, StudentStat(corr(X3,X4), nu) #np.sqrt(pearsonr(X3,X4)[0]**2+pearsonr(X3,X4)[1]**2)
+print '35', corr(X3,X5), ProbH0(X3,X5) #, StudentStat(corr(X3,X5), nu) #np.sqrt(pearsonr(X3,X5)[0]**2+pearsonr(X3,X5)[1]**2)   
+print '45', corr(X4,X5), ProbH0(X4,X5) #, StudentStat(corr(X4,X5), nu)
+
+#print type(X1), X1.shape
+print norm.cdf(  StudentStat(.21061,600) ), norm.cdf(  StudentStat(.21061,100) )
+print norm.cdf(  StudentStat(.10,100) ), StudentStat(.21061,600)
 
 
-# Out[19]:
+# Out[34]:
 
-#     12 0.303496844628
-#     13 0.193780324854
-#     14 0.573709270889
-#     15 0.507198391964
-#     23 0.734109658079
-#     24 0.590539735611
-#     25 0.263633048883
-#     34 0.490855282513
-#     35 0.203637355099
-#     45 0.643864217983
-#     E1 0.607467043672
-#     E2 0.245329348975
-#     E3 0.883781115475
-#     E4 0.802798595971
-#     E5 0.25014819006
-#     0  Y : X  0.0523145623828 0.518597884462
-#     1  Y : X  0.244926747919 2.50082217655
-#     2  Y : X  -0.0148190188756 -0.14671691297
-#     3  Y : X  -0.802798595971 -13.3287995031
-#     4  Y : X  0.124557158048 1.24273080345
-#     12 -0.10829029602 -1.07836073731
-#     13 0.163613441317 1.64181466351
-#     14 -0.0573566458612 -0.568738108961
-#     15 0.0678086612962 0.672820099636
-#     23 -0.034497666471 -0.341712869449
-#     24 -0.0548236930373 -0.54354433491
-#     25 -0.119887616723 -1.19544906772
-#     34 0.0705056139102 0.699711281581
-#     35 -0.149118339476 -1.49288769087
-#     45 -0.0470359649678 -0.466148231535
-#     <type 'numpy.ndarray'> (100,)
-#     6.87958037204e-08
+#      Y : X1 0.0523145623828 0.695544239556
+#      Y : X2 0.244926747919 0.992483149794
+#      Y : X3 -0.0148190188756 0.557579165678
+#      Y : X4 -0.802798595971 1.0
+#      Y : X5 0.124557158048 0.889176284577
+#     12 -0.10829029602 0.855770786938
+#     13 0.163613441317 0.946310096913
+#     14 -0.0573566458612 0.712607349207
+#     15 0.0678086612962 0.746486389765
+#     23 -0.034497666471 0.632035051412
+#     24 -0.0548236930373 0.704091069749
+#     25 -0.119887616723 0.880201453609
+#     34 0.0705056139102 0.75488026272
+#     35 -0.149118339476 0.92863597959
+#     45 -0.0470359649678 0.677221174173
+#     0.999999931204 0.983528213713
+#     0.840116468252 5.26843518376
 #     
-
-# image file:
-
-# image file:
-
-# image file:
-
-# image file:
-
-# image file:
 
 # In[11]:
 
