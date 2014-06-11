@@ -8,9 +8,9 @@
 
 ##### import libraries and some specifications:
 
-# In[6]:
+# In[1]:
 
-import sys, math, json, itertools, warnings
+import sys, math, scipy, json, itertools, warnings
 import pandas as pd
 import numpy as np
 import pylab as pl
@@ -26,7 +26,7 @@ get_ipython().magic(u'matplotlib inline')
 
 ##### load data:
 
-# In[142]:
+# In[2]:
 
 file_ = 'adsquare_teaser_dataMay2014.json'
 dframe = pd.DataFrame( json.load(open(file_)) )
@@ -34,12 +34,12 @@ dframe = pd.DataFrame( json.load(open(file_)) )
 
 ##### Summarising data: 
 
-# In[8]:
+# In[3]:
 
 dframe.describe()
 
 
-# Out[8]:
+# Out[3]:
 
 #               Earning       Index          X1          X2          X3          X4          X5       Zeta
 #     count  100.000000  100.000000  100.000000  100.000000  100.000000  100.000000  100.000000  26.000000
@@ -55,13 +55,13 @@ dframe.describe()
 
 # At first sight, one notice correlations for samples combinations (Earning,X4), (Zeta,X4).
 
-# In[144]:
+# In[4]:
 
 axes = pd.tools.plotting.scatter_matrix(dframe[['X1','X2','X3','X4','X5','Earning','Zeta']], color="brown")
 #The plot below can be extended manually
 
 
-# Out[144]:
+# Out[4]:
 
 # image file:
 
@@ -70,7 +70,7 @@ axes = pd.tools.plotting.scatter_matrix(dframe[['X1','X2','X3','X4','X5','Earnin
 # For doing the correlation analysis, I need a few functions that I quickly design myself. 
 # (I have crosschecked them against standard packages outputs). These functions are defined and commented on below.
 
-# In[141]:
+# In[3]:
 
 ''' quick power x_array -> x_array**2 '''
 def power( np_arr, N ):
@@ -109,10 +109,86 @@ def testH_0( n, r, Zeta = 0 ):
         return True
 
 
-# As next step, I measure how data is correlated, first looking at correlation between the different features and earnings
+# In order to evaluate the best model, we will also need R2 and the adjusted R2. The squared error naturally increases if new features are added.
+# This effect is accounted for by the adjusted R2.
+
+# In[24]:
+
+def SSreg(Y, fitY):
+    return sum(map(lambda x : (x[0] - x[1])**2, zip(Y,fitY)[:]))   
+def SStot(Y):
+    ybar = Y.mean()
+    return sum(map(lambda x : (x - ybar)**2, Y[:]))
+def R2(Y,fitY):
+    return 1-SSreg(Y,fitY)/SStot(Y)
+''' R2 adjusted '''
+def R2adj(Y,fitY,N):
+    return 1.- (1.- R2(Y,fitY))*(len(Y)-1.)/(len(Y)-N-1.)
+display(Math(r'R^2 \equiv 1 - {SS_{\rm res}\over SS_{\rm tot}},'))
+display(Math(r'R^2_{\rm{adjusted}} = 1- (1-R^2)\cdot \frac{N - 1}{N - d_f - 1},'))
+display(Math(r'with\quad SS_\text{res}=\sum_i (y_i - f_i)^2\quad and\quad SS_\text{tot}=\sum_i (y_i-\bar{y})^2.'))
+
+
+# Out[24]:
+
+# image file:
+
+# image file:
+
+# image file:
+
+#     
+#     
+
+# Ftest: one-way ANOVA F-test statistic
+
+# In[25]:
+
+''' F-test  '''
+display(Math(r'between\,\, group = \sum_i n_i(\bar{Y}_{i\cdot} - \bar{Y})^2/(K-1)')) 
+display(Math(r'within \,\, group = \sum_{ij} (Y_{ij}-\bar{Y}_{i\cdot})^2/(N-K),')) 
+display(Math(r'F\, =\, between\,\, group\, /\, within \,\, group.'))
+def beetwGroup(arrX):
+    y_i, res = [], 0.
+    [ y_i.append(x_.mean()) for x_ in arrX ]
+    y_bar = sum(y_i)/len(y_i)
+    for i in xrange(len(y_i)):
+        res += (y_i[i]- y_bar)**2 *len(arrX[i]) 
+    return res / ( len(y_i)-1 )
+
+def withinGroup(arrX):
+    y_i, res, d_f = [], 0., 0
+    [ y_i.append(x_.mean()) for x_ in arrX ]       
+    for i in xrange(len(y_i)):
+        d_f += len(arrX[i])-1
+        res += sum((arrX[i][:]-y_i[i])**2)
+    return res/d_f
+
+#F = \frac{\text{explained variance}}{\text{unexplained variance}} ,
+def F(arrX):
+    return beetwGroup(arrX) / withinGroup(arrX)
+
+def Ftest(arrX):
+    Ftest = scipy.stats.f.cdf( F(arrX),len(arrX)-1, sum([ len(tmp)-1 for tmp in arrX ]) )
+    ''' null hypothesis: same expected value '''
+    if ((1. - Ftest) > 0.05):
+        return Ftest #[True, Ftest]
+    else:
+        return Ftest #[False, Ftest]
+
+
+# Out[25]:
+
+# image file:
+
+# image file:
+
+# image file:
+
+# As first step, I measure how data is correlated, first looking at correlation between the different features and earnings
 # Then, I also consider powers of the features (include basical nonlinear models).
 
-# In[10]:
+# In[226]:
 
 '''    Preprocess Data    '''
 _columns = ['Earning', 'X1', 'X2', 'X3', 'X4', 'X5', 'Zeta']
@@ -124,7 +200,7 @@ Y = scale( np.array(dframe['Earning']) )
 
 # Measure correlations Earning VS {X1,X2,X3,X4,X5} and test Hypothesis H_0: uncorrelated data
 
-# In[11]:
+# In[227]:
 
 data = [X1, X2, X3, X4, X5]
 print 'featureVSfeature, correlation, test uncorrelated H_0'
@@ -134,7 +210,7 @@ for _n, x in enumerate( data ):
         print  ' Earning : X'+str(_n+1) , R, testH_0( n, R )
 
 
-# Out[11]:
+# Out[227]:
 
 #     featureVSfeature, correlation, test uncorrelated H_0
 #      Earning : X2 0.244926747919 False
@@ -143,7 +219,7 @@ for _n, x in enumerate( data ):
 
 # Measure correlations between elements {X1,X2,X3,X4,X5} and test Hypothesis H_0: uncorrelated data: 
 
-# In[28]:
+# In[228]:
 
 print 'featureVSfeature, correlation, test uncorrelated H_0'
 for _n, x in enumerate( data ):
@@ -153,7 +229,7 @@ for _n, x in enumerate( data ):
             print ' X'+str((_n+1))+' : X'+str(_n+_m+2), R, testH_0( n, R )
 
 
-# Out[28]:
+# Out[228]:
 
 #     featureVSfeature, correlation, test uncorrelated H_0
 #     
@@ -163,7 +239,7 @@ for _n, x in enumerate( data ):
 
 # Checked is corr( Y, pow(X, N) )
 
-# In[29]:
+# In[229]:
 
 print  'power, featureVSfeature, correlation, test uncorrelated H_0'
 for _n, x in enumerate( data ):
@@ -174,7 +250,7 @@ for _n, x in enumerate( data ):
             print  'power', _pow, ', Y : X'+str(_n+1) , R, testH_0( n, R )
 
 
-# Out[29]:
+# Out[229]:
 
 #     power, featureVSfeature, correlation, test uncorrelated H_0
 #     power 2 , Y : X4 -0.199834919763 False
@@ -182,66 +258,93 @@ for _n, x in enumerate( data ):
 #     power 4 , Y : X4 -0.22271889492 False
 #     
 
-##### Fits, Linear Regressions:
+#### Best model with Linear Regressions and plots:
 
-# Even though the X1,X3,X5 features can statistically be considered indep. of Earning, I found the
-# best regression score as all {X1,X2,X3,X5} were included. The algorithm is a standard last square linear regression.
+# Based on the previous analysis, candidates for the model should contain 'x4', 'X2' or both of them.
+# Below, I evaluate the models accuracies for the models fitted with linear regressions.
 
-# In[137]:
+# In[30]:
+
+regr = linear_model.LinearRegression()
+Y = np.array(dframe[['Earning']])
+models = [ ['X4'], ['X2'], ['X2','X4'], ['X1','X2','X4'], ['X2','X3','X4'], ['X2','X4','X5'],             ['X2','X3','X4','X5'], ['X1','X3','X4','X5'], ['X1','X2','X4','X5'],                 ['X1','X2','X3','X5'], ['X1','X2','X3','X4'], ['X1','X2','X3','X4','X5'] ]
+print 'model  : R^2 adjusted   : my R^2         : F test         : R^2 sci-kit'
+print '------------------------------------------------------------------------------------'
+for tmp in models:
+    X = np.array(dframe[tmp])
+    regr.fit(X, Y)
+    y = regr.predict(X)
+    print str(tmp),':', R2adj(Y,y,len(tmp))[0],':', R2(Y,y)[0],':', Ftest([Y,y])[0],':', regr.score(X,Y)
+
+
+# Out[30]:
+
+#      model  : R^2 adjusted   : my R^2         : F test         : R^2 sci-kit
+#     ------------------------------------------------------------------------------------
+#     ['X4'] : 0.640857887589 : 0.644485585694 : 0.0 : 0.644485585694
+#     ['X2'] : 0.0503971640078 : 0.0599891118461 : 7.51208544433e-16 : 0.0599891118461
+#     ['X2', 'X4'] : 0.678478476154 : 0.684973860474 : 5.95819396427e-16 : 0.684973860474
+#     ['X1', 'X2', 'X4'] : 0.675993820786 : 0.685812189853 : 5.95671231934e-16 : 0.685812189853
+#     ['X2', 'X3', 'X4'] : 0.677515025719 : 0.687287297667 : 5.95410792761e-16 : 0.687287297667
+#     ['X2', 'X4', 'X5'] : 0.688169589412 : 0.697618995793 : 5.9359619454e-16 : 0.697618995793
+#     ['X2', 'X3', 'X4', 'X5'] : 0.689409090898 : 0.701958218538 : 5.92839010866e-16 : 0.701958218538
+#     ['X1', 'X3', 'X4', 'X5'] : 0.640653699996 : 0.65517274242 : 6.01159283731e-16 : 0.65517274242
+#     ['X1', 'X2', 'X4', 'X5'] : 0.685443530546 : 0.698152882847 : 8.39339816571e-16 : 0.698152882847
+#     ['X1', 'X2', 'X3', 'X5'] : 0.0507166740292 : 0.0890715558866 : 1.04808863403e-15 : 0.0890715558866
+#     ['X1', 'X2', 'X3', 'X4'] : 0.674591604527 : 0.687739418486 : 5.95331036477e-16 : 0.687739418486
+#     ['X1', 'X2', 'X3', 'X4', 'X5'] : 0.686248639688 : 0.702094667987 : 8.38367363337e-16 : 0.702094667987
+#     
+
+# R^2 adjusted should account for the overfitting effects.
+# Models found with the maximal R^2 adj. are ['X4','X2'], ['X2','X4','X5'], ['X2','X3','X4','X5'].
+# Because the correlation of 'X4' and 'X2' with Y is quite clear and the increase with additional feature 
+# small, my favourite model is ['X4','X2'], with parameters shown below: 
+
+# In[51]:
 
 Y = np.array(dframe['Earning'])
-X_, X__, X___ = np.array(dframe[['X4']]), np.array(dframe[['X4','X2']]),                     np.array(dframe[['X4','X1','X2','X3','X5']])
+X_, X__, X___ = np.array(dframe[['X4']]), np.array(dframe[['X4','X2']]),                     np.array(dframe[['X4','X2','X3','X5']])
 
 regr1, regr2, regr3 = linear_model.LinearRegression(), linear_model.LinearRegression(),                             linear_model.LinearRegression()
 regr1.fit(X_, Y), regr2.fit(X__, Y), regr3.fit(X___,Y)
 Y1D, Y2D, YmultiD = regr1.predict(X_), regr2.predict(X__), regr3.predict(X___)
-
-print 'Y vs X1, score: ', regr1.score(X_,Y), len(regr1.coef_)
-print 'Y vs [X4,X2], score: ', regr2.score(X__,Y), len(regr2.coef_)
-print 'Y vs [X1,X2,X3,X4,X5], score: ', regr3.score(X___,Y), len(regr3.coef_)
+err4, err42, err4235 = Y-Y1D, Y-Y2D, Y-YmultiD
 
 title = 'plot Earning vs '
-legend1, legend2, legend3 = ['1D fit X4','fitted pts'], ['2D fitted pts X4,X2'], ['5D fitted pts']
+legend1, legend2, legend3 = ['1D fit X4','fitted pts'], ['2D fitted pts X4,X2'], ['2D fit error']
 
-fig, axes = pl.subplots(figsize=(14,5))
+fig, axes = pl.subplots(figsize=(18,6))
 pl.subplot(1,3,1)
 pl.title(title+str(' 1D fit')), pl.xlabel('feature X4'), pl.ylabel('Earning')
 pl.scatter(X_, Y,  color='black')
 pl.plot(X_, regr1.predict(X_), color='blue', linewidth=1)
 pl.plot(X_, Y1D, 'r*' )
 pl.legend(legend1, loc='upper right')
-
 pl.subplot(1,3,2)
 pl.title(title+str(' 2D fit')), pl.xlabel('feature X4'), pl.ylabel('Earning')
 pl.scatter(X_, Y,  color='black')
 pl.plot(X_, Y2D, 'bx' )
 pl.legend(legend2, loc='upper right');
-
 pl.subplot(1,3,3)
-pl.title(title+str(' 5D fit')), pl.xlabel('feature X4'), pl.ylabel('Earning')
-pl.scatter(X_, Y,  color='black')
-pl.plot(X_, YmultiD, 'gx' )
+title = '2D fit Error'
+pl.title(title), pl.xlabel('feature X4'), pl.ylabel('Fit Error')
+pl.plot(X_, err42, 'g^')
 pl.legend(legend3, loc='upper right');
 
 
-# Out[137]:
-
-#     Y vs X1, score:  0.644485585694 1
-#     Y vs [X4,X2], score:  0.684973860474 2
-#     Y vs [X1,X2,X3,X4,X5], score:  0.702094667987 5
-#     
+# Out[51]:
 
 # image file:
 
-# Parameters of the 2D linear model: 
+# Final 2D model and its parameters:
 
-# In[138]:
+# In[16]:
 
 display(Math(r'Model: \quad \vec Y = \alpha \vec X_4 + \beta \vec X_2 + h,'))
 display(Math(r'\alpha = '+str(regr2.coef_[0])+',')) , display(Math(r'\beta = '+str(regr2.coef_[1])+',')), display(Math(r'h = '+str(regr2.intercept_)+'.'));
 
 
-# Out[138]:
+# Out[16]:
 
 # image file:
 
@@ -251,18 +354,24 @@ display(Math(r'\alpha = '+str(regr2.coef_[0])+',')) , display(Math(r'\beta = '+s
 
 # image file:
 
-#### Fitting Zeta:
+#### Zeta, fits and Print data out into Json format:
 
-# In[ ]:
+# In[52]:
 
-For Zeta, we repeat the same variance analysis as for Earning, but now earnings becomes a variable, we look at
-Zeta VS {X1,X2,X3,X4,X5,Earning}. We see that Zeta is correlated primarily with X4 and Earnings.
+df = dframe.dropna()
+axes = pd.tools.plotting.scatter_matrix(df[['X1','X2','X3','X4','X5','Earning','Zeta']], color="brown")
 
 
-# In[134]:
+# Out[52]:
+
+# image file:
+
+# For Zeta, we repeat the same variance analysis as for Earning, but now earnings becomes a variable, we look at
+# Zeta VS {X1,X2,X3,X4,X5,Earning}. We see that Zeta is correlated primarily with X4 and Earnings.
+
+# In[31]:
 
 ''' preprocessing '''
-df = dframe.dropna()
 _headers = ['X1','X2','X3','X4','X5','Earning']
 _X = scale(np.array(df[['X1','X2','X3','X4','X5','Earning']]))
 Y = scale( np.array(df['Zeta']) )
@@ -285,30 +394,35 @@ for _n, x in enumerate( data ):
             print  'power', _pow, 'Zeta : '+str(_headers[_n]) , R, testH_0( n, R )
 
 
-# Out[134]:
+# Out[31]:
 
 #     featureVSfeature, correlation, test uncorrelated H_0
-#     Zeta : X4 0.951561682841 False
-#     Zeta : Earning -0.73608208576 False
-#     power 3 Zeta : X4 0.311662793951 False
-#     power 4 Zeta : X4 0.221332188038 False
-#     power 3 Zeta : Earning 0.263160233415 False
-#     power 4 Zeta : Earning 0.269084471723 False
+#     Zeta : X4 0.9142698418 False
+#     Zeta : Earning -0.759428468333 False
+#     power 2 Zeta : X4 0.500719178458 False
+#     power 3 Zeta : X4 0.605305228444 False
+#     power 4 Zeta : X4 0.455343278347 False
+#     power 2 Zeta : Earning 0.445794780234 False
+#     power 3 Zeta : Earning 0.497694397801 False
+#     power 4 Zeta : Earning 0.521701957548 False
 #     
 
 ##### Fits: 
 
-# In[135]:
+# In[49]:
 
 Y = np.array(df['Zeta'])
 X_, X__, X___ = np.array(df[['X4']]), np.array(df[['X4','Earning']]),                     np.array(df[['X4','X1','X2','X3','X5','Earning']])
 regr1, regr2, regr3 = linear_model.LinearRegression(), linear_model.LinearRegression(),                             linear_model.LinearRegression()
 regr1.fit(X_, Y), regr2.fit(X__, Y), regr3.fit(X___,Y)
 Y1D, Y2D, YmultiD = regr1.predict(X_), regr2.predict(X__), regr3.predict(X___)
+err1D, err2D, errmultiD = Y1D-Y, Y2D-Y, YmultiD-Y
 
-print 'Y vs X1, score: ', regr1.score(X_,Y), len(regr1.coef_)
-print 'Y vs [X4,Earning], score: ', regr2.score(X__,Y), len(regr2.coef_)
-print 'Y vs [X1,X2,X3,X4,X5,Earning], score: ', regr3.score(X___,Y), len(regr3.coef_)
+print 'model  : R^2 adjusted   : my R^2         : F test         : R^2 sci-kit'
+print '------------------------------------------------------------------------------------'
+print 'Y vs X4 : ', R2adj(Y,Y1D,1),':', R2(Y,Y1D),':', Ftest([Y,Y1D]),':', regr1.score(X_,Y)
+print 'Y vs [X4,Earning] : ', R2adj(Y,Y2D,2),':', R2(Y,Y2D),':', Ftest([Y,Y2D]),':', regr2.score(X__,Y)
+print 'Y vs [X1,X2,X3,X4,X5,Earning] : ', R2adj(Y,YmultiD,6),':', R2(Y,YmultiD),':', Ftest([Y,YmultiD]),':', regr3.score(X___,Y)
 
 title = 'Zeta( '
 legend1, legend2, legend3 = ['1D fit','fitted pts'], ['2D fitted pts'], ['5D fitted pts']
@@ -328,30 +442,32 @@ pl.plot(X_, Y2D, 'bx' )
 pl.legend(legend2, loc='lower right')
 
 pl.subplot(1,3,3)
-pl.title(title+str(' 5D fit )')), pl.xlabel('feature X4'), pl.ylabel('Zeta')
-pl.scatter(X_, Y,  color='black')
-pl.plot(X_, YmultiD, 'gx' )
+pl.title(title+str(' 2D fit error )')), pl.xlabel('feature X4'), pl.ylabel('2D fit error')
+#pl.scatter(X_, Y,  color='black')
+pl.plot(X_, err2D, 'g^' )
 pl.legend(legend3, loc='lower right');
 
 
-# Out[135]:
+# Out[49]:
 
-#     Y vs X1, score:  0.905469636251 1
-#     Y vs [X4,Earning], score:  0.907648241144 2
-#     Y vs [X1,X2,X3,X4,X5,Earning], score:  0.960316681916 6
+#     model  : R^2 adjusted   : my R^2         : F test         : R^2 sci-kit
+#     ------------------------------------------------------------------------------------
+#     Y vs X4 :  0.829051399609 : 0.835889343624 : 1.97319244073e-16 : 0.835889343624
+#     Y vs [X4,Earning] :  0.823598482283 : 0.8377106037 : 2.44481043569e-16 : 0.8377106037
+#     Y vs [X1,X2,X3,X4,X5,Earning] :  0.834747768478 : 0.874408304044 : 2.14646745927e-16 : 0.874408304044
 #     
 
 # image file:
 
 # 2D model coeffs: 
 
-# In[136]:
+# In[54]:
 
 display(Math(r'Model: \quad \vec Y = \alpha \vec X_4 + \beta \vec {Earning} + h,'))
 display(Math(r'\alpha = '+str(regr2.coef_[0])+',')) , display(Math(r'\beta = '+str(regr2.coef_[1])+',')), display(Math(r'h = '+str(regr2.intercept_)+'.'));
 
 
-# Out[136]:
+# Out[54]:
 
 # image file:
 
@@ -362,24 +478,6 @@ display(Math(r'\alpha = '+str(regr2.coef_[0])+',')) , display(Math(r'\beta = '+s
 # image file:
 
 ##### Fit the NaN in Zeta and Print data out into Json format
-
-# We correct the NaNs with the 2D linear model defined above.
-
-# In[101]:
-
-title, legend = 'Zeta( X4 )', ['data avail.','2D fitted pts (X4,Earning)','1D fit (X4)']
-pl.figure(figsize=(10, 6))
-
-pl.plot(np.array(df[['X4']]), np.array(df[['Zeta']]), 'bo')
-pl.plot( np.array(dframe[['X4']]), regr2.predict(dframe[['X4','Earning']]), 'rx' )
-pl.plot( np.array(df[['X4']]), regr.predict(np.array(df[['X4']])), 'b--')
-pl.xlabel('X4'), pl.ylabel('Zeta')
-pl.title(title), pl.legend(legend, loc='lower right');
-
-
-# Out[101]:
-
-# image file:
 
 # Replace NaNs with fitted values and print out into file OutputJW.json
 
@@ -396,12 +494,9 @@ _fileOut.close()
 
 #### Additional analyses:
 
-# In[ ]:
+# Additional analyses investigating for more scenarios in the data.
 
-Additional analyses investigating for more scenarios in the data.
-
-
-# In[139]:
+# In[*]:
 
 '''     Check for clusters   '''
 from sklearn.datasets.samples_generator import make_blobs
@@ -430,8 +525,3 @@ for size in xrange(2,5):
 if ( _cluster == False ):
     print 'No Clusters found'
 
-
-# Out[139]:
-
-#     No Clusters found
-#     
