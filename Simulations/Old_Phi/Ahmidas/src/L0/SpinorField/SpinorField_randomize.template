@@ -1,8 +1,0 @@
-template< typename Element, size_t D >
-void SpinorField< Element, D >::randomize()
-{
-  for(size_t idx = 0; idx < SpinorDim< D >::value; ++idx)
-    d_fields[idx]->randomize();
-}
-
-

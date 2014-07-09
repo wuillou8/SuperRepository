@@ -1,7 +1,0 @@
-template< typename Element, size_t D >
-SpinorField< Element, D > &SpinorField< Element,D >::shift(size_t const &along, Base::Direction dir)
-{
-  for (size_t idx = 0; idx < SpinorDim< D >::value; ++idx)
-    d_fields[idx]->shift(along, dir);
-  return *this;
-}

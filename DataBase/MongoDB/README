@@ -1,9 +1,0 @@
-Simple test for the activation of the MongoDB database from the C# MongodDB.Driver.
-The MongoDB database has to be started separatedly and runs by default on the data/db directory.
-WINDOWS settings: 
-C:mongodb
-C:data/db
-These directories are either creted during the install of mongodb or are to be created by hand. mongodb is launched with either
-C:mongodb/bin/mongo.exe
-C:mongodb/bin/mongod.exe, 
-whereas the latest is used for running the present C# code.

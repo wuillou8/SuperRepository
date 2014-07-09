@@ -1,8 +1,0 @@
-In file included from ziggurat_original.C:8:
-ziggurat_original.H:12:43: warning: no newline at end of file
-ziggurat_original.C: In function 'void r4_exp_setup()':
-ziggurat_original.C:244: warning: converting to 'unsigned int' from 'double'
-ziggurat_original.C:256: warning: converting to 'unsigned int' from 'double'
-ziggurat_original.C: In function 'void r4_nor_setup()':
-ziggurat_original.C:347: warning: converting to 'unsigned int' from 'double'
-ziggurat_original.C:359: warning: converting to 'unsigned int' from 'double'

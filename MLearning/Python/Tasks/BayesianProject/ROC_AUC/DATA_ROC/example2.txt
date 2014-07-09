@@ -1,7 +1,0 @@
-http://blogs.sas.com/content/iml/2011/07/29/computing-an-roc-curve-from-basic-principles/
-proc iml;
-/** x and y are column vectors. y contains {0,1} **/
-N = {0.3,0.4,0.5,0.5,0.5,0.6,0.7,0.7,0.8,0.9};
-P = {0.5,0.6,0.6,0.8,0.9,0.9,0.9,1.0,1.2,1.4};
-x = N // P;
-y = repeat(0, nrow(N)) // repeat(1, nrow(P));

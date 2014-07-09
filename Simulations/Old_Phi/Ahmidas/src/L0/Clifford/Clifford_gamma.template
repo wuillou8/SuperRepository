@@ -1,7 +1,0 @@
-template< size_t Dim >
-typename Clifford< Dim >::GMatrix const *Clifford< Dim >::gamma()
-{
-  if (!s_gamma)
-    generateGamma();
-  return s_gamma;
-}

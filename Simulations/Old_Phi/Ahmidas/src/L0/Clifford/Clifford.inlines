@@ -1,5 +1,0 @@
-template< size_t dim >
-inline typename Clifford< dim >::GMatrix const Clifford< dim >::identity()
-{
-  return Clifford< dim >::GMatrix::Identity();
-}

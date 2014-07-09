@@ -1,7 +1,0 @@
-template< size_t Dim >
-typename Clifford< Dim >::GMatrix const *Clifford< Dim >::cconj()
-{
-  if (!s_cconj)
-    generateCconj();
-  return s_cconj;
-}

@@ -1,6 +1,0 @@
-template< typename Element, size_t D >
-SpinorField< Element, D >::~SpinorField()
-{
-  for(size_t idx = 0; idx < SpinorDim< D >::value; ++idx)
-    delete d_fields[idx];
-}
