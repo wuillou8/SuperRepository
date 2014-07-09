@@ -1,0 +1,49 @@
+template< typename Element, size_t L, size_t T >
+void Base::IO::loadILDG(Core::Field< Element, L, T > *field, std::string const &filename)
+{
+  int TAG_SIEBREN = 1;
+  Base::Weave< L, T > weave = Base::Weave< L, T >::instance();
+  size_t written = 0; // Number of locally written elements
+  size_t const elementSize = sizeof(Element) / sizeof(double);
+  char *fileBuffer = new char[elementSize * sizeof(double) * weave.d_grid.contiguousBlock()];
+  if (weave.d_grid.rank() == 0)
+  {
+    Lime::Reader reader(filename);
+    reader.retrieveRecord(reader.findRecord("ildg-binary-data"));
+    size_t nBlocks = L * L * L * T / weave.d_grid.contiguousBlock();
+    for (size_t ctr = 0; ctr < nBlocks; ++ctr)
+    {
+      reader.read(fileBuffer, weave.d_grid.contiguousBlock() * elementSize * sizeof(double));
+      if (reader.fail())
+      {
+        std::cerr << "Unexpected error during I/O.\nAborting." << std::endl;
+        MPI::COMM_WORLD.Abort(EIO);
+      }
+
+      size_t destination = weave.d_grid.rank(ctr * weave.d_grid.contiguousBlock());
+      if (destination == 0) // This block of data should be stored locally
+      {
+        std::copy(reinterpret_cast< double* >(fileBuffer),
+                  reinterpret_cast< double* >(fileBuffer) + (weave.d_grid.contiguousBlock() * elementSize),
+                  reinterpret_cast< double* >(field->d_field + written));
+        written += weave.d_grid.contiguousBlock();
+        continue;
+      }
+      weave.d_grid.grid().Send(fileBuffer, weave.d_grid.contiguousBlock() * elementSize * sizeof(double), MPI::BYTE, destination, TAG_SIEBREN);
+    }
+  }
+  else
+  {
+    for (size_t ctr = 0; ctr < (weave.localVolume() / weave.d_grid.contiguousBlock()); ++ctr, written += weave.d_grid.contiguousBlock())
+    {
+      weave.d_grid.grid().Recv(fileBuffer, weave.d_grid.contiguousBlock() * elementSize * sizeof(double), MPI::BYTE, 0, TAG_SIEBREN);
+      std::copy(reinterpret_cast< double* >(fileBuffer),
+                reinterpret_cast< double* >(fileBuffer) + (weave.d_grid.contiguousBlock() * elementSize),
+                reinterpret_cast< double* >(field->d_field + written));
+    }
+  }
+  std::fill_n(field->d_offsets, 4, 0);
+  if (!bigEndian())
+    swapEndian(field->d_field, field->d_field + weave.localVolume(), sizeof(double));
+  delete[] fileBuffer;
+}

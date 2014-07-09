@@ -1,0 +1,112 @@
+namespace Tool
+{
+  namespace IO
+  {
+    namespace Lime
+    {
+      template< typename DataType >
+      inline void Reader::read(DataType *buffer, size_t elements)
+      {
+        d_in.read(reinterpret_cast< char* >(buffer), elements * sizeof(DataType));
+      }
+
+      inline void Reader::retrieveRecord(size_t const record)
+      {
+        if (record >= d_types.end() - d_types.begin())
+        {
+           d_fail = true; //Record does not exist
+           return;
+        }
+        d_currentRecord = record;
+        d_in.seekg(d_offsets[d_currentRecord], std::ios::beg);
+      }
+
+      inline void Reader::retrieveMessageAndRecord(size_t const message, size_t const record)
+      {
+        size_t const idx = std::find(d_messages.begin(), d_messages.end(), message) - d_messages.begin();
+        d_in.seekg(d_offsets[d_currentRecord = (idx + record)]);
+      }
+
+      inline void Reader::nextRecord()
+      {
+        d_in.seekg(d_offsets[++d_currentRecord], std::ios::beg);
+      }
+
+      inline void Reader::previousRecord()
+      {
+        d_in.seekg(d_offsets[--d_currentRecord], std::ios::beg);
+      }
+
+      inline std::string const &Reader::filename() const
+      {
+        return d_filename;
+      }
+
+      inline size_t Reader::records() const
+      {
+        return d_messages.size();
+      }
+
+      inline size_t Reader::messages() const
+      {
+        return d_messages.back() + 1;
+      }
+
+      inline size_t Reader::currentRecord() const
+      {
+        return d_currentRecord;
+      }
+
+      inline size_t Reader::currentMessage() const
+      {
+        return d_messages[d_currentRecord];
+      }
+
+      inline size_t Reader::recordSize() const
+      {
+        return d_sizes[d_currentRecord];
+      }
+
+      inline size_t Reader::findRecord(std::string const &type) const
+      {
+        return std::find(d_types.begin(), d_types.end(), type) - d_types.begin();
+      }
+
+      inline std::string const &Reader::type() const
+      {
+        return d_types[d_currentRecord];
+      }
+
+      inline int16_t const &Reader::version() const
+      {
+        return d_versions[d_currentRecord];
+      }
+
+      inline bool Reader::good() const
+      {
+        return d_in.good() && !d_fail;
+      }
+
+      inline bool Reader::fail() const
+      {
+        return d_in.fail() || d_fail;
+      }
+
+      inline bool Reader::messagesCorrect() const
+      {
+        return d_messagesCorrect;
+      }
+
+      inline std::streampos Reader::tellg()
+      {
+        return (d_in.tellg() - d_offsets[d_currentRecord]);
+      }
+
+      inline void Reader::seekg(std::streampos const offset, size_t const record)
+      {
+        d_in.seekg(d_offsets[record] + offset, std::ios::beg);
+      }
+
+    }
+  }
+}

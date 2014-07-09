@@ -1,0 +1,158 @@
+namespace Base
+{
+inline size_t Weave::dim(Base::SpaceTimeIndex idx) const
+{
+  return d_grid.dim(idx);
+}
+
+inline size_t Weave::localSize(Base::SpaceTimeIndex idx) const
+{
+  return d_localSize[idx];
+}
+
+inline size_t Weave::localSurface(Base::SpaceTimeIndex idx) const
+{
+  return d_surfaces[idx];
+}
+
+inline size_t Weave::localVolume() const
+{
+  return d_localVolume;
+}
+
+inline size_t Weave::globalVolume() const
+{
+  return d_globalVolume;
+}
+
+inline size_t Weave::L() const
+{
+  return d_L;
+}
+
+inline size_t Weave::T() const
+{
+  return d_T;
+}
+
+inline double Weave::sum(double result) const
+{
+  double all_result;
+  barrier();
+  d_grid.grid().Allreduce(static_cast< const void * >(&result), static_cast< void * >(&all_result),
+                          1, MPI::DOUBLE, MPI::SUM);
+  return all_result;
+}
+
+// SD: this is quite inefficient, but will do the job.
+// btw, where do we actually need this?
+inline bool Weave::isLocallyAvailable(size_t const x, size_t const y, size_t const z) const
+{
+  for (size_t t=0; t<d_T; t++)
+  {
+    if ((d_grid.grid()).Get_rank() == d_grid.rank(t * d_L * d_L * d_L +
+        z * d_L * d_L +
+        y * d_L + x))
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+inline bool Weave::isLocallyAvailable(size_t const x, size_t const y, size_t const z, size_t const t) const
+{
+  return (d_grid.grid()).Get_rank() == d_grid.rank(t * d_L * d_L * d_L +
+         z * d_L * d_L +
+         y * d_L + x);
+}
+
+inline bool Weave::isRoot() const
+{
+  // std::cout <<  "my_rank =" <<  d_grid.grid().Get_rank() << std::endl;
+  return d_grid.grid().Get_rank() == 0;
+}
+
+inline size_t Weave::fromGlobal(size_t const idx, Base::SpaceTimeIndex const mu) const
+{
+//     std::cout << "Weave::fromGlobal(" << idx << ", " << mu << ") = "
+//               << idx <<"%" << d_localSize[mu] << " = "
+//               << idx % d_localSize[mu] << std::endl;
+  return idx % d_localSize[mu];
+}
+
+inline size_t Weave::globalCoordToLocalIndex(size_t const x, size_t const y, size_t const z) const
+{
+  if (!isLocallyAvailable(x, y, z))
+    return d_localVolume; // this is our error condition
+  return (fromGlobal(x, Base::idx_X) * localSurface(Base::idx_X) + fromGlobal(y, Base::idx_Y) * localSurface(Base::idx_Y)
+          + fromGlobal(z, Base::idx_Z) * localSurface(Base::idx_Z));
+}
+
+inline size_t Weave::globalCoordToLocalIndex(size_t const x, size_t const y, size_t const z, size_t const t) const
+{
+  if (!isLocallyAvailable(x, y, z, t))
+    return d_localVolume; // error condition
+  return (fromGlobal(x, Base::idx_X) * localSurface(Base::idx_X) + fromGlobal(y, Base::idx_Y) * localSurface(Base::idx_Y)
+          + fromGlobal(z, Base::idx_Z) * localSurface(Base::idx_Z) + fromGlobal(t, Base::idx_T) * localSurface(Base::idx_T));
+}
+
+
+inline void Weave::barrier() const
+{
+  d_grid.grid().Barrier();
+}
+
+template< typename Element >
+inline void Weave::broadcast(Element *data, size_t const count, int root) const
+{
+  (d_grid.grid()).Bcast(data, count * sizeof(Element), MPI::BYTE, root);
+}
+
+template< typename Element >
+inline void Weave::sendRecv(Element const * data_send, Element * data_recv, size_t const count, int source, int destination)
+{
+  static int stag(1);
+  static int rtag(1);
+  (d_grid.grid()).Sendrecv(data_send, count * sizeof(Element), MPI::BYTE, destination, stag++,
+                           data_recv, count * sizeof(Element), MPI::BYTE, source,      rtag++);
+}
+
+template< typename Element >
+inline void Weave::allReduce(Element const *data_send, Element *data_recv, size_t const count) const
+{
+  // have to wait until all calculations are finished
+  d_grid.grid().Barrier();
+
+  // call MPI::Intracomm::Allreduce(...)
+  (d_grid.grid()).Allreduce(data_send, data_recv, count * sizeof(Element), MPI::BYTE, MPI::SUM);
+}
+
+inline void Weave::allReduce(std::complex< double > const *data_send, std::complex< double > *data_recv, size_t const count) const
+{
+  // have to wait until all calculations are finished
+  d_grid.grid().Barrier();
+
+  // call MPI::Intracomm::Allreduce(...)
+  (d_grid.grid()).Allreduce(data_send, data_recv, count, MPI::DOUBLE_COMPLEX, MPI::SUM);
+}
+
+inline void Weave::allReduce(double const *data_send, double *data_recv, size_t const count) const
+{
+  // have to wait until all calculations are finished
+  d_grid.grid().Barrier();
+
+  // call MPI::Intracomm::Allreduce(...)
+  (d_grid.grid()).Allreduce(data_send, data_recv, count, MPI::DOUBLE, MPI::SUM);
+}
+
+inline size_t Weave::rank() const
+{
+  return d_grid.rank();
+}
+
+inline size_t Weave::rank(size_t index) const
+{
+  return d_grid.rank(index);
+}
+}

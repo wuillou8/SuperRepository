@@ -1,0 +1,9 @@
+/* Publicly accessible static singleton creation function */
+template< size_t L, size_t T >
+inline Base::Weave< L, T> &Base::Weave< L, T >::instance()
+{
+  if (!s_Weave)
+    s_Weave = new Weave< L, T>();
+  return *s_Weave;
+}
+

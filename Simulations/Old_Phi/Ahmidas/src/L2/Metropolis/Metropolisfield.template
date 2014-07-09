@@ -1,0 +1,299 @@
+
+template< typename Element, size_t D >
+double Metropolis(Gauge_fields< Element, D > &gf, double kappa, double step, size_t totalSweeps)
+{
+  int count=0, countacc=0;
+  Core::Field< Element, D > plaq_new(gf[0].dims());
+  Core::Field< Element, D > plaq_old(gf[0].dims());
+  Core::Field< Element, D > Delta_plaq(gf[0].dims());
+  for (size_t sweep = 0; sweep < totalSweeps; ++sweep)
+  {
+    for (size_t mu = 0; mu < D; ++mu)
+    {
+      Core::Field< Element, D > newField(gf[mu]);
+
+// Odd sites                //
+      for (size_t idx = 0; idx < newField.volume() / 2; ++idx)
+      {
+        Element shift = Element::Identity() + step * Element::Random();
+        SUN::reunitarize(shift);
+        newField.atOdd(idx)*=shift;
+      }
+      for(size_t nu = 0; nu < D; ++nu)
+      {
+        if (mu == nu)
+          continue;
+
+        plaq_new = plaquette(newField,gf[nu],mu,nu);
+        plaq_new += plaq_new.shift(nu, Base::dir_UP).dagger();
+        plaq_old = plaquette(gf[mu],gf[nu],mu,nu);
+        plaq_old += plaq_old.shift(nu, Base::dir_UP).dagger();
+        plaq_old -= plaq_new;
+      }
+      for (size_t idx = 0; idx < newField.volume() / 2; ++idx)
+      {
+        count++;
+        if(std::exp(kappa*real(plaq_old.atOdd(idx).trace())) > 1.0 || std::exp(kappa*real(plaq_old.atOdd(idx).trace())) < (1.0-rand()/(static_cast< double >(RAND_MAX))))
+        {
+          gf[mu].atOdd(idx)=newField.atOdd(idx);
+          countacc++;
+        }
+      }
+
+// Even sites               //
+      for (size_t idx = 0; idx < newField.volume() / 2; ++idx)
+      {
+        Element shift = Element::Identity() + step * Element::Random();
+        SUN::reunitarize(shift);
+        newField.atEven(idx)*=shift;
+      }
+      for(size_t nu = 0; nu < D; ++nu)
+      {
+        if (mu == nu)
+          continue;
+
+        plaq_new = plaquette(newField,gf[nu],mu,nu);
+        plaq_new += plaq_new.shift(nu, Base::dir_UP).dagger();
+        plaq_old = plaquette(gf[mu],gf[nu],mu,nu);
+        plaq_old += plaq_old.shift(nu, Base::dir_UP).dagger();
+        plaq_old -= plaq_new;
+
+      }
+      for (size_t idx = 0; idx < newField.volume() / 2; ++idx)
+      {
+        count++;
+        if (std::exp(real(kappa*plaq_old.atEven(idx).trace())) > 1.0 || std::exp(kappa*real(plaq_old.atEven(idx).trace())) < (1.0-rand()/(static_cast< double >(RAND_MAX))))
+        {
+          gf[mu].atEven(idx)=newField.atEven(idx);
+          countacc++;
+        }
+      }
+    }
+  }
+  return (double) countacc/count;
+}
+
+
+template< typename Element, size_t D >
+double Metropolis2(Gauge_fields< Element, D > &gf, double kappa, double step, size_t totalSweeps)
+{
+  int count=0, countacc=0;
+  Core::Field< Element, D > plaq_new1(gf[0].dims()), plaq_new2(gf[0].dims()), plaq_newbuff(gf[0].dims());
+  Core::Field< Element, D > plaq_old1(gf[0].dims()), plaq_old2(gf[0].dims()), plaq_oldbuff(gf[0].dims());
+  Core::Field< Element, D > Delta_plaq(gf[0].dims());
+
+  for (size_t sweep = 0; sweep < totalSweeps; ++sweep)
+  {
+    for (size_t mu = 0; mu < D; ++mu)
+    {
+      Core::Field< Element, D > newField(gf[mu]);
+
+// Even sites               //
+      for (size_t idx = 0; idx < newField.volume() / 2; ++idx)
+      {
+        Element shift = Element::Identity() + step * Element::Random();
+        SUN::reunitarize(shift);
+        newField.atEven(idx)*=shift;
+
+      }
+      for(size_t nu = 0; nu < D; ++nu)
+      {
+        if (mu == nu)
+          continue;
+
+        Weave< 2 >::DimArray ca((size_t)0, 2);
+        ca[1] = 0;
+        ca[0] = 0;
+
+        plaq_new1 = newField;
+        plaq_new1.rightMultiply(staple_up(newField,gf[nu],mu,nu));
+        plaq_new2 = newField;
+        plaq_new2.rightMultiply(staple_down(newField,gf[nu],mu,nu));
+        plaq_new1 += plaq_new2;
+
+        plaq_old1 = gf[mu];
+        plaq_old1.rightMultiply(staple_up(gf[mu],gf[nu],mu,nu));
+        plaq_old2 = gf[mu];
+        plaq_old2.rightMultiply(staple_down(gf[mu],gf[nu],mu,nu));
+        plaq_old1 += plaq_old2;
+
+        plaq_old1 -= plaq_new1;
+      }
+      for (size_t idx = 0; idx < newField.volume() / 2; ++idx)
+      {
+        count++;
+        if (std::exp(real(kappa*plaq_old1.atEven(idx).trace())) > 1.0 || std::exp(kappa*real(plaq_old1.atEven(idx).trace())) < (1.0-rand()/(static_cast< double >(RAND_MAX))))
+        {
+          gf[mu].atEven(idx)=newField.atEven(idx);
+          countacc++;
+        }
+      }
+
+// Odd sites                //
+      for (size_t idx = 0; idx < newField.volume() / 2; ++idx)
+      {
+        Element shift = Element::Identity() + step * Element::Random();
+        SUN::reunitarize(shift);
+        newField.atOdd(idx)*=shift;  //shift;
+      }
+      for(size_t nu = 0; nu < D; ++nu)
+      {
+        if (mu == nu)
+          continue;
+
+        plaq_new1 = newField;
+        plaq_new1.rightMultiply(staple_up(newField,gf[nu],mu,nu));
+        plaq_new2 = newField;
+        plaq_new2.rightMultiply(staple_down(newField,gf[nu],mu,nu));
+        plaq_new1 += plaq_new2;
+
+        plaq_old1 = gf[mu];
+        plaq_old1.rightMultiply(staple_up(gf[mu],gf[nu],mu,nu));
+        plaq_old2 = gf[mu];
+        plaq_old2.rightMultiply(staple_down(gf[mu],gf[nu],mu,nu));
+        plaq_old1 += plaq_old2;
+
+        plaq_old1 -= plaq_new1;
+      }
+      for (size_t idx = 0; idx < newField.volume() / 2; ++idx)
+      {
+        count++;
+        if (std::exp(real(kappa*plaq_old1.atOdd(idx).trace())) > 1.0 || std::exp(kappa*real(plaq_old1.atOdd(idx).trace())) < (1.0-rand()/(static_cast< double >(RAND_MAX))))
+        {
+          gf[mu].atOdd(idx)=newField.atOdd(idx);
+          countacc++;
+        }
+      }
+    }
+  }
+  return (double) countacc/(count*totalSweeps);
+}
+
+
+template< typename Element, size_t D >
+double Metropolis3(Gauge_fields< Element, D > &gf, double kappa, double step, size_t totalSweeps)
+{
+  int count=0, countacc=0;
+  Core::Field< Element, D > plaq_new1(gf[0].dims()), plaq_new2(gf[0].dims()), plaq_newbuff(gf[0].dims());
+  Core::Field< Element, D > plaq_new(gf[0].dims()), plaq_newbufff(gf[0].dims());
+  Core::Field< Element, D > plaq_old1(gf[0].dims()), plaq_old2(gf[0].dims());
+  Core::Field< Element, D > plaq_old(gf[0].dims());
+  Core::Field< Element, D > Delta_plaq(gf[0].dims());
+
+  for (size_t sweep = 0; sweep < totalSweeps; ++sweep)
+  {
+    for (size_t mu = 0; mu < D; ++mu)
+    {
+      Core::Field< Element, D > newField(gf[mu]);
+
+// Even sites               //
+      for (size_t idx = 0; idx < newField.volume() / 2; ++idx)
+      {
+        Element shift = Element::Identity() + step * Element::Random();
+        SUN::reunitarize(shift);
+        newField.atEven(idx)*=shift;
+
+      }
+      for(size_t nu = 0; nu < D; ++nu)
+      {
+        if (mu == nu)
+          continue;
+
+        Weave< 2 >::DimArray ca((size_t)0, 2);
+        ca[1] = 0;
+        ca[0] = 0;
+
+        plaq_new1 = newField;
+        plaq_new1.rightMultiply(staple_up(newField,gf[nu],mu,nu));
+        std::cout << plaq_new1.atEven(0) << " plaq_newupieven " << std::endl;
+        plaq_new2 = newField;
+//std::cout << plaq_new2.atEven(0) << " plaq_new2upieven " << std::endl;
+        plaq_newbufff = staple_down(newField,gf[nu],mu,nu);
+//std::cout << plaq_newbufff.atEven(0) << " plaq_new2downieven " << std::endl;
+        plaq_new2.rightMultiply(plaq_newbufff);//staple_down(newField,gf[nu],mu,nu));
+        std::cout << plaq_new2.atEven(0) << " plaq_new2downiieven " << std::endl;
+        plaq_new1 += plaq_new2;
+
+        plaq_old1 = gf[mu];
+        plaq_old1.rightMultiply(staple_up(gf[mu],gf[nu],mu,nu));
+//std::cout << plaq_new1.atEven(0) << " plaq_oldpurieven " << std::endl;
+        plaq_old2 = gf[mu];
+        plaq_old2.rightMultiply(staple_down(gf[mu],gf[nu],mu,nu));
+//std::cout << plaq_new1.atEven(0) << " plaq_oldpuriieven " << std::endl;
+//std::cout << plaq_new1.atEven(0) << " plaq_new1even " << std::endl;
+//std::cout << plaq_old1.atEven(0) << " plaq_old1even " << std::endl;
+        plaq_old1 += plaq_old2;
+        plaq_old1 -= plaq_new1;
+
+
+        plaq_new = plaquette(newField,gf[nu],mu,nu);
+        std::cout << plaq_new.atEven(0) << " plaq_newupeven " << std::endl;
+        std::cout << plaq_new.shift(nu, Base::dir_UP).atEven(0) << " plaq_newdowneven " << std::endl;
+        plaq_new += plaq_new.shift(nu, Base::dir_UP).dagger();
+        plaq_old = plaquette(gf[mu],gf[nu],mu,nu);
+        plaq_old += plaq_old.shift(nu, Base::dir_UP).dagger();
+//std::cout << plaq_new.atEven(0) << " plaq_neweven " << std::endl;
+//std::cout << plaq_old.atEven(0) << " plaq_oldeven " << std::endl;
+        std::cout << "   " << std::endl;
+        plaq_old -= plaq_new;
+
+      }
+      for (size_t idx = 0; idx < newField.volume() / 2; ++idx)
+      {
+        count++;
+        if (std::exp(real(kappa*plaq_old1.atEven(idx).trace())) > 1.0 || std::exp(kappa*real(plaq_old1.atEven(idx).trace())) < (1.0-rand()/(static_cast< double >(RAND_MAX))))
+        {
+          gf[mu].atEven(idx)=newField.atEven(idx);
+          countacc++;
+        }
+      }
+
+// Odd sites                //
+      for (size_t idx = 0; idx < newField.volume() / 2; ++idx)
+      {
+        Element shift = Element::Identity() + step * Element::Random();
+        SUN::reunitarize(shift);
+        newField.atOdd(idx)*=shift;  //shift;
+      }
+      for(size_t nu = 0; nu < D; ++nu)
+      {
+        if (mu == nu)
+          continue;
+
+        plaq_new1 = newField;
+        plaq_new1.rightMultiply(staple_up(newField,gf[nu],mu,nu));
+        plaq_new2 = newField;
+        plaq_new2.rightMultiply(staple_down(newField,gf[nu],mu,nu));
+        plaq_new1 += plaq_new2;
+
+        plaq_old1 = gf[mu];
+        plaq_old1.rightMultiply(staple_up(gf[mu],gf[nu],mu,nu));
+        plaq_old2 = gf[mu];
+        plaq_old2.rightMultiply(staple_down(gf[mu],gf[nu],mu,nu));
+        plaq_old1 += plaq_old2;
+
+        plaq_old1 -= plaq_new1;
+
+        plaq_new = plaquette(newField,gf[nu],mu,nu);
+        plaq_new += plaq_new.shift(nu, Base::dir_UP).dagger();
+        plaq_old = plaquette(gf[mu],gf[nu],mu,nu);
+        plaq_old += plaq_old.shift(nu, Base::dir_UP).dagger();
+        plaq_old -= plaq_new;
+
+        plaq_old -= plaq_old1;
+//std::cout << plaq_old.atEven(0) << " plaq_oldoddd " << std::endl;
+
+      }
+      for (size_t idx = 0; idx < newField.volume() / 2; ++idx)
+      {
+        count++;
+        if (std::exp(real(kappa*plaq_old1.atOdd(idx).trace())) > 1.0 || std::exp(kappa*real(plaq_old1.atOdd(idx).trace())) < (1.0-rand()/(static_cast< double >(RAND_MAX))))
+        {
+          gf[mu].atOdd(idx)=newField.atOdd(idx);
+          countacc++;
+        }
+      }
+    }
+  }
+  return (double) countacc/(count*totalSweeps);
+}

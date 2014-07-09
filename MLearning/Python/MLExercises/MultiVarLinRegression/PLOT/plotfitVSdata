@@ -1,0 +1,10 @@
+set term epslatex standalone color
+set out "tmp.tex"
+
+set title ' Learning Sample and its Lin. Regression  '
+
+set xlabel ' Age '
+set ylabel ' Height '
+
+
+plot '../DATA/ex3xy.dat' u 1:3 t ''

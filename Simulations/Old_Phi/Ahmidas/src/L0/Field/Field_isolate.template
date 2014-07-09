@@ -1,0 +1,13 @@
+template< typename Element, size_t D >
+void Field< Element, D >::isolate()
+{
+  if ((*d_references) == 1)
+    return;
+  assert(*d_references > 1);
+  (*d_references) -= 1;
+  d_references = new size_t(1);
+  Element *newField = new Element[d_weave->localVolume()];
+  std::copy(d_field, d_field + d_weave->localVolume(), newField);
+  d_field = newField;
+  d_weave = new Weave< D >(*d_weave);
+}

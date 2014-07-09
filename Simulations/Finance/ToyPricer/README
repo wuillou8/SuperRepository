@@ -1,0 +1,18 @@
+!!!Prototype(sketch of)!!!
+
+Toy Pricer, requires the installation of Eigen lib.
+Does MC for basical products and does basic experiments with a generalised class for the fin. products using template classes as well as gives a struct. for nice parallelisation.
+
+Ideas played with:
+	-see everything as vector through time
+	As a result, we can use the Eigen library and its optimistions.
+	-every Fin. product is based on an underlying 
+	  (at the lowest level, the BM has a random genearted number as an underlying)
+	-filtration or infos should ported through time --> filtration class
+	-MC simulated generating vector/matrices i.e Multi-trajectories
+	(therefore, a random flow obj ios built up)  
+
+Structure:
+PO is the simple layer, contains simple objects
+P1 contains more elaborated items
+P2 contains the complexes ones	

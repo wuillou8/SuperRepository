@@ -1,0 +1,12 @@
+float efix ( void );
+unsigned long int jsr_value ( void );
+float nfix ( void );
+void r4_exp_setup ( void );
+float r4_exp_value ( void );
+void r4_nor_setup ( void );
+float r4_nor_value ( void );
+float r4_uni_value ( void );
+unsigned long int shr3_value ( void );
+void timestamp ( void );
+unsigned long int ul_uni_value ( void );
+void zigset ( unsigned long int jsrseed );

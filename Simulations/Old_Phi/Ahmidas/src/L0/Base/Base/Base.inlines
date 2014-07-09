@@ -1,0 +1,47 @@
+namespace Base
+{
+// Reverses byteorder, STL version
+template< typename T >
+inline void swapEndian(T *begin, T *end, size_t block = sizeof(T))
+{
+  char const *chEnd = reinterpret_cast< char* >(end);
+  for (char *iter = reinterpret_cast< char* >(begin); iter < chEnd; iter += block)
+    std::reverse(iter, iter + block);
+}
+
+template< typename T >
+inline void swapEndian(T &value)
+{
+  char *chVal = reinterpret_cast< char* >(&value);
+  std::reverse(chVal, chVal + sizeof(T));
+}
+
+inline Direction opposite(Direction dir)
+{
+  return (dir == dir_UP ? dir_DOWN : dir_UP);
+}
+
+template< typename T >
+inline T opProd(T const lhand, T const rhand)
+{
+  return (lhand * rhand);
+}
+
+template< typename T >
+inline T product(T const *begin, T const *end)
+{
+  return std::accumulate(begin, end, 1, opProd< T >);
+}
+
+template< typename T >
+inline T opSum(T const lhand, T const rhand)
+{
+  return (lhand * rhand);
+}
+
+template< typename T >
+inline T sum(T const *begin, T const *end)
+{
+  return std::accumulate(begin, end, 1, opSum< T >);
+}
+}

@@ -1,0 +1,20 @@
+namespace Base
+{
+namespace IO
+{
+inline Generic::Generic(std::string const &filename)
+  : d_stream(filename.c_str())
+{}
+
+template< typename DataType >
+inline void Generic::read(DataType *data, uint64_t const elements) const
+{
+  read(reinterpret_cast< char* >(data), elements * sizeof(DataType));
+}
+
+inline bool Generic::fail() const
+{
+  return d_stream.fail();
+}
+}
+}
