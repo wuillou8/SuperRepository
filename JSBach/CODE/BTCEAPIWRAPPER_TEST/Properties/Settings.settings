@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="BTCEAPIWRAPPER_TEST.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="APIKEY" Type="System.String" Scope="User">
+      <Value Profile="(Default)">56ZPI5TH-TSZSIHYL-CKHHJLLP-6AK0NFTN-F05YWIMK</Value>
+    </Setting>
+    <Setting Name="APIKEYSECRET" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ecbf9589b608dae6e5d113849892e89cf91d4520443d9ffb9535e822ace91645</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

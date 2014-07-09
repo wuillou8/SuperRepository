@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BTCEAPIWRAPPER", "BTCEAPIWRAPPER\BTCEAPIWRAPPER.csproj", "{DB682550-FC08-4031-A57A-9B691F581F8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BTCEAPIWRAPPER_TEST", "BTCEAPIWRAPPER_TEST\BTCEAPIWRAPPER_TEST.csproj", "{F6ED5842-A389-4610-A514-ECB80E343933}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DATABASE", "DATABASE\DATABASE.csproj", "{503D6846-1170-4230-911F-2B8F215C548C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DB682550-FC08-4031-A57A-9B691F581F8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB682550-FC08-4031-A57A-9B691F581F8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB682550-FC08-4031-A57A-9B691F581F8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB682550-FC08-4031-A57A-9B691F581F8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6ED5842-A389-4610-A514-ECB80E343933}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6ED5842-A389-4610-A514-ECB80E343933}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6ED5842-A389-4610-A514-ECB80E343933}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6ED5842-A389-4610-A514-ECB80E343933}.Release|Any CPU.Build.0 = Release|Any CPU
+		{503D6846-1170-4230-911F-2B8F215C548C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{503D6846-1170-4230-911F-2B8F215C548C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{503D6846-1170-4230-911F-2B8F215C548C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{503D6846-1170-4230-911F-2B8F215C548C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
