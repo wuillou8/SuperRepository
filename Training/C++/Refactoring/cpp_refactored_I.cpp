@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
 	double* pts;
 	FILE* file = fopen("Outprintfeats.dat", "r"); 
 	if(file==NULL) {fputs ("File error",stderr); exit (1);}
-	if ( fread(&type, sizeof(FeatureType), 1, file) != 1/*sizeof(FeatureType)*/ ) 
+	if ( fread(&type, sizeof(FeatureType), 1, file) != 1 ) 
 	{ fputs ("Type not readable",stderr); exit (2); }
         switch (type) {
 		case eCircle: 
