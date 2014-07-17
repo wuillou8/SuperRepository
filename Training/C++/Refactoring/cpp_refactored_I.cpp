@@ -30,11 +30,11 @@ class Polygon: public Shape {
 };
 
 void Circle::draw () {
-	/*** draw Circle somehow ***/
+	/*** draw a Circle somehow ***/
 	};
 
 void Polygon::draw () {
-	/*** draw Polygon somehow ***/
+	/*** draw a Polygon somehow ***/
 	};
 
 double* readPts(FILE* file, int n_pts) {
@@ -52,13 +52,10 @@ int main(int argc, char* argv[])
 	FeatureType type;
 	Shape* obj;
 	double* pts;
-	printf("DBG0");
 	FILE* file = fopen("Outprintfeats.dat", "r"); 
 	if(file==NULL) {fputs ("File error",stderr); exit (1);}
-	printf("DBG1");
 	if ( fread(&type, sizeof(FeatureType), 1, file) != 1/*sizeof(FeatureType)*/ ) 
 	{ fputs ("Type not readable",stderr); exit (2); }
-	printf("DBG2");
         switch (type) {
 		case eCircle: 
 			obj = new Circle( readPts(file, 3) ); break;
@@ -67,9 +64,8 @@ int main(int argc, char* argv[])
 	        case eSquare: 
 			obj = new Polygon( readPts(file, 8) ); break;
         	default: type = eUnknown; 
-			fputs ("Type not in Features list",stderr); exit (3);
+			fputs ("Type not in FeatureTypes list",stderr); exit (3);
         }
 	
-	obj->draw();
 	return 0;
 }
