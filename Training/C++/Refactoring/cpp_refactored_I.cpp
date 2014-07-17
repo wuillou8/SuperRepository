@@ -39,9 +39,7 @@ void Polygon::draw () {
 
 double* readPts(FILE* file, int n_pts) {
 	double* pts;
-	printf("DBG4");
-	if( !(fread(&pts, sizeof(double), n_pts, file) == n_pts/**sizeof(double)*/ ) ) {
-		//printf("%f",pts[0]);
+	if( !(fread(&pts, sizeof(double), n_pts, file) == n_pts) ) {
 		fputs ("Points not recognised",stderr); exit (3);
 	}
 	return pts;
