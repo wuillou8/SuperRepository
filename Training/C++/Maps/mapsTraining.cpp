@@ -52,7 +52,7 @@ class interval_map {
 	}
 
 	// create littel non-trivial <int,char> example..
-		void inline genLittleExample() {
+	void inline genLittleExample() {
 		m_map[2] = 'D';	
 		m_map[4] = 'A'; 
 		m_map[12] = 'C'; 
