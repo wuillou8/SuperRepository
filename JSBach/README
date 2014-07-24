@@ -15,3 +15,7 @@ pot sols in russian:
 https://bitcointalk.org/index.php?topic=98282.0%20RU
 solutions/examples:-)
 http://bitcoincharts.com/about/markets-api/
+python:
+https://github.com/alanmcintyre/btce-api
+data
+http://api.bitcoincharts.com/v1/csv/
