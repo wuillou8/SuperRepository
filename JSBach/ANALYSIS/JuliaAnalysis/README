@@ -2,4 +2,4 @@ link to see the analysis in original, ipython//julia format.
 one run ipython as:
 ipython notebook --profile julia
 
-http://nbviewer.ipython.org/github.com/wuillou8/SuperRepository/tree/master/JSBach/ANALYSIS/JuliaAnalysis/ijuliaAnalysis.html
+http://nbviewer.ipython.org/github.com/wuillou8/SuperRepository/blob/master/JSBach/ANALYSIS/JuliaAnalysis/ijuliaAnalysis.html
