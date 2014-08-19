@@ -125,11 +125,9 @@ y = df[:Price]
 yy = DataFrames.vector(y)
 y_rsi = rsiFunc_Corr( yy, 50 )
 #y_rsi = rsiFunc( yy, 50 )
-PyPlot.figure(facecolor="#07000d") #"black")
+PyPlot.figure(facecolor="#07000d")
 PyPlot.subplot2grid((6,4), (2,0), rowspan = 4, colspan = 4, axisbg="#07000d")
 plot(x, y, color="red", linewidth=2.0, linestyle="--")
-#grid(True) #, color="w")
-#spines["bottom"].set_color("#5998ff")
 xlabel("UnixTime")
 ylabel("Prices")
 

@@ -1889,11 +1889,9 @@ In&nbsp;[76]:
 <span class="n">yy</span> <span class="o">=</span> <span class="n">DataFrames</span><span class="o">.</span><span class="n">vector</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
 <span class="n">y_rsi</span> <span class="o">=</span> <span class="n">rsiFunc_Corr</span><span class="p">(</span> <span class="n">yy</span><span class="p">,</span> <span class="mi">50</span> <span class="p">)</span>
 <span class="c">#y_rsi = rsiFunc( yy, 50 )</span>
-<span class="n">PyPlot</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s">&quot;#07000d&quot;</span><span class="p">)</span> <span class="c">#&quot;black&quot;)</span>
+<span class="n">PyPlot</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s">&quot;#07000d&quot;</span><span class="p">)</span>
 <span class="n">PyPlot</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">rowspan</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">colspan</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">axisbg</span><span class="o">=</span><span class="s">&quot;#07000d&quot;</span><span class="p">)</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;red&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">&quot;--&quot;</span><span class="p">)</span>
-<span class="c">#grid(True) #, color=&quot;w&quot;)</span>
-<span class="c">#spines[&quot;bottom&quot;].set_color(&quot;#5998ff&quot;)</span>
 <span class="n">xlabel</span><span class="p">(</span><span class="s">&quot;UnixTime&quot;</span><span class="p">)</span>
 <span class="n">ylabel</span><span class="p">(</span><span class="s">&quot;Prices&quot;</span><span class="p">)</span>
 
