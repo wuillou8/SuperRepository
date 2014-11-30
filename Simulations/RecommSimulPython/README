@@ -1,0 +1,16 @@
+Prototupe testing the idea of recommender for simplified settings.
+Data class is a set of N items defined on a finite number of features.
+each item has sparse number of features.
+The users are modelled as having a unique preference within (the set of Data features)
+and they have an history of items they have somehow used/consumed.
+There history of items can be generated according to their preferences, i.e.
+they are going to rather pick item containing their preference, modulo a random noise.
+Their choice is modelled as a Monte Carlo run picking up items with probability given 
+by the sigmoid function over a basical utility function.
+
+With these settings, one can compute scores for each items, based on collaborative filtering
+and make recommendation to the users. 
+The plot generated with plot.* shows that activating the "recommendation engine" increases 
+user probability to pick within the items recommended, when he gets the choice across
+a basket of randomly picked and recommended items.
+This is illustrated in fig.png.  

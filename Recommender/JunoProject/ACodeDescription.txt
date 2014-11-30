@@ -1,0 +1,113 @@
+########################
+### Code Description ###
+########################
+
+components: 
+	testClust_Prep.jl, testTrain_NBayes.jl
+
+
+1) Preparation step:	
+	Summary:
+		Load news, usage, clusters data and time-decomposition into train/test.
+		print out train/test and test subsampes according specified cluster decomposition.
+	Component:
+		testPrep_Clust.jl
+
+	Inputs: (right now hardcoded within the function)
+		julia testPrep_Clust.jl newspath usagepath \
+				 	user_clustshashtable newsclustparms usageclustparms \
+				 	Time1 Time2 Time3
+		--newspath usagepath
+			paths to the data news, usage data.
+		--user_clustshashtable newsclustparms usageclustparms 
+			user/clustersh hashtable and paths to the cluster parameters.
+		--Time1 Time2 Time3
+			time decomposition into train and test sets. 
+			train, test resp. within T1 and T2, T2 and T3
+
+	Output:
+		pull train/test, cluserised data into pseudoDBASE. 
+		json format for the news, csv for the usage.
+
+	Requirements:
+		NEWS/news0601_1118filter.json
+		DATA/[:country:]traintest0717_1120.csv
+		include("utilitiesjuno.jl")
+		include("classesjuno.jl")
+		include("testingjuno.jl")
+		( include("DataFramesMeta.jl") )
+		pseudoDBASE/
+
+
+2) Training step:
+	Summary:
+		Load clusterised train data.
+	Component:
+		testTrain_NBayes.jl
+
+	Inputs: (hardcoded in function)
+		julia testTrain_NBayes.jl clustNews clustUsage cutOff
+		
+		--clustUsage clustNews
+			cluster model paramaters for news and usage
+		--cutOff
+			cutOff specific the frequency at which an entity/keyword/topic
+			has to appear in the training set to be considered.
+	
+	Output: 
+		model parameters in json format: 
+			pseudoDBASE/currentNaiveBayesModel.json	
+	Requirements:
+		NEWS/news0601_1118filter.json
+		DATA/[:country:]traintest0717_1120.csv
+		include("utilitiesjuno.jl")
+		include("classesjuno.jl")
+		include("testingjuno.jl")
+		include("modeljuno.jl")
+		( include("DataFramesMeta.jl") )
+		pseudoDBASE/*.json or *.csv
+
+3) Scores News list:
+	Summary: 
+		Injest news list and an trained model and create a score list.
+	Component:
+		testScores_News.jl
+	
+	Inputs:
+		julia testScores_News.jl modelpath newslistpath
+		
+		--modelpath
+			path to model parameters.
+		--newslistpath
+			path to news list to be scored.
+
+	Output:
+		scored article's list: {score,Id}:
+			pseudoDBASE/scores.csv
+	Requirements:
+		pseudoDBASE/currentNaiveBayesModel.json
+		pseudoDBASE/testNewseverything.json
+		include("utilitiesjuno.jl")
+		include("classesjuno.jl")
+		include("testingjuno.jl")
+		include("modeljuno.jl")
+		( include("DataFramesMeta.jl") )
+		pseudoDBASE/*.json or *.csv
+
+4) Performance measurement:
+	Summary:
+		Takes scores and assess performance for different recommendation list sizes.
+	Component:
+		testTest_miniROCAUC.jl
+
+	Inputs:
+		julia testTest_miniROCAUC.jl  newslistpath testusagepath scores
+		
+		--newslistpath
+			path to newslist to be scored/tested against.
+		--testusagepath
+			path to test usage data.
+		--scores
+			scores list (for newslistpath)
+
+	 

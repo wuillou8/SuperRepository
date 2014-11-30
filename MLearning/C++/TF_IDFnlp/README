@@ -1,0 +1,8 @@
+sim0.C : Simple similarity evaluation based on two documents keywords similarity.
+
+sim1.C : TFIDF computation in C, should be pretty fast. 
+	 Notice that the dictionary upper limit was manually set to 3000.
+         runs as: ./a.out doc1 doc2
+
+sim_tf_idfcheck.jl :
+         julia code used to compare the C code with.
