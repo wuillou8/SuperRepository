@@ -1,0 +1,6 @@
+test Harness V.0.4:
+###################
+
+Test recommendations offline on past usage data.
+The code communicates with the data base and evaluate recommender model performance
+decoupled from the recommendation platform.
