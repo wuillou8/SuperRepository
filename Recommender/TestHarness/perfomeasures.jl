@@ -1,9 +1,9 @@
 #==========================================
-        Perfo. Measure
+        Perfo. Measures
 ==========================================#
 
 
-# function measuring INFORMATION RETRIEVAL metrics
+# 1) function measuring INFORMATION RETRIEVAL metrics
 # listnews: it the list of news
 # listReco: the recommendation list
 # idUser: used Id
@@ -28,7 +28,7 @@ function perfoMeasOpt(listNews::Array{String,1}, listReco::Array{String,1}, idUs
     
 end
 
-# mean reciprocal rank measure: MRR
+# 2) mean reciprocal rank measure: MRR
 # http://en.wikipedia.org/wiki/Mean_reciprocal_rank
 # MRR = 1/Q_i sum_i=1^Q 1./rank_i, whereas i is summed over the objects.
 # utility function for MRR
@@ -38,7 +38,7 @@ function get_Rank(recoList, use)
             return n
         end
     end
-    1_000_000_000_000_000
+    1_000_000_000_000_000 # approximates cutoff
 end
 
 # MRR comput.

@@ -67,6 +67,22 @@ function PerfoRandom(L_listNews::Int64, L_listUsage::Int64, L_listReco::Int64)
   Perfo(Precis, Recall, Specif, F1) #Precis, Recall, Specif, F1
 end
 
+# Performance class for ranking metrics
+# mean reciprocal rank measure: MRR
+type PerfoRanking <: PERFO
+     Nuse::Int64
+     mrr_meas::Array{Float64,1}
+     mrr_rand::Array{Float64,1}
+     random::Array{Float64,1}
+end 
+
+function add(pr1::PerfoRanking,pr2::PerfoRanking) 
+    Nuse = pr1.Nuse + pr2.Nuse 
+    mrr_meas = ( pr1.Nuse*pr1.mrr_meas + pr2.Nuse*pr2.mrr_meas ) / Nuse
+    mrr_rand = ( pr1.Nuse*pr1.mrr_rand + pr2.Nuse*pr2.mrr_rand ) / Nuse
+    random = ( pr1.Nuse*pr1.random + pr2.Nuse*pr2.random ) / Nuse
+    PerfoRanking( Nuse,mrr_meas,mrr_rand,random ) 
+end
 
 ###################################################################
 #                TEST HARNESS                                     #
@@ -138,8 +154,7 @@ immutable DataUsage
         value = jsonfile["value"]
         time = jsonfile["time"]
         new(source_entity_type, target_entity_type,
-                    source_entity_id, target_entity_id,
-                    action, value, time)
+                    source_entity_id, target_entity_id, action, value, time)
     end
 end
 
@@ -148,16 +163,18 @@ type BEData
     #Hashtable ?
     BEData(Usage::Array{DataUsage,1}) = new(Usage)
     function BEData(IObedata::Dict{String,Any})
-        Usage = DataUsage[]
-        for usage in IObedata["Usage"]
-            push!(Usage,DataUsage(usage))
-        end
+        Usage = IObedata["Usage"] |> 
+                             (_ -> map(x -> DataUsage(x), _))                      
         new(Usage)
     end
 
 end
 
 # getters for BEData
+getAllarticleIds(bedata::BEData) = filter(x -> x.target_entity_type == "article", bedata.Usage) |>
+                        (_ -> map(x -> x.source_entity_id, _))
+
+
 getId(bedata::BEData, __myId::String) = 
                         filter(x -> x.source_entity_id == __myId, bedata.Usage)
 
@@ -191,3 +208,16 @@ gettargetIds(bedata::BEData, __type::String) = bedata.Usage |>
             (_ -> map(x -> x.target_entity_id, _)) |>
             unique |>
             (_ -> convert(Array{String,1}, _))
+
+# get entities
+getEntssourceMap(bedata::BEData,userId::String) =  filter(x -> x.source_entity_id == userId, bedata.Usage) |>
+                                (_ -> filter(x -> x.target_entity_type == "entity", _)) |>
+                                (_ -> map(x -> x.value, _)) |>
+                                unique |>
+                                StatsBase.countmap
+
+getEntstargetMap(bedata::BEData,targId::String) =  filter(x -> x.target_entity_id == targId, bedata.Usage) |>
+                                (_ -> filter(x -> x.target_entity_type == "entity", _)) |>
+                                (_ -> map(x -> x.value, _)) |> 
+                                unique |>
+                                StatsBase.countmap
