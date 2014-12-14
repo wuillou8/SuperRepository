@@ -12,7 +12,7 @@ function recommenderList( rec::PersoModel, testnews::Array{String,1}, userId::AS
     #if userId in rec.persoIds
     usrPrf = getEntssourceMap(traindata, userId) |> 
                                             EntityFan
-    scores = map( x -> scoreNew(usrPrf, testdata, x)[1], testnews)
+    scores = map( x -> scoreNew(usrPrf, testdata, x)[1], testnews )
     map( x -> testnews[x], findNMax(scores+100, length(scores)) ) |> 
                                     ( _ -> convert(Array{String,1},_) )    
 end

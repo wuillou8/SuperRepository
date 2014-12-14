@@ -1,5 +1,3 @@
-#include("DataFramesMeta.jl")
-#using DataFramesMeta
 #=========================================================
         CLUSTER MODELS
         simulates the clustering for the computations
@@ -19,10 +17,12 @@ end
 #=========================================================
         Classical Perfo Evaluation
 =========================================================#
+
 abstract PERFO
 
 ################################
 # Information recovery model.
+
 type Perfo <: PERFO
   tp::Int64
   fp::Int64
@@ -69,20 +69,41 @@ end
 
 # Performance class for ranking metrics
 # mean reciprocal rank measure: MRR
-type PerfoRanking <: PERFO
+type PerfoRank <: PERFO
      Nuse::Int64
      mrr_meas::Array{Float64,1}
      mrr_rand::Array{Float64,1}
-     random::Array{Float64,1}
 end 
 
-function add(pr1::PerfoRanking,pr2::PerfoRanking) 
+function add(pr1::PerfoRank,pr2::PerfoRank) 
     Nuse = pr1.Nuse + pr2.Nuse 
     mrr_meas = ( pr1.Nuse*pr1.mrr_meas + pr2.Nuse*pr2.mrr_meas ) / Nuse
     mrr_rand = ( pr1.Nuse*pr1.mrr_rand + pr2.Nuse*pr2.mrr_rand ) / Nuse
-    random = ( pr1.Nuse*pr1.random + pr2.Nuse*pr2.random ) / Nuse
     PerfoRanking( Nuse,mrr_meas,mrr_rand,random ) 
 end
+
+immutable Intervals <: PERFO
+    intervals::Vector{Int64}
+end
+
+####################################################################
+#                 Output File                                      #
+####################################################################
+
+abstract OUTPUTRES
+
+#=== currently in display
+type OutputRes{model <: MODEL} <: OUTPUTRES
+    # creation time
+    testdate::ASCIIString 
+    # query::
+    testHarn::testHarness
+    # model with parameteres
+    testmodel::model
+    # testresults (different performances can be appended)
+    testres::Vector{PERFO}
+end
+===#
 
 ###################################################################
 #                TEST HARNESS                                     #
@@ -93,7 +114,7 @@ function getMetrics(var::String)
         "all"; return ["perfs","rankings"]
         "perfs"; return ["perfs"]
         "rankings"; return ["rankings"]
-            println("testHarness::getmetrics var must be in all perfs, rankings") ,exit()
+                println("testHarness::getmetrics var must be in all perfs, rankings") ,exit()
     end
 end
 
@@ -173,7 +194,6 @@ end
 # getters for BEData
 getAllarticleIds(bedata::BEData) = filter(x -> x.target_entity_type == "article", bedata.Usage) |>
                         (_ -> map(x -> x.source_entity_id, _))
-
 
 getId(bedata::BEData, __myId::String) = 
                         filter(x -> x.source_entity_id == __myId, bedata.Usage)

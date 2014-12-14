@@ -2,6 +2,8 @@ using JSON
 using Dates
 using Lazy
 using StatsBase
+using Dates
+using PyPlot
 
 
 include("utilities.jl")
@@ -10,6 +12,10 @@ include("models.jl")
 include("recommender.jl")
 include("perfomeasures.jl")
 include("tests.jl")
+include("display.jl")
+
+
+
 
 
 
@@ -35,8 +41,6 @@ include("tests.jl")
 
 # send event for training
     # print modelname to be trained
-    
-    # pass data    
     __traindatapath = "DataBase/datafortraining.json"
     out = open(__traindatapath,"w+")
     JSON.print( out, trainbedata)
@@ -59,8 +63,6 @@ include("tests.jl")
 
 
 # load trained model(s)
-    #println("Model pseudo loaded ",__TH.Recommenders[1])
-    #__model = modelsFactory(__TH.Recommenders[1], "data")
     __models = MODEL[]
     for i = 1:length(__TH.Recommenders)
         __modelName = __TH.Recommenders[i]
@@ -76,38 +78,52 @@ include("tests.jl")
 
 # Test Harness Core 
 # recomm list intervals for tests/plots
-__recommSizes = 
-              [ 1, 3, 5, 7, 10, 20, 40, 80, 120, 200]
+    __recommSizes = [ 1, 3, 5, 7, 10, 20, 40, 80, 120, 200]
 
-for __model in __models
-#__model = __models[1]
+    __perfs, __perfs_ranks, __randoms = Vector{Perfo}[], PerfoRank[], Vector{Float64}[]
+    __outresults = OUTPUTRES[]
 
 
-   __perfs, __mrr_meas, __mrr_rand, __random = 
-                                TestPerfos( __model, 
-                                            testusersIds, testnewsIds,
-                                            trainbedata, testbedata,
-                                            __recommSizes )
+testusersIds = __models[1].modelP.persoIds
 
-__perfs |> println
-__mrr_meas |> println 
-__mrr_rand |> println 
-__random |> println
-"***********fin 1 " |> println 
-end
+   for __model in __models
+    
+       __perf, __perf_rank, __random = 
+                            TestPerfos( __model, testusersIds, testnewsIds, 
+                                                 trainbedata, testbedata, __recommSizes )
+       # build results
+       push!(__perfs, __perf)
+       push!(__perfs_ranks, __perf_rank)
+       push!(__randoms, __random)          
+       push!(__outresults, 
+               OutputRes(strftime(time()), __TH, __model, [Intervals(__recommSizes), __perf, __perf_rank]) ) 
+    end
 
-exit()
+# Print out result file
+    __resupath = "DataBase/testresufile.json"
+    out = open(__resupath,"w+")
+    JSON.print( out, __outresults)
+    close(out)
+
 # Plot
-if __TH.Plotting # == true
-    using PyPlot
-    include("display.jl")
+    #println(__TH.Plotting)
+    Nmodel = length(__TH.Recommenders)
+    if __TH.Plotting # == true
 
-    if "perfs" in __TH.Metrics
-        plotPerf(__perfs,__random,__recommSizes,__TH.Recommenders[1])
+        if "perfs" in __TH.Metrics
+            Nmodel > 1 ? plotPerf2(__perfs,__randoms,__recommSizes,__TH.Recommenders) :
+                                 plotPerf1(__perfs[1],__randoms[1],__recommSizes,__TH.Recommenders[1])
+        end
+        if "rankings" in __TH.Metrics
+            Nmodel > 1 ? plotMeanRecRank2(__perfs_ranks,__recommSizes,__TH.Recommenders) :
+                                 plotMeanRecRank1(__perfs_ranks[1].__mrr_meas,__perfs_ranks[1].__mrr_rand,__recommSizes,__TH.Recommenders[1])
+        end
     end
-    if "rankings" in __TH.Metrics
-        plotMeanRecRank(__mrr_meas,__mrr_rand,__recommSizes,__TH.Recommenders[1])
-    end
-end
 
-println(__TH.Recommenders[2])
+#plotPerf1(::Array{Perfo,1}, ::Array{Float64,1}, ::Array{Int64,1}, ::Array{String,1})
+
+
+
+
+
+

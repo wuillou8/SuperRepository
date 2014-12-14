@@ -41,10 +41,15 @@ function TestPerfos( __model::MODEL,
 
     # Postprocess 
     map(_ -> evaluate(_),__perfs)
-    # Random values for plot
     __random = map(x -> x/length(__testnewsIds),__recommSizes)
+
+    # Random values for plot
+    __N = length(__testusersIds)
     __mrr_meas = map(x -> x[1]/x[2],__mrr_meas)
     __mrr_rand = convert(Array{Float64,1},[ MRR_Meas(__testnewsIds, nb) for nb in __recommSizes ])
+    __perfs_rank = PerfoRank( __N,__mrr_meas,__mrr_rand) #,__random )
 
-    __perfs, __mrr_meas, __mrr_rand, __random
+    __perfs, __perfs_rank, __random
 end
+
+#TestPerfos(::SubString{ASCIIString}, ::Array{String,1}, ::Array{String,1}, ::BEData, ::BEData, ::Array{Int64,1})

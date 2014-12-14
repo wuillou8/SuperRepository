@@ -1,5 +1,9 @@
 
 abstract MODEL
+# model's particular Parameters
+abstract MODELparams
+# models particular contexts'decompo/etc...
+abstract MODELcontext
 
 # idea of doing model factory as we actually load the model might be silly or to be 
 # rather placed in the trainer script.
@@ -37,33 +41,45 @@ end
                LOCAL MODELS
 ==================================================================================#
 
-# Personalisation model
-type PersoModel <: MODEL
-    # cutoff for separating user into global//perso
+immutable PersoModelparams <: MODELparams
     cutoff::Int64
+    PersoModelparams(cutoff::Int64) = new(cutoff)
+    PersoModelparams(pmpIOObj::Dict{String,Any}) = new(pmpIOObj["cutoff"])
+end
+
+immutable PersoModelcontext <: MODELcontext
     # ids in the perso model
-    persoIds::Array{String,1}
+    persoIds::Vector{String}
     # ids in the glob model
-    globalIds::Array{String,1}
+    globalIds::Vector{String}
+    PersoModelcontext(persoIds::Vector{String},globalIds::Vector{String}) = new(persoIds, globalIds)
+    PersoModelcontext(ctxtIOObj::Dict{String,Any}) = new(ctxtIOObj["persoIds"], ctxtIOObj["globalIds"])
+   end
+
+# Basical Personalisation model
+type PersoModel <: MODEL
+
+    # cutoff for separating user into global//perso
+    modelP::PersoModelparams
+    # context parameters users allocated to global//perso model
+    context::PersoModelcontext 
     # global model for cold start pbm (or __globalIds)
     globModel::MODEL
     # Std. Instantiater:
-    # decompose the user set into train and test subsets, based on their 
-    # usage. 
+    # decompose the user set into train and test subsets, based on their usage. 
     function PersoModel(trainbedata::BEData, testbedata::BEData, cutoff = 30)
         persoIds, globalIds = Users4LocalModel(trainbedata, testbedata, cutoff)
-        new(cutoff,persoIds,globalIds) 
+        new(PersoModelparams(cutoff), PersoModelcontext(persoIds, globalIds)) 
     end
     # Reader from file
     function PersoModel(pmodel::Dict{String,Any})
-       cutoff, persoIds, globalIds, globModel = 
-		pmodel |> (_ -> begin
-        		convert(Int64,_["cutoff"]),
-        		convert(Array{String,1},_["persoIds"]),
-        		convert(Array{String,1},_["globalIds"]),
-        		RandomModel()
-	     			end )
-        new(cutoff, persoIds, globalIds, globModel)
+       mparams, mcontext, globModel = pmodel |>
+              (_ -> begin
+        		_["modelP"],
+        		_["context"],
+        		_["globModel"]
+	     	     end )
+        new(PersoModelparams(mparams), PersoModelcontext(mcontext), RandomModel(globModel))
     end
 end
 
