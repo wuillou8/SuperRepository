@@ -167,3 +167,74 @@ function Users4LocalModel(train_bedata::BEData, test_bedata::BEData, __cutoff::I
     __selectedIds, __unselectedIds
 end
 
+
+# Old Bernoulli
+type BernoulliNB <: MODEL
+    Voc::Array{String,1}
+    Nc::Int64
+    Nc_::Int64
+    prior::Float64
+    prior_::Float64
+    probvec::Array{Float64,1}
+    probvec_::Array{Float64,1}
+end
+
+#====
+
+# Old Bernoulli
+type BernoulliNB <: MODEL
+    Voc::Array{String,1}
+    Nc::Int64
+    Nc_::Int64
+    prior::Float64
+    prior_::Float64
+    probvec::Array{Float64,1}
+    probvec_::Array{Float64,1}
+
+    function BernoulliNB( Voc::Array{String,1},Nc::Int64,Nc_::Int64,
+                          prior::Float64, prior_::Float64,
+                   
+
+       probvec::Array{Float64,1}, probvec_::Array{Float64,1})
+        new(Voc,Nc,Nc_,prior,prior_,probvec,probvec_)
+    end
+
+    function BernoulliNB(trainUsage::DataFrame, trainNews::News)
+        usedEnts, newsEnts = GetEntities(trainUsage, trainNews)
+        usedNews = countmap(usedEnts)
+        generalNews = countmap(newsEnts)
+        Voc = unique(newsEnts)
+
+        Ndocs = length(unique(trainNews.news))
+        Nc = length(unique(trainUsage[:Custom1]))
+        Nc_ = Ndocs - Nc
+        prior, prior_ = Nc/Ndocs, Nc_/Ndocs
+
+        probvec, probvec_ = TrainBernoulliNB(usedNews,generalNews, Voc, Nc, Nc_)
+
+        new(Voc,Nc,Nc_,prior,prior_,probvec,probvec_)
+    end
+
+    function BernoulliNB(trainUsage::DataFrame, trainNews::News, __CutOff::Int64)
+        # Build up Bernoulli Naive Bayesian model.
+        usedEnts, newsEnts = GetEntities(trainUsage, trainNews)
+
+        usedNews = countmap(usedEnts)
+        generalNews = countmap(newsEnts)
+
+        arr = String[]
+        for k in keys(generalNews)
+            if generalNews[k] >= __CutOff
+            push!(arr,k)
+            end
+        end
+
+        arr2 = String[]
+        for k in keys(usedNews)
+            if k in arr
+                push!(arr2,k)
+            end
+        end
+    end
+end
+====#

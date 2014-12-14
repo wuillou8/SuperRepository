@@ -83,8 +83,8 @@ include("display.jl")
     __perfs, __perfs_ranks, __randoms = Vector{Perfo}[], PerfoRank[], Vector{Float64}[]
     __outresults = OUTPUTRES[]
 
-
-testusersIds = __models[1].modelP.persoIds
+# if local only
+#testusersIds = __models[1].context.persoIds
 
    for __model in __models
     
@@ -116,7 +116,7 @@ testusersIds = __models[1].modelP.persoIds
         end
         if "rankings" in __TH.Metrics
             Nmodel > 1 ? plotMeanRecRank2(__perfs_ranks,__recommSizes,__TH.Recommenders) :
-                                 plotMeanRecRank1(__perfs_ranks[1].__mrr_meas,__perfs_ranks[1].__mrr_rand,__recommSizes,__TH.Recommenders[1])
+                                 plotMeanRecRank1(__perfs_ranks[1].mrr_meas,__perfs_ranks[1].mrr_rand,__recommSizes,__TH.Recommenders[1])
         end
     end
 
