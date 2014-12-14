@@ -16,12 +16,17 @@ function recommenderList( recmodel::PersoModel, testnews::Array{String,1}, userI
         recommenderList( recmodel.globModel, testnews, userId, traindata, testdata )   
     
     #if userId in rec.persoIds
-    else 
+    else
+        # create profile 
         usrPrf = getEntssourceMap(traindata, userId) |> 
                                                    EntityFan
-        scores = map( x -> scoreNew(usrPrf, testdata, x)[1], testnews )
-        map( x -> testnews[x], findNMax(scores+100, length(scores)) ) |> 
-                                        ( _ -> convert(Array{String,1},_) )    
+        
+        #scores = map( x -> scoreNew(usrPrf, testdata, x)[1], testnews )
+        #map( x -> testnews[x], findNMax(scores+100, length(scores)) ) |> 
+        #                                ( _ -> convert(Array{String,1},_) )    
+        map( x -> scoreNew(usrPrf, testdata, x)[1], testnews ) |>
+                     ( _ -> map( x -> testnews[x], findNMax(_+100, length(_)) ) ) |>
+                     ( _ -> convert(Array{String,1},_) ) 
     end
 end
 

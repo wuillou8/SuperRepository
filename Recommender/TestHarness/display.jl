@@ -42,7 +42,7 @@ function plotPerf2(__perfs::Array{Vector{Perfo},1}, __randoms::Array{Vector{Floa
     savefig("FIGS/"*"Recallall_"*foldr(*,__modellabel)*__plotlabel*".png")
 
     close("all")
-    lim = 9
+    lim = 6
     xlim([0,__xaxis[lim]+1])
     title("Performance Comparison: Recall // close In")
     xlabel("Recomm List size")
@@ -116,7 +116,7 @@ function plotPerf1(__perfs::Array{Perfo,1}, __random, __xaxis, __modellabel::Str
     savefig("FIGS/"*__modellabel*"Recallall_"*__plotlabel*".png")
 
     close("all")
-    lim = 9
+    lim = 6
     xlim([0,__xaxis[lim]+1])
     title("Performance Comparison: Recall // close In")
     xlabel("Recomm List size")

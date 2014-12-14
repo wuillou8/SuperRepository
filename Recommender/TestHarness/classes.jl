@@ -195,6 +195,11 @@ end
 getAllarticleIds(bedata::BEData) = filter(x -> x.target_entity_type == "article", bedata.Usage) |>
                         (_ -> map(x -> x.source_entity_id, _))
 
+getAllEnts(bedata::BEData) = (_ -> filter(x -> x.target_entity_type == "entity", bedata.Usage)) |>
+                             (_ -> map(x -> x.value, _)) |> 
+                             unique |>
+                             StatsBase.countmap
+
 getId(bedata::BEData, __myId::String) = 
                         filter(x -> x.source_entity_id == __myId, bedata.Usage)
 

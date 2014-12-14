@@ -179,6 +179,26 @@ type BernoulliNB <: MODEL
     probvec_::Array{Float64,1}
 end
 
+
+function BernoulliNB(trainUsage::DataFrame, trainNews::News)
+    usedEnts, newsEnts = GetEntities(trainUsage, trainNews)
+    usedNews = countmap(usedEnts)
+    generalNews = countmap(newsEnts)
+    Voc = unique(newsEnts)
+
+    Ndocs = length(unique(trainNews.news))
+    Nc = length(unique(trainUsage[:Custom1]))
+    Nc_ = Ndocs - Nc
+    prior, prior_ = Nc/Ndocs, Nc_/Ndocs
+
+    probvec, probvec_ = TrainBernoulliNB(usedNews,generalNews, Voc, Nc, Nc_)
+
+    new(Voc,Nc,Nc_,prior,prior_,probvec,probvec_)
+end
+
+
+
+
 #====
 
 # Old Bernoulli
