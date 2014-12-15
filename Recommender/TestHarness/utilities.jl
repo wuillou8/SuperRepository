@@ -32,3 +32,41 @@ function findNMax (scor::Array{Float64,1}, N::Int64, arr = Int64[])
         return arr
     end
 end
+
+#===== MODEL ===========================================#
+
+# select users for the local model:
+# if they read more than Cutoff articles in the training period
+function Users4LocalModel(train_bedata::BEData, test_bedata::BEData, __cutoff::Int64)
+    __selectedIds, __unselectedIds = String[], String[]
+
+    # select users in train/test sets
+    testfullusersids = getAllarticleIds(test_bedata)
+    trainfullusersids = getAllarticleIds(train_bedata)
+    arry = Any[]
+    for user in unique(testfullusersids)
+        cnt1, cnt2  = 0, 0
+        for use in trainfullusersids
+            if use == user
+                cnt1 += 1
+            end
+        end
+        for use in testfullusersids
+            if use == user
+                cnt2 += 1
+            end
+        end
+        push!(arry,[user,cnt1,cnt2]);
+    end
+
+    # selection users for Perso
+    for _arr in arry
+        if _arr[2] > __cutoff
+            push!(__selectedIds,_arr[1])
+        else
+            push!(__unselectedIds,_arr[1])
+        end
+    end
+
+    __selectedIds, __unselectedIds
+end

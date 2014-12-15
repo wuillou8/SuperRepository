@@ -1,3 +1,4 @@
+include("utilities.jl")
 
 abstract MODEL
 # model's particular Parameters
@@ -5,21 +6,24 @@ abstract MODELparams
 # models particular contexts'decompo/etc...
 abstract MODELcontext
 
-# idea of doing model factory as we actually load the model might be silly or to be 
+#===
+# idea of doing model factory as we actually load the model might be silly or to be
 # rather placed in the trainer script.
 function modelsFactory(modelname::String, data::Any)
 	@switch modelname begin
 		"Random"; return RandomModel()
-                # ... 
+                # ...
 		"model::$modelname not implemented yet" |> println
 	end
 end
+===#
 
 # make model from json dict
 function modelsFactory(model::Dict{String,Any}, modelname::String)
 	@switch modelname begin
-		"Random"; return RandomModel() # nothing to be done :-)
-		"PersoSimple"; return PersoModel(model)
+		"Random"; RandomModel() # nothing to be done :-)
+		"PersoSimple"; PersoModel(model)
+    "PersoNaiveBayes"; PersoBernoulliNB(model)
                 # ...
                 "model::$modelname not implemented yet" |> println
 	end
@@ -31,8 +35,6 @@ end
 ==================================================================================#
 
 type RandomModel <: MODEL
-    #myparams::String
-    # reader from JSON file
     RandomModel(dict::Dict{String,Any}) = new()
     RandomModel() = new()
 end
@@ -62,31 +64,31 @@ type PersoModel <: MODEL
     # cutoff for separating user into global//perso
     modelP::PersoModelparams
     # context parameters users allocated to global//perso model
-    context::PersoModelcontext 
+    context::PersoModelcontext
     # global model for cold start pbm (or __globalIds)
     globModel::MODEL
     # Std. Instantiater:
-    # decompose the user set into train and test subsets, based on their usage. 
+    # decompose the user set into train and test subsets, based on their usage.
     function PersoModel(trainbedata::BEData, testbedata::BEData, cutoff = 30)
         persoIds, globalIds = Users4LocalModel(trainbedata, testbedata, cutoff)
-        new(PersoModelparams(cutoff), PersoModelcontext(persoIds, globalIds)) 
+        new(PersoModelparams(cutoff), PersoModelcontext(persoIds, globalIds))
     end
     # Reader from file
     function PersoModel(pmodel::Dict{String,Any})
        mparams, mcontext, globModel = pmodel |>
               (_ -> begin
-        		_["modelP"],
-        		_["context"],
-        		_["globModel"]
-	     	     end )
+        		           _["modelP"],
+        		           _["context"],
+        		           _["globModel"]
+	     	            end )
         new(PersoModelparams(mparams), PersoModelcontext(mcontext), RandomModel(globModel))
     end
 end
 
 # Trivial model based on preference footprints
-type EntityFan 
+type EntityFan
     Profile::Dict{String,Int64}
-#==    
+#==
     keys::Array{String,1}
     values::Array{Int64}
     function UserProfile(Profile::Dict{String,Int64})
@@ -96,23 +98,6 @@ type EntityFan
     end
 ==#
 end
-
-###    FUNCTIONALITIES    ###
-#      train
-function train(myModel::PersoModel, mode::String, data = Any[])
-    if mode == "Random"
-        myModel.globModel = RandomModel()
-        #elseif() train with data
-    end
-end
-function train(myModel::RandomModel, mode::String, data = Any[])
-    #if mode == "Random"
-    #	myModel.globModel = RandomModel()
-    #elseif() train with data
-    #end
-end
-
-Merge!(usrprof::EntityFan, hashDict) = merge!(usrprof.Profile, hashDict)
 
 # Scoring function for EntityFan model
 function scoreNew(usrprof::EntityFan, bedata::BEData, guid::String)
@@ -131,57 +116,162 @@ function scoreNew(usrprof::EntityFan, bedata::BEData, guid::String)
     end
 end
 
-# select users for the local model: 
-# if they read more than Cutoff articles in the training period
-function Users4LocalModel(train_bedata::BEData, test_bedata::BEData, __cutoff::Int64)
-    __selectedIds, __unselectedIds = String[], String[]
-    
-    # select users in train/test sets
-    testfullusersids = getAllarticleIds(test_bedata) 
-    trainfullusersids = getAllarticleIds(train_bedata)
-    arry = Any[]
-    for user in unique(testfullusersids)
-        cnt1, cnt2  = 0, 0
-        for use in trainfullusersids
-            if use == user
-                cnt1 += 1
-            end
-        end
-        for use in testfullusersids
-            if use == user 
-                cnt2 += 1
-            end
-        end
-        push!(arry,[user,cnt1,cnt2]);
-    end
+################################################################################################
+#                          NAIVE BAYESIANs                                                     #
+################################################################################################
 
-    # selection users for Perso
-    for _arr in arry
-        if _arr[2] > __cutoff
-            push!(__selectedIds,_arr[1])
-        else 
-            push!(__unselectedIds,_arr[1])
-        end
-    end  
-
-    __selectedIds, __unselectedIds
+type PersoBernoulliNBparams <: MODELparams
+    cutoff::Int64
+    PersoBernoulliNBparams(cutoff::Int64) = new(cutoff)
+    PersoBernoulliNBparams(pmpIOObj::Dict{String,Any}) = new(pmpIOObj["cutoff"])
 end
 
+type PersoBernoulliNBcontext <: MODELcontext
+    # ids in the perso model
+    persoIds::Vector{String}
+    # ids in the glob model
+    globalIds::Vector{String}
+    Ents::Dict{String,Int64}
+    Voc::Vector{String}
+    Ndocs::Int64
+    PersoBernoulliNBcontext(persoIds::Vector{String},globalIds::Vector{String},Ents::Dict{String,Int64},Voc::Vector{String},Ndocs::Int64) =
+              new(persoIds, globalIds, Ents, Voc, Ndocs)
+    PersoBernoulliNBcontext(_::Dict{String,Any}) = new(_["persoIds"], _["globalIds"], _["Ents"], _["Voc"], _["Ndocs"])
+end
 
 # Old Bernoulli
-type BernoulliNB <: MODEL
-    Voc::Array{String,1}
-    Nc::Int64
-    Nc_::Int64
-    prior::Float64
-    prior_::Float64
-    probvec::Array{Float64,1}
-    probvec_::Array{Float64,1}
+type PersoBernoulliNB <: MODEL
+    # cutoff for statistics
+    modelP::PersoBernoulliNBparams
+    # context parameters users allocated to global//perso model
+    context::PersoBernoulliNBcontext
+    # global model for cold start pbm (or __globalIds)
+    globModel::MODEL
+
+    function PersoBernoulliNB(trainbedata::BEData, testbedata::BEData)
+        cutoff = 1
+        Ents = getAllEnts(trainbedata)
+        Voc = convert(Vector{String},[k for k in keys(Ents)])
+        Ndocs = getAllarticleIds(trainbedata) |>
+                                   unique |> length
+        persoIds, globalIds = Users4LocalModel(trainbedata, testbedata, cutoff)
+        new(PersoBernoulliNBparams(cutoff), PersoBernoulliNBcontext(persoIds, globalIds, Ents, Voc, Ndocs))
+    end
+
+    function PersoBernoulliNB(pmodel::Dict{String,Any})
+       mparams, mcontext, globModel = pmodel |>
+              (_ -> begin
+        		_["modelP"],
+        		_["context"],
+        		_["globModel"]
+	     	     end )
+        new(PersoBernoulliNBparams(mparams), PersoBernoulliNBcontext(mcontext), RandomModel(globModel))
+    end
 end
 
+#EntityFan
+#    Profile::Dict{String,Int64}
+#    Ents::Dict{String,Int64}
+#    Voc::Vector{String}
+#    Ndocs::Int64
 
+function TrainBernoulliNB(__modelNB::PersoBernoulliNB,__usermodel::EntityFan) #generalNews::Dict{String,Int64})
+
+    usedNews = __usermodel.Profile
+    Voc = __modelNB.context.Voc
+    Ntot = length(Voc)
+    Nc = values(usedNews) |> sum
+    Nc_ = (1.-Nc/Ntot)*Ntot |> round |> (_ -> convert(Int64,_))
+
+    prior, prior_ = Nc/Ntot, 1. - Nc/Ntot #(Ntot - Nc)/Ntot
+    probvec, probvec_ = zeros(Ntot), zeros(Ntot)
+
+    # !!!!!
+    # Version based on the available vocabulary and not the
+    # available nbs of documents as in the litterature, however, this
+    # should be performing better in these settings.
+
+    # entities used
+    for i in 1:Ntot
+        wd = Voc[i]
+        if wd in keys(usedNews)
+            Nct = usedNews[wd]
+        else
+            Nct = 0
+        end
+        # with Laplace smoothing
+        probvec[i] = (Nct + 1)/(Nc + 2)
+    end
+
+    # entities unused
+    for i in 1:Ntot
+        wd = Voc[i]
+        if wd in keys(usedNews)
+            Nct = 0
+        else
+            Nct = 1
+        end
+        # With Laplace smoothing
+        probvec_[i] = (Nct + 1)/(Nc_ + 2)
+    end
+
+    prior, probvec, prior_, probvec_
+end
+#===
+function ApplyBernoulliNB(modelNB::BernoulliNB, news::News, id::String)
+    L = length(modelNB.Voc)
+    new = getguid(news,id)
+    ents= String[]
+    for ent in map(x->x["value"], new.entities)
+        push!(ents,ent)
+    end
+
+    score = log(modelNB.prior)
+    for i = 1:L
+        wd = modelNB.Voc[i]
+        if wd in ents #keys(voc)
+            score += log(modelNB.probvec[i])
+            #println(probvec[i]," ", score)
+        else
+            score += log(1.-modelNB.probvec[i])
+        end
+    end
+    score
+end
+===#
+
+#==================================================================================
+               MODEL FUNCTIONALITIES
+==================================================================================#
+#      train
+function train(myModel::RandomModel, mode::String, data = Any[])
+    #if mode == "Random"
+    #	myModel.globModel = RandomModel()
+    #elseif() train with data
+    #end
+end
+
+function train(myModel::PersoModel, mode::String, data = Any[])
+    if mode == "Random"
+        myModel.globModel = RandomModel()
+        #elseif() train with data
+    end
+end
+
+function train(myModel::PersoBernoulliNB, mode::String, data = Any[])
+    if mode == "Random"
+        myModel.globModel = RandomModel()
+        #elseif() train with data
+    end
+end
+
+Merge!(usrprof::EntityFan, hashDict) = merge!(usrprof.Profile, hashDict)
+
+
+
+#===
 function BernoulliNB(trainUsage::DataFrame, trainNews::News)
-    usedEnts, newsEnts = GetEntities(trainUsage, trainNews)
+    getAllEnts(trainbedata), newsEnts = GetEntities(trainUsage, trainNews)
     usedNews = countmap(usedEnts)
     generalNews = countmap(newsEnts)
     Voc = unique(newsEnts)
@@ -195,7 +285,7 @@ function BernoulliNB(trainUsage::DataFrame, trainNews::News)
 
     new(Voc,Nc,Nc_,prior,prior_,probvec,probvec_)
 end
-
+===#
 
 
 
@@ -213,7 +303,7 @@ type BernoulliNB <: MODEL
 
     function BernoulliNB( Voc::Array{String,1},Nc::Int64,Nc_::Int64,
                           prior::Float64, prior_::Float64,
-                   
+
 
        probvec::Array{Float64,1}, probvec_::Array{Float64,1})
         new(Voc,Nc,Nc_,prior,prior_,probvec,probvec_)

@@ -5,20 +5,13 @@ using StatsBase
 using Dates
 using PyPlot
 
-
-include("utilities.jl")
 include("classes.jl")
+include("utilities.jl")
 include("models.jl")
 include("recommender.jl")
 include("perfomeasures.jl")
 include("tests.jl")
 include("display.jl")
-
-
-
-
-
-
 
 # read data passed from backend
     __backenddatapath = "DataBase/bedata.json"
@@ -31,13 +24,12 @@ include("display.jl")
     trainbedata = BEData(getInTs(bedata,__TH.T1,__TH.T2))
     testbedata = BEData(getInTs(bedata,__TH.T2,__TH.T3))
 
-# filter out test UsersId and NewsId 
+# filter out test UsersId and NewsId
 # create hash table
     testusersIds = getsourceIds(testbedata,"user")
     testnewsIds = gettargetIds(testbedata,"article")
-    hashtestUsage = 
+    hashtestUsage =
             { Id => convert(Array{String,1}, getUsageIds(testbedata, Id)) for Id in testusersIds }
-
 
 # send event for training
     # print modelname to be trained
@@ -53,7 +45,6 @@ include("display.jl")
     JSON.print(out,testbedata)
     close(out)
 
-
 # launch model trainings
     for i = 1:length(__TH.Recommenders)
         model = __TH.Recommenders[i]
@@ -61,22 +52,21 @@ include("display.jl")
         run(`time julia trainModel.jl $model Random $i`)
     end
 
-
 # load trained model(s)
     __models = MODEL[]
     for i = 1:length(__TH.Recommenders)
         __modelName = __TH.Recommenders[i]
 
         # load/instantiate/append model
-        "DataBase/trainedmodel$__modelName$i.json" |> 
+        "DataBase/trainedmodel$__modelName$i.json" |>
                    JSON.parsefile |> (_ -> modelsFactory(_,  __modelName)) |>
-                                (_ -> begin 
+                                (_ -> begin
                                           push!(__models,_)
                                           "model $__modelName loaded" |> println
                                       end )
     end
 
-# Test Harness Core 
+# Test Harness Core
 # recomm list intervals for tests/plots
     __recommSizes = [ 1, 3, 5, 7, 10, 20, 40, 80, 120, 200]
 
@@ -87,16 +77,16 @@ include("display.jl")
 #testusersIds = __models[1].context.persoIds
 
    for __model in __models
-    
-       __perf, __perf_rank, __random = 
-                            TestPerfos( __model, testusersIds, testnewsIds, 
+
+       __perf, __perf_rank, __random =
+                            TestPerfos( __model, testusersIds, testnewsIds,
                                                  trainbedata, testbedata, __recommSizes )
        # build results
        push!(__perfs, __perf)
        push!(__perfs_ranks, __perf_rank)
-       push!(__randoms, __random)          
-       push!(__outresults, 
-               OutputRes(strftime(time()), __TH, __model, [Intervals(__recommSizes), __perf, __perf_rank]) ) 
+       push!(__randoms, __random)
+       push!(__outresults,
+               OutputRes(strftime(time()), __TH, __model, [Intervals(__recommSizes), __perf, __perf_rank]) )
     end
 
 # Print out result file

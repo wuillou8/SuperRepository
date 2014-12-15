@@ -17,18 +17,18 @@ end
 ===#
 
 # Main test function
-function TestPerfos( __model::MODEL,  
-                     __testusersIds::Array{String,1}, __testnewsIds::Array{String,1}, 
-                     __trainbedata::BEData, __testbedata::BEData, 
-                     __recommSizes ) 
+function TestPerfos( __model::MODEL,
+                     __testusersIds::Array{String,1}, __testnewsIds::Array{String,1},
+                     __trainbedata::BEData, __testbedata::BEData,
+                     __recommSizes )
 
     __perfs = [ Perfo(0,0,0,0) for i in __recommSizes ]
     __mrr_meas = [ [0.,0] for i in __recommSizes ]
 
 
     for userId in __testusersIds
-        recoList = #recommenderList( __model, __testnewsIds, userId )
-                   recommenderList( __model, __testnewsIds, userId, __trainbedata, __testbedata )
+        recoList =
+                recommenderList( __model, __testnewsIds, userId, __trainbedata, __testbedata )
 
         usage = hashtestUsage[userId]
 
@@ -39,7 +39,7 @@ function TestPerfos( __model::MODEL,
         end
     end
 
-    # Postprocess 
+    # Postprocess
     map(_ -> evaluate(_),__perfs)
     __random = map(x -> x/length(__testnewsIds),__recommSizes)
 

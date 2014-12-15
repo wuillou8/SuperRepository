@@ -7,7 +7,7 @@ include("models.jl")
 
 
 # readin which model//settings
-	__model = ARGS[1]; #"Random" 
+	__model = ARGS[1]; #"Random"
 	__submodel = ARGS[2]; #"Random"
         __modelNb = ARGS[3]
 
@@ -17,30 +17,24 @@ include("models.jl")
 	__testdatapath = "DataBase/datafortesting.json"
 	test_bedata = BEData( JSON.parsefile(__testdatapath) )
 
-# filter out test UsersId and NewsId 
+# filter out test UsersId and NewsId
 # create hash table
 	testnewsIds = gettargetIds(test_bedata,"article")
 	testusersIds = getsourceIds(test_bedata,"user")
 
 # instantiate and train models:
 # here we have PersoSimple
-	# if PersoSimple
-	if __model == "Random"
-	__myModel = 
- 		RandomModel()
-	elseif __model == "PersoSimple"
-	__myModel = 
-		PersoModel(train_bedata, test_bedata)
-		#if modelToTrain2 == "Random"
-		#	__myModel.globModel = RandomModel()
-		#end
-	else 
-		"trainModel.jl:: model::$__model not recognised" |> println
-		exit()
-	end
-	# 	...
+	__myModel=
+                @switch __model begin
+                        "Random" ; RandomModel()
+                        "PersoSimple" ; PersoModel(train_bedata, test_bedata)
+                        "PersoNaiveBayes" ;  PersoBernoulliNB(train_bedata, test_bedata)
+                        #    ...
+                             "trainModel.jl:: model::$__model not recognised" |> println
+		                 exit()
+                end
 
-# train 
+# train
 	train(__myModel, __submodel)
 
 # store trained model

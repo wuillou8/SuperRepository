@@ -73,13 +73,13 @@ type PerfoRank <: PERFO
      Nuse::Int64
      mrr_meas::Array{Float64,1}
      mrr_rand::Array{Float64,1}
-end 
+end
 
-function add(pr1::PerfoRank,pr2::PerfoRank) 
-    Nuse = pr1.Nuse + pr2.Nuse 
+function add(pr1::PerfoRank,pr2::PerfoRank)
+    Nuse = pr1.Nuse + pr2.Nuse
     mrr_meas = ( pr1.Nuse*pr1.mrr_meas + pr2.Nuse*pr2.mrr_meas ) / Nuse
     mrr_rand = ( pr1.Nuse*pr1.mrr_rand + pr2.Nuse*pr2.mrr_rand ) / Nuse
-    PerfoRanking( Nuse,mrr_meas,mrr_rand,random ) 
+    PerfoRanking( Nuse,mrr_meas,mrr_rand,random )
 end
 
 immutable Intervals <: PERFO
@@ -95,7 +95,7 @@ abstract OUTPUTRES
 #=== currently in display
 type OutputRes{model <: MODEL} <: OUTPUTRES
     # creation time
-    testdate::ASCIIString 
+    testdate::ASCIIString
     # query::
     testHarn::testHarness
     # model with parameteres
@@ -131,22 +131,25 @@ end
 function createTest(__testfilename::String)
     T1, T2, T3 = DateTime(), DateTime(), DateTime()
     Recommenders = String[] #::Array{String,1}
+    Submodels = String[]
     Scorings = String[] #::Array{String,1}
     Plotting = Bool
     Metrics = String[]
-    
+
     iofile = readdlm(__testfilename)
     for i = 1:length(iofile[1:end,1])
         _type = iofile[i,1]
         _var = iofile[i,2]
         @switch _type begin
-            "T1="; T1 = DateTime(_var) 
+            "T1="; T1 = DateTime(_var)
             "T2="; T2 = DateTime(_var)
             "T3="; T3 = DateTime(_var)
-            "Recommender="; push!(Recommenders, _var)
-            "Scoring="; push!(Scorings, _var)
-            "Metrics="; Metrics = getMetrics(_var)
-            "Plotting="; _var == "yes" ? Plotting = true : Plotting = false
+            "Recommender=" ; push!(Recommenders, _var)
+            "Submodel=" ;  push!(Submodels, _var)
+            "Scoring=" ; push!(Scorings, _var)
+            "Metrics=" ; Metrics = getMetrics(_var)
+            "Plotting=" ; _var == "yes" ? Plotting = true : Plotting = false
+                " pass "
         end
     end
     testHarness(T1,T2,T3,Recommenders,Scorings,Plotting,Metrics)
@@ -184,8 +187,8 @@ type BEData
     #Hashtable ?
     BEData(Usage::Array{DataUsage,1}) = new(Usage)
     function BEData(IObedata::Dict{String,Any})
-        Usage = IObedata["Usage"] |> 
-                             (_ -> map(x -> DataUsage(x), _))                      
+        Usage = IObedata["Usage"] |>
+                             (_ -> map(x -> DataUsage(x), _))
         new(Usage)
     end
 
@@ -195,30 +198,32 @@ end
 getAllarticleIds(bedata::BEData) = filter(x -> x.target_entity_type == "article", bedata.Usage) |>
                         (_ -> map(x -> x.source_entity_id, _))
 
-getAllEnts(bedata::BEData) = (_ -> filter(x -> x.target_entity_type == "entity", bedata.Usage)) |>
-                             (_ -> map(x -> x.value, _)) |> 
-                             unique |>
-                             StatsBase.countmap
+getAllEnts(bedata::BEData) = filter(x -> x.target_entity_type == "entity", bedata.Usage) |>
+                        (_ -> map(x -> x.value, _)) |>
+                        unique |>
+                        StatsBase.countmap
 
-getId(bedata::BEData, __myId::String) = 
+getSId(bedata::BEData, __myId::String) =
                         filter(x -> x.source_entity_id == __myId, bedata.Usage)
+getTId(bedata::BEData, __myId::String) =
+                        filter(x -> x.target_entity_id == __myId, bedata.Usage)
 
-getEntType(bedata::BEData, __myEnt::String) = 
+getEntType(bedata::BEData, __myEnt::String) =
                         filter(x -> (x.target_entity_type == "entity") & (x.source_entity_id == __myEnt), bedata.Usage)
 
-getEntType(bedata::BEData, __myEnt::String) = 
+getEntType(bedata::BEData, __myEnt::String) =
                         filter(x -> (x.target_entity_type == "entity") & (x.value == __myEnt), bedata.Usage)
 
-getUnderT(bedata::BEData, __Time::DateTime) = 
+getUnderT(bedata::BEData, __Time::DateTime) =
                         filter(x -> x.time < datetime2unix(__Time), bedata.Usage)
 
-getOverT(bedata::BEData, __Time::DateTime) = 
+getOverT(bedata::BEData, __Time::DateTime) =
                         filter(x -> x.time > datetime2unix(__Time), bedata.Usage)
 
 getInTs(bedata::BEData, __T1::DateTime, __T2::DateTime) =
                         filter(x -> (x.time > datetime2unix(__T1)) & (x.time <= datetime2unix(__T2)), bedata.Usage)
 
-getUsageIds(bedata::BEData,userId::String) = getId(bedata,userId) |>
+getUsageIds(bedata::BEData,userId::String) = getSId(bedata,userId) |>
                         (_ -> filter(x -> x.target_entity_type == "article",_)) |>
                         (_ -> map(x->x.target_entity_id,_))
 
@@ -243,6 +248,6 @@ getEntssourceMap(bedata::BEData,userId::String) =  filter(x -> x.source_entity_i
 
 getEntstargetMap(bedata::BEData,targId::String) =  filter(x -> x.target_entity_id == targId, bedata.Usage) |>
                                 (_ -> filter(x -> x.target_entity_type == "entity", _)) |>
-                                (_ -> map(x -> x.value, _)) |> 
+                                (_ -> map(x -> x.value, _)) |>
                                 unique |>
                                 StatsBase.countmap

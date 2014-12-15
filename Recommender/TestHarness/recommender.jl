@@ -2,32 +2,56 @@
 
 # Create recommendation list
 function recommenderList( rec::RandomModel, testnews::Array{String,1}, userId::ASCIIString, traindata::BEData, testdata::BEData )
-    
+
     scores = [ rand() for i = 1:length(testnews) ]
-    map( x -> testnews[x], findNMax(scores, length(scores)) ) |> 
+    map( x -> testnews[x], findNMax(scores, length(scores)) ) |>
     ( _ -> convert(Array{String,1},_) )
 end
 
 # bug two els lost along the way... findNmax probably
 function recommenderList( recmodel::PersoModel, testnews::Array{String,1}, userId::ASCIIString, traindata::BEData, testdata::BEData )
-    
+
     # if userId in globalIds
     if userId in recmodel.context.globalIds #persoIds
-        recommenderList( recmodel.globModel, testnews, userId, traindata, testdata )   
-    
+        recommenderList( recmodel.globModel, testnews, userId, traindata, testdata )
+
     #if userId in rec.persoIds
     else
-        # create profile 
-        usrPrf = getEntssourceMap(traindata, userId) |> 
+        # create profile
+        usrPrf = getEntssourceMap(traindata, userId) |>
                                                    EntityFan
-        
+
         #scores = map( x -> scoreNew(usrPrf, testdata, x)[1], testnews )
-        #map( x -> testnews[x], findNMax(scores+100, length(scores)) ) |> 
-        #                                ( _ -> convert(Array{String,1},_) )    
+        #map( x -> testnews[x], findNMax(scores+100, length(scores)) ) |>
+        #                                ( _ -> convert(Array{String,1},_) )
         map( x -> scoreNew(usrPrf, testdata, x)[1], testnews ) |>
                      ( _ -> map( x -> testnews[x], findNMax(_+100, length(_)) ) ) |>
-                     ( _ -> convert(Array{String,1},_) ) 
+                     ( _ -> convert(Array{String,1},_) )
     end
 end
 
-# recommenderList(::PersoModel, ::Array{String,1}, ::ASCIIString, ::BEData, ::BEData)
+# bug two els lost along the way... findNmax probably
+function recommenderList( recmodel::PersoBernoulliNB, testnews::Array{String,1}, userId::ASCIIString, traindata::BEData, testdata::BEData )
+
+    # if userId in globalIds
+    if userId in recmodel.context.globalIds #persoIds
+        recommenderList( recmodel.globModel, testnews, userId, traindata, testdata )
+
+    #if userId in rec.persoIds
+    else
+        recommenderList( recmodel.globModel, testnews, userId, traindata, testdata )
+        # create profile
+        usrPrf = getEntssourceMap(traindata, userId) |> EntityFan
+        # in this model, NB has to be trained "live"
+        prior, probvec, prior_, probvec_ = TrainBernoulliNB( recmodel, usrPrf )
+        println("jjajajaj ++++ w")
+    exit()
+
+        #scores = map( x -> scoreNew(usrPrf, testdata, x)[1], testnews )
+        #map( x -> testnews[x], findNMax(scores+100, length(scores)) ) |>
+        #                                ( _ -> convert(Array{String,1},_) )
+        #map( x -> scoreNew(usrPrf, testdata, x)[1], testnews ) |>
+        #             ( _ -> map( x -> testnews[x], findNMax(_+100, length(_)) ) ) |>
+        #             ( _ -> convert(Array{String,1},_) )
+    end
+end
