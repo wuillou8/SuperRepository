@@ -1,10 +1,49 @@
-include("utilities.jl")
+include("JuliaCode/utilities.jl")
 
 abstract MODEL
 # model's particular Parameters
 abstract MODELparams
 # models particular contexts'decompo/etc...
 abstract MODELcontext
+
+
+#===== MODEL ===========================================#
+
+# select users for the local model:
+# if they read more than Cutoff articles in the training period
+function Users4LocalModel(train_bedata::BEData, test_bedata::BEData, __cutoff::Int64)
+    __selectedIds, __unselectedIds = String[], String[]
+
+    # select users in train/test sets
+    testfullusersids = getAllarticleIds(test_bedata)
+    trainfullusersids = getAllarticleIds(train_bedata)
+    arry = Any[]
+    for user in unique(testfullusersids)
+        cnt1, cnt2  = 0, 0
+        for use in trainfullusersids
+            if use == user
+                cnt1 += 1
+            end
+        end
+        for use in testfullusersids
+            if use == user
+                cnt2 += 1
+            end
+        end
+        push!(arry,[user,cnt1,cnt2]);
+    end
+
+    # selection users for Perso
+    for _arr in arry
+        if _arr[2] > __cutoff
+            push!(__selectedIds,_arr[1])
+        else
+            push!(__unselectedIds,_arr[1])
+        end
+    end
+
+    __selectedIds, __unselectedIds
+end
 
 #===
 # idea of doing model factory as we actually load the model might be silly or to be
@@ -20,6 +59,14 @@ end
 
 # make model from json dict
 function modelsFactory(model::Dict{String,Any}, modelname::String)
+  #println(modelname)
+  modelname |>
+  ( _ ->
+      _ == "Random" ? RandomModel() :
+      _ == "PersoSimple" ? PersoModel(model) :
+      _ == "PersoNaiveBayes" ? PersoBernoulliNB(model) :
+      ""   )
+  #===
 	@switch modelname begin
 		"Random"; RandomModel() # nothing to be done :-)
 		"PersoSimple"; PersoModel(model)
@@ -27,6 +74,7 @@ function modelsFactory(model::Dict{String,Any}, modelname::String)
                 # ...
                 "model::$modelname not implemented yet" |> println
 	end
+  ===#
 end
 
 
@@ -161,10 +209,10 @@ type PersoBernoulliNB <: MODEL
     function PersoBernoulliNB(pmodel::Dict{String,Any})
        mparams, mcontext, globModel = pmodel |>
               (_ -> begin
-        		_["modelP"],
-        		_["context"],
-        		_["globModel"]
-	     	     end )
+        		            _["modelP"],
+        		            _["context"],
+        		            _["globModel"]
+	     	             end )
         new(PersoBernoulliNBparams(mparams), PersoBernoulliNBcontext(mcontext), RandomModel(globModel))
     end
 end
@@ -217,6 +265,28 @@ function TrainBernoulliNB(__modelNB::PersoBernoulliNB,__usermodel::EntityFan) #g
 
     prior, probvec, prior_, probvec_
 end
+
+function applyBernoulliNB(__model::PersoBernoulliNB, Id::String, prior::Float64, probvec::Vector{Float64})
+    # following Manning's book methods.
+    L = length(__model.context.Voc)
+    ents = getTId(testbedata, Id) |>
+            (_ -> filter(x -> x.target_entity_type == "entity", _)) |>
+            (_ -> map(x -> x.value, _)) |>
+            unique
+
+    score = log(prior)
+    for i = 1:L
+        wd = __model.context.Voc[i]
+        if wd in ents
+            score += log(probvec[i])
+        else
+            score += log(1.-probvec[i])
+        end
+    end
+
+    score
+end
+
 #===
 function ApplyBernoulliNB(modelNB::BernoulliNB, news::News, id::String)
     L = length(modelNB.Voc)

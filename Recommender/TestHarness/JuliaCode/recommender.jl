@@ -12,7 +12,7 @@ end
 function recommenderList( recmodel::PersoModel, testnews::Array{String,1}, userId::ASCIIString, traindata::BEData, testdata::BEData )
 
     # if userId in globalIds
-    if userId in recmodel.context.globalIds #persoIds
+    if userId in recmodel.context.globalIds
         recommenderList( recmodel.globModel, testnews, userId, traindata, testdata )
 
     #if userId in rec.persoIds
@@ -36,16 +36,26 @@ function recommenderList( recmodel::PersoBernoulliNB, testnews::Array{String,1},
     # if userId in globalIds
     if userId in recmodel.context.globalIds #persoIds
         recommenderList( recmodel.globModel, testnews, userId, traindata, testdata )
-
     #if userId in rec.persoIds
     else
-        recommenderList( recmodel.globModel, testnews, userId, traindata, testdata )
+        #recommenderList( recmodel.globModel, testnews, userId, traindata, testdata )
         # create profile
-        usrPrf = getEntssourceMap(traindata, userId) |> EntityFan
+        usrPrf = getEntssourceMap( traindata, userId ) |> EntityFan
         # in this model, NB has to be trained "live"
         prior, probvec, prior_, probvec_ = TrainBernoulliNB( recmodel, usrPrf )
-        println("jjajajaj ++++ w")
-    exit()
+        #println("jjajajaj ++++ w")
+        #applyBernoulliNB( __model::PersoBernoulliNB, Id::String, prior, probvec )
+        #applyBernoulliNB(::PersoBernoulliNB, ::ASCIIString, ::Float64, ::Array{Float64,1})
+    #applyBernoulliNB(__model::PersoBernoulliNB, Id::String, prior::Float64, probvec::Float64)
+    #applyBernoulliNB(::PersoBernoulliNB, ::ASCIIString, ::Float64, ::Array{Float64,1})
+        testnews |>
+        (_ -> map( x -> applyBernoulliNB( recmodel, userId, prior, probvec )), _) |>
+                     ( _ -> map( x -> testnews[x], findNMax(_+1000., length(_)) ) ) |>
+                     ( _ -> convert(Array{String,1},_) ) #|> println
+        #map( x -> applyBernoulliNB( recmodel, userId, prior, probvec ), testnews ) |>
+                     #( _ -> map( x -> testnews[x], findNMax(_+1000., length(_)) ) ) |>
+                     #( _ -> convert(Array{String,1},_) ) |> println
+    #exit()
 
         #scores = map( x -> scoreNew(usrPrf, testdata, x)[1], testnews )
         #map( x -> testnews[x], findNMax(scores+100, length(scores)) ) |>

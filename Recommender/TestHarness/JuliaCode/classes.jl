@@ -110,12 +110,11 @@ end
 ###################################################################
 
 function getMetrics(var::String)
-    @switch var begin
-        "all"; return ["perfs","rankings"]
-        "perfs"; return ["perfs"]
-        "rankings"; return ["rankings"]
-                println("testHarness::getmetrics var must be in all perfs, rankings") ,exit()
-    end
+   var |> ( _->
+            _ == "all" ? ["perfs","rankings"] :
+            _ == "perfs" ? ["perfs"] :
+            _ == "rankings" ? ["rankings"] :
+            println("testHarness::getmetrics var must be in all perfs, rankings") )
 end
 
 type testHarness
@@ -140,6 +139,18 @@ function createTest(__testfilename::String)
     for i = 1:length(iofile[1:end,1])
         _type = iofile[i,1]
         _var = iofile[i,2]
+        _type |> ( _ ->
+                   _ == "T1=" ? T1 = DateTime(_var) :
+                   _ == "T2=" ? T2 = DateTime(_var) :
+                   _ == "T3=" ? T3 = DateTime(_var) :
+                   _ == "Recommender=" ? push!(Recommenders, _var) :
+                   _ == "Submodel=" ? push!(Submodels, _var) :
+                   _ == "Scoring=" ? push!(Scorings, _var) :
+                   _ == "Metrics=" ? Metrics = getMetrics(_var) :
+                   _ == "Plotting=" ? ( _var == "yes" ? Plotting = true : Plotting = false ) :
+                          " pass "
+                  )
+       #==
         @switch _type begin
             "T1="; T1 = DateTime(_var)
             "T2="; T2 = DateTime(_var)
@@ -151,6 +162,7 @@ function createTest(__testfilename::String)
             "Plotting=" ; _var == "yes" ? Plotting = true : Plotting = false
                 " pass "
         end
+        ==#
     end
     testHarness(T1,T2,T3,Recommenders,Scorings,Plotting,Metrics)
 end
@@ -168,7 +180,8 @@ immutable DataUsage
     action::String #(ie, "view", "rate"),
     value::String #(ie, null, [1-5]),
     time::Int64 #(UTC timestamp),
-
+    DataUsage(source_entity_type::String,target_entity_type::String,source_entity_id::String,target_entity_id::String,action::String,value::String,time::Int64) =
+                new(source_entity_type,target_entity_type,source_entity_id,target_entity_id,action,value,time)
     function DataUsage(jsonfile::Dict{String,Any})
         source_entity_type = jsonfile["source_entity_type"]
         target_entity_type = jsonfile["target_entity_type"]
@@ -192,6 +205,27 @@ type BEData
         new(Usage)
     end
 
+    function BEData(myiostream::IOStream)
+        __bedata = DataUsage[]
+        #println("ici")
+        while !eof(STDIN)
+            sent_type, tent_type, sent_id, tent_id, action, value, time =
+            readline(STDIN) |> JSON.parse |>
+              ( _ -> begin
+                        _["source_entity_type"],
+                        _["target_entity_type"],
+                        _["source_entity_id"],
+                        _["target_entity_id"],
+                        _["action"],
+                        _["value"],
+                        _["time"]
+                      end )
+            #println("lalal")
+            push!(__bedata, DataUsage(sent_type, tent_type, sent_id, tent_id, action, value, time))
+        end
+        #println("IIIci")
+        new(__bedata)
+    end
 end
 
 # getters for BEData

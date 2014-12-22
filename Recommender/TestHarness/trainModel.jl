@@ -1,21 +1,26 @@
 using JSON
 using Dates #Time
-using Lazy, StatsBase
+#using Lazy #, StatsBase
 
-include("classes.jl")
-include("models.jl")
+include("JuliaCode/classes.jl")
+include("JuliaCode/models.jl")
 
 
 # readin which model//settings
-	__model = ARGS[1]; #"Random"
-	__submodel = ARGS[2]; #"Random"
-        __modelNb = ARGS[3]
+	__model = ARGS[1]
+	__submodel = ARGS[2]
+  #__modelNb = ARGS[3]
 
 # read in event for training
-	__traindatapath = "DataBase/datafortraining.json"
-	train_bedata = BEData( JSON.parsefile(__traindatapath) )
-	__testdatapath = "DataBase/datafortesting.json"
-	test_bedata = BEData( JSON.parsefile(__testdatapath) )
+	__traindatapath = "DataBase/data4train.json"
+  STDIN = open(__traindatapath)
+	train_bedata = BEData( STDIN )
+	__testdatapath = "DataBase/data4test.json"
+	STDIN = open(__testdatapath)
+  test_bedata = BEData( STDIN )
+
+
+
 
 # filter out test UsersId and NewsId
 # create hash table
@@ -24,7 +29,13 @@ include("models.jl")
 
 # instantiate and train models:
 # here we have PersoSimple
-	__myModel=
+	__myModel = __model |>
+                (_ -> _ == "Random" ? RandomModel() :
+                      _ == "PersoSimple" ? PersoModel(train_bedata, test_bedata) :
+                      _ == "PersoNaiveBayes" ? PersoBernoulliNB(train_bedata, test_bedata) :
+                       "trainModel.jl:: model::$_ not recognised"  )
+
+                #====
                 @switch __model begin
                         "Random" ; RandomModel()
                         "PersoSimple" ; PersoModel(train_bedata, test_bedata)
@@ -33,15 +44,13 @@ include("models.jl")
                              "trainModel.jl:: model::$__model not recognised" |> println
 		                 exit()
                 end
+                ====#
 
 # train
 	train(__myModel, __submodel)
 
 # store trained model
-	__trainmodelpath = "DataBase/trainedmodel$__model$__modelNb.json"
+	__trainmodelpath = "DataBase/trainedmodel$__model.json"
 	out = open(__trainmodelpath,"w+")
 	JSON.print(out,__myModel)
 	close(out)
-
-
-#"model trained: $__model  $__submodel" |> println

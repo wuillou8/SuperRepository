@@ -5,13 +5,13 @@ using StatsBase
 using Dates
 using PyPlot
 
-include("classes.jl")
-include("utilities.jl")
-include("models.jl")
-include("recommender.jl")
-include("perfomeasures.jl")
-include("tests.jl")
-include("display.jl")
+include("JuliaCode/classes.jl")
+include("JuliaCode/utilities.jl")
+include("JuliaCode/models.jl")
+include("JuliaCode/recommender.jl")
+include("JuliaCode/perfomeasures.jl")
+include("JuliaCode/tests.jl")
+include("JuliaCode/display.jl")
 
 # read data passed from backend
     __backenddatapath = "DataBase/bedata.json"
@@ -111,9 +111,3 @@ include("display.jl")
     end
 
 #plotPerf1(::Array{Perfo,1}, ::Array{Float64,1}, ::Array{Int64,1}, ::Array{String,1})
-
-
-
-
-
-
