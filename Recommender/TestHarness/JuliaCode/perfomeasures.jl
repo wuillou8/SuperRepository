@@ -9,10 +9,10 @@
 # idUser: used Id
 # output: perf::Perfo
 function perfoMeasOpt(listNews::Array{String,1}, listReco::Array{String,1}, idUsed::String)
+
     L_listNews = length(listNews)
     L_listReco = length(listReco)
-    
-    perf = Perfo(0,0,0,0)    
+    perf = Perfo(0,0,0,0)
     if idUsed in listReco
         perf.tp = 1
         perf.fp = L_listReco - 1
@@ -25,7 +25,6 @@ function perfoMeasOpt(listNews::Array{String,1}, listReco::Array{String,1}, idUs
         perf.tn = L_listNews - L_listReco - 1
     end
     perf
-    
 end
 
 # 2) mean reciprocal rank measure: MRR

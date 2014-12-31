@@ -1,3 +1,10 @@
+# Recommendation class
+immutable Recommendation
+    reclist::Vector{String}
+    Recommendation(vec::Vector{String}) = new(vec)
+    Recommendation(obj::Dict{String,Any}) = new( obj["reclist"] )
+end
+
 #=========================================================
         CLUSTER MODELS
         simulates the clustering for the computations
@@ -91,6 +98,18 @@ end
 ####################################################################
 
 abstract OUTPUTRES
+#===
+type OutputRes{model <: MODEL} <: OUTPUTRES
+    # creation time
+    testdate::ASCIIString
+    # query::
+    testHarn::testHarness
+    # model with parameteres
+    testmodel::model
+    # testresults (different performances can be appended)
+    testres::Vector{PERFO}
+end
+===#
 
 #=== currently in display
 type OutputRes{model <: MODEL} <: OUTPUTRES
@@ -198,6 +217,7 @@ end
 type BEData
     Usage::Array{DataUsage,1}
     #Hashtable ?
+    # constructor
     BEData(Usage::Array{DataUsage,1}) = new(Usage)
     function BEData(IObedata::Dict{String,Any})
         Usage = IObedata["Usage"] |>

@@ -32,5 +32,3 @@ function findNMax (scor::Array{Float64,1}, N::Int64, arr = Int64[])
         return arr
     end
 end
-
-
