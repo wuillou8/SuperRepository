@@ -1,7 +1,8 @@
 # Recommendation class
 immutable Recommendation
     reclist::Vector{String}
-    Recommendation(obj::Dict{String,Any}) = Recommendation( obj["reclist"] )
+    Recommendation(vec::Vector{String}) = new(vec)
+    Recommendation(obj::Dict{String,Any}) = new( obj["reclist"] )
 end
 
 #=========================================================
@@ -97,6 +98,18 @@ end
 ####################################################################
 
 abstract OUTPUTRES
+#===
+type OutputRes{model <: MODEL} <: OUTPUTRES
+    # creation time
+    testdate::ASCIIString
+    # query::
+    testHarn::testHarness
+    # model with parameteres
+    testmodel::model
+    # testresults (different performances can be appended)
+    testres::Vector{PERFO}
+end
+===#
 
 #=== currently in display
 type OutputRes{model <: MODEL} <: OUTPUTRES

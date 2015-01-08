@@ -11,13 +11,18 @@ function recommenderList( model::PredictionIO, testnews::Array{String,1}, userId
     import predictionio
     engine_client = predictionio.EngineClient(url="http://localhost:8000")
     print engine_client.send_query({"user": "1", "num": 4}) ===#
-
-    PIOquery( userId, length(testnews) )
+    #in Julia : get("http://httpbin.org/get"; query = {"title" => "page1"})
+    #PIOquery( userId, length(testnews) )
+    # call Random instead or PIO for now...
+    scores = [ rand() for i = 1:length(testnews) ]
+    map( x -> testnews[x], findNMax(scores, length(scores)) ) |>
+    ( _ -> convert(Array{String,1},_) )
+    #rmodel = RandomModel()
+    #recommenderList(rmodel, testnews, userId, traindata, testdata)
 end
 
 # Create recommendation list
-function recommenderList( rec::RandomModel, testnews::Array{String,1}, userId::ASCIIString, traindata::BEData, testdata::BEData )
-
+function recommenderList( rec::RandomModel, testnews::Array{String,1}, userId::String, traindata::BEData, testdata::BEData )
     scores = [ rand() for i = 1:length(testnews) ]
     map( x -> testnews[x], findNMax(scores, length(scores)) ) |>
     ( _ -> convert(Array{String,1},_) )
@@ -57,7 +62,7 @@ function recommenderList( recmodel::PersoBernoulliNB, testnews::Array{String,1},
 
         testnews |>
         (_ -> map( x -> applyBernoulliNB( recmodel, userId, prior, probvec ), _)) |>
-                     ( _ -> map( x -> testnews[x], findNMax(_+1000_000_000_000., length(_)) ) ) |>
+                     ( _ -> map( x -> testnews[x], findNMax(convert(Vector{Float64}, _)+1000_000_000_000., length(_)) ) ) |>
                      ( _ -> convert(Array{String,1},_) ) #|> println
 
     end

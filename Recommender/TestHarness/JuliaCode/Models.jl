@@ -6,7 +6,6 @@ abstract MODELparams
 # models particular contexts'decompo/etc...
 abstract MODELcontext
 
-
 #===== MODEL ===========================================#
 
 # select users for the local model:
@@ -65,6 +64,7 @@ function modelsFactory(model::Dict{String,Any}, modelname::String)
       _ == "Random" ? RandomModel() :
       _ == "PersoSimple" ? PersoModel(model) :
       _ == "PersoNaiveBayes" ? PersoBernoulliNB(model) :
+      _ == "PredictionIO" ? PredictionIO(model) :
       ""   )
   #===
 	@switch modelname begin
@@ -86,6 +86,7 @@ type Ids
     testusersIds::Vector{String}
     testnewsIds::Vector{String}
     hashtestUsage::Dict{String,Array{String,1}}
+
     function Ids(trainbedata::BEData, testbedata::BEData)
         testusersIds = getsourceIds(testbedata,"user")
         testnewsIds = gettargetIds(testbedata,"article")
@@ -210,13 +211,14 @@ type PersoBernoulliNB <: MODEL
     globModel::MODEL
 
     function PersoBernoulliNB(trainbedata::BEData, testbedata::BEData)
-        cutoff = 1
-        Ents = getAllEnts(trainbedata)
-        Voc = convert(Vector{String},[k for k in keys(Ents)])
-        Ndocs = getAllarticleIds(trainbedata) |>
+
+       cutoff = 1
+       Ents = getAllEnts(trainbedata)
+       Voc = convert(Vector{String},[k for k in keys(Ents)])
+       Ndocs = getAllarticleIds(trainbedata) |>
                                    unique |> length
-        persoIds, globalIds = Users4LocalModel(trainbedata, testbedata, cutoff)
-        new(PersoBernoulliNBparams(cutoff), PersoBernoulliNBcontext(persoIds, globalIds, Ents, Voc, Ndocs))
+       persoIds, globalIds = Users4LocalModel(trainbedata, testbedata, cutoff)
+       new(PersoBernoulliNBparams(cutoff), PersoBernoulliNBcontext(persoIds, globalIds, Ents, Voc, Ndocs))
     end
 
     function PersoBernoulliNB(pmodel::Dict{String,Any})
@@ -304,20 +306,27 @@ end
 #                          PredictionIO                                                        #
 ################################################################################################
 
-immutable PIOquery
+abstract PIOq
+
+immutable PIOquery <: PIOq
     user::String
     num::Int64
 end
 
 type PredictionIOparams <: MODELparams
-    acess_key::String
-    url::String
+    access_key::ASCIIString
+    url::ASCIIString #String
     threads::Int64
     qsize::Int64
+    PredictionIOparams(access_key::ASCIIString,url::ASCIIString,threads::Int64,qsize::Int64) =
+                                                                                           new(access_key,url,threads,qsize)
+    PredictionIOparams(_::Dict{String,Any}) = new(_["persoIds"], _["globalIds"], _["Ents"], _["Voc"], _["Ndocs"])
 end
 
 type PredictionIOcontext <: MODELcontext
-    appId::PIOquery
+    # PIO method
+    # appId::PIOquery
+    #PredictionIOcontext() = new()
    end
    #==
    client = predictionio.EventClient(
@@ -330,7 +339,18 @@ type PredictionIOcontext <: MODELcontext
 type PredictionIO <: MODEL
     modelP::PredictionIOparams
     context::PredictionIOcontext
-    appId::PIOquery
+    #appId::PIOquery
+    PredictionIO() = new(PredictionIOparams("bla","bla",1,1), PredictionIOcontext())
+
+    function PredictionIO(pmodel::Dict{String,Any})
+        mparams, mcontext = pmodel |>
+              (_ -> begin
+        		            _["modelP"],
+        		            _["context"]#,
+        		            #_["globModel"]
+	     	             end )
+        new(PersoBernoulliNBparams(mparams), PersoBernoulliNBcontext(mcontext)) #, RandomModel(globModel))
+    end
 end
 
 #===
@@ -380,6 +400,8 @@ function train(myModel::PersoBernoulliNB, mode::String, data = Any[])
         #elseif() train with data
     end
 end
+
+train(myModel::PredictionIO, mode::String, data = Any[]) = "" #myModel = myModel
 
 Merge!(usrprof::EntityFan, hashDict) = merge!(usrprof.Profile, hashDict)
 
