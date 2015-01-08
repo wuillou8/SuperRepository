@@ -1,7 +1,8 @@
 # Recommendation class
 immutable Recommendation
     reclist::Vector{String}
-    Recommendation(obj::Dict{String,Any}) = Recommendation( obj["reclist"] )
+    Recommendation(vec::Vector{String}) = new(vec)
+    Recommendation(obj::Dict{String,Any}) = new( obj["reclist"] )
 end
 
 #=========================================================

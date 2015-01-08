@@ -1,26 +1,126 @@
 using HttpServer, Logging
+using Requests
 using JSON
 using Dates
-using Lazy
-using StatsBase
-using Dates
+#using Lazy
+using StatsBase, Dates
 using PyPlot
 
 include("JuliaCode/classes.jl")
 include("JuliaCode/utilities.jl")
 include("JuliaCode/models.jl")
+#include("__globalFun.jl")
 include("__globalModel.jl")
 include("JuliaCode/recommender.jl")
 include("JuliaCode/perfomeasures.jl")
 include("JuliaCode/tests.jl")
 include("JuliaCode/display.jl")
 
-#include("JuliaCode/IO.jl")
-#include("__globalFun.jl")
+function printresult(resp::Response)
+    resp |> (_ -> begin
+                      _.status,
+                      _.headers,
+                      _.data,
+                      _.finished
+                   end ) |> println
+end
+# read data passed from backend
+#    __backenddatapath = "DataBase/bedata.json"
+#    bedata = BEData( JSON.parsefile(__backenddatapath) )
+
+# instantiate test harness
+    __TH = createTest("testfile.txt")
+
+# split data into train/test sets
+#    trainbedata = BEData( getInTs(bedata,__TH.T1,__TH.T2) )
+#    testbedata = BEData( getInTs(bedata,__TH.T2,__TH.T3) )
 
 
 
+jair = get("http://localhost:8000/retrain")
+printresult(jair)
+#jair = get("http://localhost:8000/recommend/blabla")
+#printresult(jair)
+jair = get("http://localhost:8000/testStat/")
+printresult(jair)
+jair = get("http://localhost:8000/retrain/PersoSimple/")
+printresult(jair)
+jair = get("http://localhost:8000/testStat/")
+printresult(jair)
+jair = get("http://localhost:8000/retrain/PersoSimple/")  #NaiveBayes/")
+printresult(jair)
+jair = get("http://localhost:8000/testStat/")
+printresult(jair)
+jair = get("http://localhost:8000/retrain/PersoNaiveBayes/")
+printresult(jair)
+jair = get("http://localhost:8000/testStat/")
+printresult(jair)
+jair = get("http://localhost:8000/retrain/PredictionIO/")
+printresult(jair)
+jair = get("http://localhost:8000/testStat/")
+printresult(jair)
 
+jair = get("http://localhost:8000/retrain/")  #NaiveBayes/")
+printresult(jair)
+jair = get("http://localhost:8000/testStat/")
+printresult(jair)
+jair = get("http://localhost:8000/retrain/")  #NaiveBayes/")
+printresult(jair)
+jair = get("http://localhost:8000/testStat/")
+printresult(jair)
+
+jair = get("http://localhost:8000/plot/")
+printresult(jair)
+
+println(__TH.Recommenders)
+
+#===
+# recomm list intervals for tests/plots
+    __recommSizes = [ 1, 3, 5, 7, 10, 20, 40, 80, 120, 200]
+
+    __perfs, __perfs_ranks, __randoms = Vector{Perfo}[], PerfoRank[], Vector{Float64}[]
+    __outresults = OUTPUTRES[]
+
+for __model in [__TH.Recommenders[1]] #__models
+
+       __perf, __perf_rank, __random =
+                            TestPerfos( __model, testusersIds, testnewsIds,
+                                                 trainbedata, testbedata, __recommSizes )
+       # build results
+       push!(__perfs, __perf)
+       push!(__perfs_ranks, __perf_rank)
+       push!(__randoms, __random)
+       push!(__outresults,
+               OutputRes(strftime(time()), __TH, __model, [Intervals(__recommSizes), __perf, __perf_rank]) )
+end
+===#
+
+#===
+jair = get("http://localhost:8000/retrain/PersoSimple/")
+printresult(jair)
+jair = get("http://localhost:8000/recommend/blabla")
+printresult(jair)
+
+jair = get("http://localhost:8000/retrain/PersoNaiveBayes/")
+printresult(jair)
+jair = get("http://localhost:8000/recommend/blabla")
+printresult(jair)
+
+jair = get("http://localhost:8000/retrain/PredictionIO/")
+printresult(jair)
+jair = get("http://localhost:8000/recommend/blabla")
+printresult(jair)
+===#
+
+#===
+jair = get("http://localhost:8000/retrain")
+
+println("retrain")
+jair |> typeof |> println
+
+printresult(jair)
+===#
+#=====
 # read data passed from backend
     __backenddatapath = "DataBase/bedata.json"
     bedata = BEData( JSON.parsefile(__backenddatapath) )
@@ -75,6 +175,8 @@ include("JuliaCode/display.jl")
         "$__modelName analysed \n" |> println
     end
 
+=====#
+#==============
 # Test Harness Core
 # recomm list intervals for tests/plots
     __recommSizes = [ 1, 3, 5, 7, 10, 20, 40, 80, 120, 200]
@@ -84,13 +186,16 @@ include("JuliaCode/display.jl")
 
 # if local only
 #testusersIds = __models[1].context.persoIds
+
    for __model in __models
 
        __perf, __perf_rank, __random =
                             TestPerfos( __model, testusersIds, testnewsIds,
                                                  trainbedata, testbedata, __recommSizes )
        # build results
-       push!(__perfs, __perf); push!(__perfs_ranks, __perf_rank); push!(__randoms, __random)
+       push!(__perfs, __perf)
+       push!(__perfs_ranks, __perf_rank)
+       push!(__randoms, __random)
        push!(__outresults,
                OutputRes(strftime(time()), __TH, __model, [Intervals(__recommSizes), __perf, __perf_rank]) )
     end
@@ -117,3 +222,6 @@ include("JuliaCode/display.jl")
     end
 
 #plotPerf1(::Array{Perfo,1}, ::Array{Float64,1}, ::Array{Int64,1}, ::Array{String,1})
+
+
+=======#
