@@ -12,6 +12,8 @@ function trapz{T<:Real}(x::Vector{T}, y::Vector{T})
 end
 
 # find N first elements: [int_1, int_2, ..., int_N]
+# self written quickly so not optimised and double-checked
+# (to be replaced)
 function findNMax (scor::Array{Float64,1}, N::Int64, arr = Int64[])
     if N < 1
         return arr

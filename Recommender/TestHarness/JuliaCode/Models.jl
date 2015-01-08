@@ -58,7 +58,6 @@ end
 
 # make model from json dict
 function modelsFactory(model::Dict{String,Any}, modelname::String)
-  #println(modelname)
   modelname |>
   ( _ ->
       _ == "Random" ? RandomModel() :
@@ -232,12 +231,6 @@ type PersoBernoulliNB <: MODEL
     end
 end
 
-#EntityFan
-#    Profile::Dict{String,Int64}
-#    Ents::Dict{String,Int64}
-#    Voc::Vector{String}
-#    Ndocs::Int64
-
 function TrainBernoulliNB(__modelNB::PersoBernoulliNB,__usermodel::EntityFan) #generalNews::Dict{String,Int64})
 
     usedNews = __usermodel.Profile
@@ -324,17 +317,8 @@ type PredictionIOparams <: MODELparams
 end
 
 type PredictionIOcontext <: MODELcontext
-    # PIO method
-    # appId::PIOquery
-    #PredictionIOcontext() = new()
-   end
-   #==
-   client = predictionio.EventClient(
-    access_key=<ACCESS KEY>,
-    url=<URL OF EVENTSERVER>,
-    threads=5,
-    qsize=500
-    ) ===#
+
+
 
 type PredictionIO <: MODEL
     modelP::PredictionIOparams

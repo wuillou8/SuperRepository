@@ -5,6 +5,8 @@
 #===
 abstract OUTPUTRES
 ===#
+
+# for each tests, the testharness parameters,
 type OutputRes{model <: MODEL} <: OUTPUTRES
     # creation time
     testdate::ASCIIString
@@ -20,6 +22,42 @@ end
 #####################################################################
 #                 Output Plot                                       #
 #####################################################################
+
+function plotMeanRecRank1(__mrr_meas, __mrr_rand, __xaxis,__modellabel::String, __plotlabel::String = "")
+    close("all")
+    xlim([0,__xaxis[end]+1])
+    plot(__xaxis,__mrr_meas,"go")
+    plot(__xaxis,__mrr_rand)
+    legend(["random","random values"], "lower right")
+    title("Performance Comparison: Mean reciprocal Rank Meas.")
+    xlabel("Recomm List size")
+    ylabel("MRR")
+    savefig("FIGS/"*__modellabel*"MRR_"*__plotlabel*".png")
+end
+
+function plotMeanRecRank2(__pr::Vector{PerfoRank}, __xaxis, __modellabel::Vector{String}, __plotlabel::String = "")
+    close("all")
+    xlim([0,__xaxis[end]+1])
+    __pr |> (_ -> map(x -> plot(__xaxis,x.mrr_meas, "o"), _))
+    __pr |> (_ -> map(x -> plot(__xaxis,x.mrr_rand,"k"), _))
+    legend([__modellabel,"Random theoretical"], "lower right")
+    title("Performance: Mean reciprocal Rank Measure")
+    xlabel("Recomm List size")
+    ylabel("MRR")
+    savefig("FIGS/"*foldr(*,__modellabel)*__plotlabel*"MRR_"*__plotlabel*".png")
+end
+
+function plotMeanRecRank3(__pr::Vector{PerfoRank}, __xaxis, __modellabel::Vector{String}, __plotlabel::String = "")
+    close("all")
+    xlim([0,__xaxis[end]+1])
+    __pr |> (_ -> map(x -> plot(__xaxis,x.mrr_meas, "o"), _))
+    __pr |> (_ -> map(x -> plot(__xaxis,x.mrr_rand,"k"), _))
+    legend([__modellabel,"Random theoretical"], "lower right")
+    title("Performance: Mean reciprocal Rank Measure")
+    xlabel("Recomm List size")
+    ylabel("MRR")
+    savefig("FIGSs/"*foldr(*,__modellabel)*__plotlabel*"MRR_"*__plotlabel*".png")
+end
 
 function plotPerf2(__perfs::Array{Vector{Perfo},1}, __randoms::Array{Vector{Float64},1}, __xaxis, __modellabel::Vector{String}, __plotlabel::String = "")
     # prepare for plotting
@@ -240,38 +278,4 @@ function plotPerf3(__perfs::Array{Vector{Perfo},1}, __randoms::Array{Vector{Floa
 =====#
 end
 
-function plotMeanRecRank2(__pr::Vector{PerfoRank}, __xaxis, __modellabel::Vector{String}, __plotlabel::String = "")
-    close("all")
-    xlim([0,__xaxis[end]+1])
-    __pr |> (_ -> map(x -> plot(__xaxis,x.mrr_meas, "o"), _))
-    __pr |> (_ -> map(x -> plot(__xaxis,x.mrr_rand,"k"), _))
-    legend([__modellabel,"Random theoretical"], "lower right")
-    title("Performance: Mean reciprocal Rank Measure")
-    xlabel("Recomm List size")
-    ylabel("MRR")
-    savefig("FIGS/"*foldr(*,__modellabel)*__plotlabel*"MRR_"*__plotlabel*".png")
-end
 
-function plotMeanRecRank1(__mrr_meas, __mrr_rand, __xaxis,__modellabel::String, __plotlabel::String = "")
-    close("all")
-    xlim([0,__xaxis[end]+1])
-    plot(__xaxis,__mrr_meas,"go")
-    plot(__xaxis,__mrr_rand)
-    legend(["random","random values"], "lower right")
-    title("Performance Comparison: Mean reciprocal Rank Meas.")
-    xlabel("Recomm List size")
-    ylabel("MRR")
-    savefig("FIGS/"*__modellabel*"MRR_"*__plotlabel*".png")
-end
-
-function plotMeanRecRank3(__pr::Vector{PerfoRank}, __xaxis, __modellabel::Vector{String}, __plotlabel::String = "")
-    close("all")
-    xlim([0,__xaxis[end]+1])
-    __pr |> (_ -> map(x -> plot(__xaxis,x.mrr_meas, "o"), _))
-    __pr |> (_ -> map(x -> plot(__xaxis,x.mrr_rand,"k"), _))
-    legend([__modellabel,"Random theoretical"], "lower right")
-    title("Performance: Mean reciprocal Rank Measure")
-    xlabel("Recomm List size")
-    ylabel("MRR")
-    savefig("FIGSs/"*foldr(*,__modellabel)*__plotlabel*"MRR_"*__plotlabel*".png")
-end

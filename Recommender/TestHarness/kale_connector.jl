@@ -1,10 +1,9 @@
 using HttpServer, Logging
 using Lumberjack
 using JSON
-using Dates #Time
+using Dates
 using StatsBase
 using PyPlot
-#using Lazy #, StatsBase
 
 include("JuliaCode/utilities.jl")
 include("JuliaCode/classes.jl")
@@ -100,7 +99,7 @@ http = try
                                   val
                                 end   :
 
-                           ismatch(r"^/recommend/?", _) ? # recommend/dddd/
+                           ismatch(r"^/recommend/?", _) ?
                               begin
                                   val = try
                                       match(r"^/recommend/(\w+)/?$", _) |>
@@ -114,7 +113,7 @@ http = try
                               end   :
 
                            # recommendation from PredictionIO
-                           ismatch(r"^/recommendIO/?", _) ? # recommend/dddd/
+                           ismatch(r"^/recommendIO/?", _) ?
                               begin
                                   val = try
                                       match(r"^/recommendIO/(\w+)/?$", _) |>
@@ -150,7 +149,8 @@ http = try
                                    println(g_Comput.perfo)
                                    vec = [ 1, 3, 5, 7, 10, 20, 40, 80, 120, 200]
                                    name = convert(Vector{String},["Random","Random"])
-                                   plotMeanRecRank2(g_Comput.perfo.perfs_ranks, vec, g_Comput.perfo.modelNames) #,__TH.Recommenders)
+                                   plotPerf2(g_Comput.perfo.perfs,g_Comput.perfo.randoms,vec,g_Comput.perfo.modelNames)
+                                   plotMeanRecRank2(g_Comput.perfo.perfs_ranks, vec, g_Comput.perfo.modelNames)
                                   200
                               end   :
 
@@ -158,11 +158,9 @@ http = try
                     )
 
   Var |> typeof |> println
-  #Var |> println
 
   endsignal = Var |>
   (_ -> isa(_, Int64) ? _ :
-        #isa(_, PIOQuery)?  JSON.json(_):
         isa(_, Recommendation) ? JSON.json(_.reclist)
         : begin
               var = try
@@ -175,9 +173,6 @@ http = try
               var
           end
       )
-
-  #g_Comput |> println
-  #println(endsignal)
 
     return Response(string(endsignal))
 end

@@ -25,73 +25,7 @@ end
         Classical Perfo Evaluation
 =========================================================#
 
-abstract PERFO
-
-################################
-# Information recovery model.
-
-type Perfo <: PERFO
-  tp::Int64
-  fp::Int64
-  tn::Int64
-  fn::Int64
-  Precis::Float64
-  Recall::Float64
-  Specif::Float64
-  F1::Float64
-  Perfo(tp::Int64,fp::Int64,tn::Int64,fn::Int64) = new(tp,fp,tn,fn,-1.,-1.,-1.,-1.)
-  Perfo(Precis::Float64,Recall::Float64,Specif::Float64,F1::Float64) = new(-1,-1,-1,-1,Precis,Recall,Specif,F1)
-end
-
-function add(perf::Perfo,tp,fp,tn,fn)
-  perf.tp += tp
-  perf.fp += fp
-  perf.tn += tn
-  perf.fn += fn
-end
-
-function add(perf::Perfo,perf2::Perfo)
-  perf.tp += perf2.tp
-  perf.fp += perf2.fp
-  perf.tn += perf2.tn
-  perf.fn += perf2.fn
-end
-
-Precis(perf::Perfo) = perf.tp/(perf.tp + perf.fp)
-Recall(perf::Perfo) = perf.tp/(perf.tp + perf.fn)
-Specif(perf::Perfo) = 1.-perf.fp/(perf.fp + perf.tn)
-F1(perf::Perfo) =  2*Precis(perf)*Recall(perf)/(Precis(perf)+Recall(perf))
-
-evaluate(perf::Perfo) =  perf.Precis, perf.Recall, perf.Specif, perf.F1 =
-                                                            Precis(perf), Recall(perf), Specif(perf), F1(perf)
-
-function PerfoRandom(L_listNews::Int64, L_listUsage::Int64, L_listReco::Int64)
-  # compute random performance in standard recommender settings.
-  Precis = L_listUsage/L_listNews
-  Recall = L_listReco/L_listNews
-  Specif = 1. - L_listReco/L_listNews
-  F1 = 2*Precis*Recall/(Precis + Recall)
-  Perfo(Precis, Recall, Specif, F1) #Precis, Recall, Specif, F1
-end
-
-# Performance class for ranking metrics
-# mean reciprocal rank measure: MRR
-type PerfoRank <: PERFO
-     Nuse::Int64
-     mrr_meas::Array{Float64,1}
-     mrr_rand::Array{Float64,1}
-end
-
-function add(pr1::PerfoRank,pr2::PerfoRank)
-    Nuse = pr1.Nuse + pr2.Nuse
-    mrr_meas = ( pr1.Nuse*pr1.mrr_meas + pr2.Nuse*pr2.mrr_meas ) / Nuse
-    mrr_rand = ( pr1.Nuse*pr1.mrr_rand + pr2.Nuse*pr2.mrr_rand ) / Nuse
-    PerfoRanking( Nuse,mrr_meas,mrr_rand,random )
-end
-
-immutable Intervals <: PERFO
-    intervals::Vector{Int64}
-end
+-
 
 ####################################################################
 #                 Output File                                      #
@@ -148,9 +82,9 @@ end
 
 function createTest(__testfilename::String)
     T1, T2, T3 = DateTime(), DateTime(), DateTime()
-    Recommenders = String[] #::Array{String,1}
+    Recommenders = String[]
     Submodels = String[]
-    Scorings = String[] #::Array{String,1}
+    Scorings = String[]
     Plotting = Bool
     Metrics = String[]
 
@@ -227,7 +161,7 @@ type BEData
 
     function BEData(myiostream::IOStream)
         __bedata = DataUsage[]
-        #println("ici")
+
         while !eof(STDIN)
             sent_type, tent_type, sent_id, tent_id, action, value, time =
             readline(STDIN) |> JSON.parse |>
@@ -240,10 +174,8 @@ type BEData
                         _["value"],
                         _["time"]
                       end )
-            #println("lalal")
             push!(__bedata, DataUsage(sent_type, tent_type, sent_id, tent_id, action, value, time))
         end
-        #println("IIIci")
         new(__bedata)
     end
 end

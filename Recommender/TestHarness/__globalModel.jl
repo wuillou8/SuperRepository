@@ -7,7 +7,7 @@
 type PerfoMeasure
     perfs::Vector{Vector{Perfo}}
     perfs_ranks::Vector{PerfoRank}
-    randoms::Vector{Vector}
+    randoms::Vector{Vector{Float64}}
     modelNames::Vector{String}
     #outresults = Vector{OUTPUTRES}
     PerfoMeasure() = new(Vector{Perfo}[], PerfoRank[], Vector{Float64}[], String[])

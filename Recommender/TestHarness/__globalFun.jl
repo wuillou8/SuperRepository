@@ -17,11 +17,9 @@ function trainModel(__modelName::String = "Random", __submodel::String = "Random
     "building model: $__modelName // $__submodel" |> println
     # read in events for training
     # test events needed for the "local models"
-  test_bedata = getDataUsage("DataBase/data4test_short.json") #_short
-###test_bedata = getDataUsage("DataBase/data4test.json")
+test_bedata = getDataUsage("DataBase/data4test.json")
     # read in event for training
- train_bedata = getDataUsage("DataBase/data4train_short.json") #_short.json")
-###train_bedata = getDataUsage("DataBase/data4train.json")
+  train_bedata = getDataUsage("DataBase/data4train.json")
     # filter out test UsersId and NewsId
     # create hash table
 	  testnewsIds = gettargetIds(test_bedata,"article")
@@ -65,10 +63,8 @@ function trainModel(__modelName::String = "Random", __submodel::String = "Random
       "load data: traindata: $__traindatapath // testdata: $__testdatapath" |> println
       # read in events for training
 	    train_bedata = getDataUsage("DataBase/data4train_short.json")
-###train_bedata = getDataUsage("DataBase/data4train.json")
       # test events needed for the "local models"
       test_bedata = getDataUsage("DataBase/data4test_short.json")
-###test_bedata = getDataUsage("DataBase/data4test.json")
       # make Ids element
       ids = Ids(train_bedata, test_bedata)
 
@@ -78,43 +74,8 @@ function trainModel(__modelName::String = "Random", __submodel::String = "Random
   function recommend(gm::GlobalModel, __userId::String = "")
 
       __userId = "987d1a033896bb4214b0586e64f6805ee8e80564"
-      #recommenderList( gm, __userId ) |> println
       recommenderList( gm, __userId )
   end
 
 
 
-
-#======
-  function recommend(__userId::String = "", __modelName::String = "Random")
-
-    # read in events for training
-    # test events needed for the "local models"
-    test_bedata = getDataUsage("DataBase/data4test_short.json")
-
-    # read in event for training
-	  train_bedata = getDataUsage("DataBase/data4train_short.json") #__bedata #BEData( STDIN )
-
-    # filter out test UsersId and NewsId
-    # create hash table
-	   testnewsIds = gettargetIds(test_bedata,"article")
-	   testusersIds = getsourceIds(test_bedata,"user")
-
-    # instantiate and train models:
-    # here we have PersoSimple
-    #__myModel = modelsFactory( JSON.parsefile("DataBase/trainedmodel$__myModel.json")
-    model = __modelName |>
-                (_ -> _ == "Random" ? RandomModel() :
-                      _ == "PersoSimple" ? PersoModel(train_bedata, test_bedata) :
-                      _ == "PersoNaiveBayes" ? PersoBernoulliNB(train_bedata, test_bedata) :
-                       "trainModel.jl:: model::$_ not recognised"  )
-    # hack
-    __userId = testnewsIds[1]
-
-    recoList =
-              recommenderList( model, testnewsIds, __userId, train_bedata, test_bedata )
-    println(recoList)
-    recoList |> typeof |> println
-    recoList
-  end
-  =========#
