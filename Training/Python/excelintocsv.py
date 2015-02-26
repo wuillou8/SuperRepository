@@ -16,10 +16,9 @@ def correct_unicode(x):
 
 if len(sys.argv) != 2:
 	print "one file name expected"
+    sys.exit(1)
 
-print sys.argv[1]
-
-filename = "GUCCI Test products V3.xlsm"
+filename = sys.argv[1]
 try:
 	xl = pd.ExcelFile(filename)
 
