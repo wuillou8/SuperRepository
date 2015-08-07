@@ -1,0 +1,73 @@
+<html>
+<head>
+<script async="" src="style_event.js"></script>
+</head>
+<body>
+<script>
+window.user = {id: "user1234",
+               country: "france"} 
+
+window.view = {id: "view"}
+window.click = {id: "click"}
+window.menu = {id: "menu"}
+
+window.prod1 = {
+    id: "P1",
+    name: "T-Shirt",
+    category: "Clothing",
+    brand: "Google",
+    variant: "black",
+    price: "29.20",
+    costs: "18.75"
+    }
+window.prod2 = {
+    id: "P2",
+    name: "Pant",
+    category: "Clothing",
+    brand: "Google",
+    variant: "blue",
+    price: "9.20",
+    costs: "5.75"
+    }
+window.prod3 = {
+    id: "P3",
+    name: "T-Shirt",
+    category: "Clothing",
+    brand: "Google",
+    variant: "green",
+    price: "14.20",
+    costs: "8.75"
+    }
+window.pagedata = {
+    id: "a std page",
+    param1: "param1 ..."
+    }
+var items = [window.prod1, window.prod2, window.prod3]
+window.item = items[Math.floor(Math.random()*items.length)]
+</script> 
+<div class="event-test-panel">
+<h3>Event Tests</h3>
+Product Events:
+<button id="viewEvent" onClick="send_event(window.user, 'browse', 'view', window.view, window.pagedata)">
+  viewEvent
+</button>
+<button id="clickEvent" onClick="send_event(window.user, 'browse', 'click', window.click, window.pagedata)">
+  click Event
+</button>
+<button id="menuNavigation" onClick="send_event(window.user, 'browse', 'menu-navigation', window.menu, window.pagedata)">
+  menu Navigation
+</button>
+<button id="addtobasket" onClick="send_event(window.user, 'transaction', 'add to basket', window.item, window.pagedata)">
+  add to basket
+</button>
+<button id="purchase" onClick="send_event(window.user, 'transaction', 'purchase', window.item, window.pagedata)">
+  purchase
+</button>
+<button id="paymentConfirmation" onClick="send_event(window.user, 'transaction', 'purchase confirmation', window.item, window.pagedata)">
+  paym. Confirmation 
+</button>
+
+</body>
+</html>
+
+
