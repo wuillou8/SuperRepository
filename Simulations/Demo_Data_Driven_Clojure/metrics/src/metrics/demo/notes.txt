@@ -1,0 +1,4 @@
+le cose piu importante sono:
+- generate all of the necessary events and send them to GA (click on product, add/remove from shopping cart, purchase cart, etc…)
+- request metrics and get back exactly what we expect
+- compute aggregates over these events so we know overall stats on stuff like (most clicked products, trending, etc.)
