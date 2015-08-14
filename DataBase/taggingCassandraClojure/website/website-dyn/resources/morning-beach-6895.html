@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+      <head>
+              <meta charset="utf-8">
+                  <title>Hello World</title>
+                      <script>
+
+var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
+xmlhttp.open("POST", "/json-handler");
+xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+xmlhttp.send(JSON.stringify({name:"John Rambo", time:"2pm"}));
+
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-63941181-1', { 'userId': 'USER1234' });
+    ga('require', 'ec');
+      ga('send', 'event', 'page', 'pageview', 'menswear', 1);
+        var userID = 'myUsertest01234'; 
+          ga('set', 'dimension1', userID);
+            ga('send', 'event', 'page', 'pageview', 'homepage', 1);
+                
+                      </script>
+
+                        </head>
+                          <body>
+                                  <h1>Menswear</h1>
+                                      <p>!Not for fashion victims!</p>
+                                          <a id="top" href="500.html" onClick="ga('ec:addProduct','1134','DD33','Tip top','Olive Medium','11.99','1');
+                                                                                                               ga('ec:setAction','purchase','1134','womens clothes','28.28','1.29','15.00','San Jose','California','USA');
+                                                                                                               ga('send', 'event','link', 'click', 'topwomen',1);">top</a>
+                                              
+                                          <a id="dress" href="500.html" onClick="ga('ec:addProduct','1135','DD33','dress dla morrr','Olive Medium','11.99','1');
+                                                                                             ga('ec:setAction','purchase','1135','womens clothes','28.28','1.29','15.00','San Jose','California','USA');
+                                                                                             ga('send', 'event', 'link', 'click', 'dresswomen', 1);">dress</a>   
+
+                                         <a id="shirt" href="500.html" onClick="ga('ec:addProduct','1234','DD44','T-Shirt','Olive Medium','11.99','1');
+                                                                                                 ga('ec:setAction','purchase','1234','womens clothes','28.28','1.29','15.00','San Jose','California','USA');i
+                                                                                                                                            ga('send', 'event', 'link', 'click', 'shirtwomen', 1);">shirt</a>
+
+                                         <a id="trouser" href="500.html" onClick="ga('ec:addProduct','1235','DD48','Trousers dla mort','Olive Medium','12.99','1');
+                                                                                                                                   ga('ec:setAction','purchase','1235','womens clothes','31.28','2.29','16.00','San Francisco','California','USA');i
+                                                                                                                                   ga('send', 'event', 'link', 'click', 'trouserwomen', 1);">trouser</a>
+
+                                                        </body>
+</html>

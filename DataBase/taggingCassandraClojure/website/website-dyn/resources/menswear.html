@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Hello World</title>
+    <script type="text/javascript" src="ga-init.js"></script>
+    <script type="text/javascript">
+        MYLIBRARY.init('USER_ID');
+        MYLIBRARY.helloWorld();
+    </script>
+
+  </head>
+  <body>
+    <h1>Menswear</h1>
+    <p>!Not for fashion victims!</p>
+    <a id="top" href="page/500.html" onClick="ga('ec:addProduct','1134','DD33','Tip top','Olive Medium','11.99','1');
+                                         ga('ec:setAction','purchase','1134','womens clothes','28.28','1.29','15.00','San Jose','California','USA');
+                                         ga('send', 'event','link', 'click', 'topwomen',1);">top</a>
+    
+    <a id="dress" href="page/500.html" onClick="ga('ec:addProduct','1135','DD33','dress dla morrr','Olive Medium','11.99','1');
+                                           ga('ec:setAction','purchase','1135','womens clothes','28.28','1.29','15.00','San Jose','California','USA');
+                                           ga('send', 'event', 'link', 'click', 'dresswomen', 1);">dress</a>   
+
+    <a id="shirt" href="page/500.html" onClick="ga('ec:addProduct','1234','DD44','T-Shirt','Olive Medium','11.99','1');
+                                           ga('ec:setAction','purchase','1234','womens clothes','28.28','1.29','15.00','San Jose','California','USA');i
+                                           ga('send', 'event', 'link', 'click', 'shirtwomen', 1);">shirt</a>
+
+    <a id="trouser" href="page/500.html" onClick="ga('ec:addProduct','1235','DD48','Trousers dla mort','Olive Medium','12.99','1');
+                                             ga('ec:setAction','purchase','1235','womens clothes','31.28','2.29','16.00','San Francisco','California','USA');i
+                                             ga('send', 'event', 'link', 'click', 'trouserwomen', 1);">trouser</a>
+
+  </body>
+</html>
+

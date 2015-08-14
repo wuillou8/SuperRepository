@@ -1,0 +1,21 @@
+\documentclass{article}
+\usepackage{float}
+\usepackage[caption = false]{subfig}
+%\usepackage[demo]{graphicx}
+\usepackage{pdfpages}
+\begin{document}
+
+\begin{figure}[htp]
+\centering
+\label{figur}\caption{equation...}
+    \begin{tabular}{cc}
+    % Requires \usepackage{graphicx}
+    \includegraphics[width=60mm]{Figs/perfo_rand_recall.pdf}&
+    \includegraphics[width=60mm]{Figs/perfo_rand_mrr.pdf}\\
+    \includegraphics[width=60mm]{Figs/perfo_rand_precis.pdf}&
+    \includegraphics[width=60mm]{Figs/perfo_rand_F1.pdf}\\
+    \end{tabular}
+    \caption{Oh how biutifoul! blablfa bla...}
+\end{figure}
+
+\end{document}

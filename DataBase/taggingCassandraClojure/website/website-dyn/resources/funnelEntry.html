@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Hello World</title>
+    <script src="js/ga-init.js"></script>
+
+  </head>
+  <body>
+    <h1>womenswear</h1>
+    <p>!not for fashion victims!</p>
+    <a id="funnelPlaceIntoCart" 
+        href="funnelPlaceInCart.html" 
+        onClick="ga('ec:addProduct', {
+                    'id': 'P12345',
+                    'name': 'Android Warhol T-Shirt', 
+                    'category': 'Apparel',
+                    'brand': 'Google', 
+                    'variant': 'black',
+                    'price': '29.20',
+                    'quantity': 1});
+        ga('ec:setAction','checkout', {'step': 1,'option': 'Visa'});
+        ga('send','event', 'link', 'click', 'intofunnelPlaceInCart', 1);">funnelPlaceIntoCart</a> 
+    <a id="STOP"
+        href="#" 
+        onClick="ga('send','event', 'link', 'click', 'NotintofunnelPlaceInCart', 1);">STOP</a>
+  </body>
+
+</html>
