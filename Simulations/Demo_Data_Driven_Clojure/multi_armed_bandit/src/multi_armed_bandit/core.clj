@@ -60,36 +60,35 @@
          value-update (+ value (- (:value machine-update) value-machine))  
          average-update (float (/ value-update n-update))
          machines-update (assoc (:machines machines) machine-key machine-update)
-         history-update (conj history (assoc (get-machine-value machine-update) :strategy (str machine-key)))]
-      (->machines n-update machines-update average-update value-update history-update))))
-;(println machine-key ;n value history machine-key value-machine
-       ;value-update
-       ;average-update
- ;      machines-update
- ;      " -------- "
- ;      history-update
- ;      ))))
+         history-update (conj history (assoc {:n n-update :value value-update :average average-update}
+                                             :strategy (str machine-key)))
+         machines (->machines n-update machines-update average-update value-update history-update)
+         ]
+      machines)))
 
 (sweep-iteration machine-1)
 (sweep-iteration machines-pfolio random-machine-key)
-;(keys (:machines machines-pfolio))
 
+;(keys (:machines machines-pfolio))
 ;(random-machine-key machines-pfolio)
 ;(sweep-iteration machines-pfolio)
-;
-;
-;
+;;;;;
+
+
 (defn recur-machine-run [my-machines strategy-choice iterations-nb] 
-  (loop [machines my-machines cnt iterations-nb result []]  
+  (loop [machines my-machines cnt iterations-nb]  
     (if (= cnt 0)
-       result
-      (recur (sweep-iteration machines strategy-choice) (dec cnt) (conj result (get-machine-value machine)))))) 
+      (:history machines) 
+      (recur (sweep-iteration machines strategy-choice) (dec cnt))))) 
 
 (defn recur-machine-run [my-machine iterations-nb] 
   (loop [machine my-machine cnt iterations-nb result []]  
     (if (= cnt 0)
-       result
+      machines
       (recur (:machine (sweep-iteration machine)) (dec cnt) (conj result (get-machine-value machine)))))) 
+
+
+(to-dataset (recur-machine-run machines-pfolio random-machine-key 10))
 
 
 (defn run-simulation [n-simulation]
