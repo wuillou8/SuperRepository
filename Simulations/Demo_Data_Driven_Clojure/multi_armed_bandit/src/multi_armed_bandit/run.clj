@@ -30,7 +30,7 @@
 (def dbs-bandits (let [bandit-keys (-> bandits-db :bandits keys)
                        dbs (zipmap bandit-keys (map #(-> bandits-db :bandits % :history) bandit-keys))]
                    dbs))
-
+; plotting
 (doto
   (xy-plot :n :value
     :title "Comparison bandits"
@@ -45,10 +45,3 @@
   clear-background
   view)
 
-;(head data-to-plot)
-;($where {:strategy ""} data-to-plot)
-
-;(fn foo
-;  "I don't do a whole lot."
-;  [x]
-;  (println x "Hello, World!"))
