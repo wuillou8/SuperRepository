@@ -4,22 +4,47 @@
             [incanter.stats :refer :all]
             [incanter.charts :refer :all]))
 
-; ucb alrorithms
-(defn score-ucb1 [bandit n-overall]
-  (let [n (:n bandit)
-        average (:average bandit)]
-    ($= average + (sqrt 2 * (log n-overall) / n))))
 
-(defn score-ucb2 [bandit epoque-nb alpha]
-  (let [n (:n bandit)
+; scores functions
+
+(defn score-ucb1 
+  ; ucb1 algo, paper 2002 finit-time analysis of mutliarmed bandit
+  ; auer/cesa-bianchi/fischer
+  [bandit n-overall]
+  (let [n (count (:history bandit))
+        average (:average bandit)]
+   (if (not= 0 n) 
+     ($= average + (sqrt 2 * (log n-overall) / n))
+     ($= 1000.))))
+
+(defn score-ucb2 
+  ; ucb2 algo, paper 2002 finit-time analysis of mutliarmed bandit
+  ; auer/cesa-bianchi/fischer
+  [bandit epoque-nb alpha]
+  (let [n (count (:history bandit))
         alph ($= 1. + alpha)
         tau ($= pow alph n)
         average (:average bandit)]
     ($= average + (sqrt ( alph * (log (epoque-nb / n))) / (2 * tau) ))))
 
 
+; strategies
 
-;random strategy
-(defn random-bandit-key [bandits]
-  (let [rand-key (rand-nth (keys (:bandits bandits)))]
-    rand-key))
+(defn bandits->random-strategy 
+  ; random strategy
+  [bandits]
+  (let [rand-bandit (rand-nth (keys (:bandits bandits)))]
+    rand-bandit))
+
+(defn bandits->ucb1-strategy 
+  ; ucb1
+  [bandits]
+  (let [n (:n bandits)
+        ;tmp-bandits (vals (:bandits bandits))
+        key-bandit (key 
+            (apply max-key #(score-ucb1 (val %) n) (:bandits bandits)))]
+  key-bandit))
+
+
+;(apply max-key val {:a 3 :b 7 :c 9})
+

@@ -30,7 +30,6 @@
   {:n n :strategy strategy :average average :value value}))
 
 ; simulation functions
-
 (defn sweep-bandit 
   ([bandit n]  
     (let[strategy (:strategy bandit)
@@ -38,41 +37,43 @@
          ;n (:n bandit)
          history (:history bandit)
        
-         n-update (+ n 1)
          value-update (if (strategy) (+ value 1.) value)
          n-average (count history)
          average-update  (if (not= 0 n-average)
-                          (float (/ value-update (count history)))
+                          (float (/ value-update n-average))
                           value-update)
-         
-         history-update (conj history (get-bandit-value bandit))]
-      (->bandit n-update strategy average-update value-update history-update))))
+        
+        bandit-update (->bandit n strategy average-update value-update history) 
+        history-update (conj history (get-bandit-value bandit-update))]
+      (assoc bandit-update :history history-update))))
 
-(defn sweep-bandits [bandits strategy-choice-fct]
-    (let[n (:n bandits)
-         value (:value bandits)
+(defn sweep-bandits [bandits strategy-bandits->key n]
+    (let[value (:value bandits)
          history (:history bandits)
 
-         bandit-key (strategy-choice-fct bandits)
-         value-bandit (-> bandits :bandits bandit-key :value) 
-         bandit-update (sweep-bandit (-> bandits :bandits bandit-key) n)
+         bandit-key (strategy-bandits->key bandits)
+         bandit (bandit-key (:bandits bandits))
+         
+         value-bandit (:value bandit) 
+         bandit-update (sweep-bandit bandit n)
 
-         n-update (+ n 1)
          value-update (+ value (- (:value bandit-update) value-bandit))  
-         average-update (float (/ value-update n-update))
+         n-average (count history)
+         average-update (if (not= 0 n-average)
+                          (float (/ value-update (count history)))
+                          value-update)
          bandits-update (assoc (:bandits bandits) bandit-key bandit-update)
-         history-update (conj history (assoc {:n n-update :value value-update :average average-update} :strategy bandit-key) 
-                        )
-         bandits (->bandits n-update bandits-update average-update value-update history-update)
+         history-update (conj history (assoc {:n n :value value-update :average average-update} :strategy bandit-key))
+         bandits (->bandits n bandits-update average-update value-update history-update)
          ]
       bandits))
 
 
 (defn simulation-run [my-bandits strategy-fct iterations-nb] 
-  (loop [bandits my-bandits cnt iterations-nb]  
-    (if (= cnt 0)
+  (loop [bandits my-bandits cnt 0]  
+    (if (= cnt iterations-nb)
       bandits 
-      (recur (sweep-bandits bandits strategy-fct) (dec cnt))))) 
+      (recur (sweep-bandits bandits strategy-fct cnt) (inc cnt))))) 
 
 
 
