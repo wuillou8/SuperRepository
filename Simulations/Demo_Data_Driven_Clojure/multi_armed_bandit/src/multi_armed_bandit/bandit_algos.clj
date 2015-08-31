@@ -12,7 +12,7 @@
   ; auer/cesa-bianchi/fischer
   [bandit n-overall]
   (let [n (count (:history bandit))
-        average (:average bandit)]
+        average (:probability bandit)]
    (if (not= 0 n) 
      ($= average + (sqrt 2 * (log n-overall) / n))
      ($= 1000.))))
@@ -24,7 +24,7 @@
   (let [n (count (:history bandit))
         alph ($= 1. + alpha)
         tau ($= pow alph n)
-        average (:average bandit)]
+        average (:probability bandit)]
     ($= average + (sqrt ( alph * (log (epoque-nb / n))) / (2 * tau) ))))
 
 

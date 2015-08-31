@@ -11,7 +11,7 @@
   ; strategy return function (item/user later)
   ; value is the conversions or income for particular good
   ; history is the data stored into database
-  [n strategy average value history])
+  [n strategy probability value history])
 
 (defrecord bandits 
   ; portfolio general performance
@@ -19,15 +19,15 @@
   ; strategy return function (item/user later)
   ; value is the conversions or income for particular good
   ; history is the data stored into database
-  [n bandits average value history])
+  [n bandits probability value history])
 
 ; basic function
 (defn get-bandit-value [bandit]
   (let [n (:n bandit)
         strategy (str (:strategy bandit))
-        average (:average bandit)
+        average (:probability bandit)
         value (:value bandit)]
-  {:n n :strategy strategy :average average :value value}))
+  {:n n :strategy strategy :probability average :value value}))
 
 ; simulation functions
 (defn sweep-bandit 
@@ -63,7 +63,7 @@
                           (float (/ value-update (count history)))
                           value-update)
          bandits-update (assoc (:bandits bandits) bandit-key bandit-update)
-         history-update (conj history (assoc {:n n :value value-update :average average-update} :strategy bandit-key))
+         history-update (conj history (assoc {:n n :value value-update :probability average-update} :strategy bandit-key))
          bandits (->bandits n bandits-update average-update value-update history-update)
          ]
       bandits))

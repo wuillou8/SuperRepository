@@ -13,6 +13,41 @@
           bandit-history-vect))
 
 
+; statistical post-processing 
+(defn collect-statistics [dbs-bandits]
+  (map (fn [bandit] 
+       (let [p (-> bandit :probability)
+             nb (-> bandit :history count) 
+             variance ($= nb * (p * (1. - p)))
+             std (sqrt variance)]
+       {:nb nb :p p :std std}))
+    dbs-bandits))
+
+(defn do-statistics [statistics-summary strategy-value]
+  (let [p-best (apply max (map :p statistics-summary))
+        p-mean (mean (map :p statistics-summary) )
+        nb-total (reduce + (map :nb statistics-summary))
+        gain ($= strategy-value - (p-mean * nb-total))      
+        regret ($= strategy-value - (p-best * nb-total))
+        error (sqrt (reduce (fn [sum std] (+ sum (pow std 2.))) 0.0 (map :std statistics-summary))) 
+      ] 
+  {:gain gain :regret regret :sigma error}))
+
+(defn run-statistics [bandit-strategies]
+  (let [strategy-conversions (:value bandit-strategies)
+        statistics-summary (collect-statistics (vals (:bandits bandit-strategies)))
+        statistics-scores (do-statistics statistics-summary strategy-conversions)
+        ]
+    statistics-scores))
+
+
+
+
+
+
+
+
+
 ;not in use...
 ;(defn event->score-update [score-list element]
 ;  (let[strat-key (:strategy element)
