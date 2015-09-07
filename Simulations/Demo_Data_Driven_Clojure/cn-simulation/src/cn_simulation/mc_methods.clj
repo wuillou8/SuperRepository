@@ -46,31 +46,10 @@
   ; standard logit function.
   (/ 1. (+ 1. (jexp (- x)) ) ))
 
-(defn logit-noisy [x alpha]
+(defn logit-noisy [x alpha epsilon]
   ; white gaussian noise on the top of the logit function:
   ; x -> x + \epsilon, \epsilon \in N(0., \alpha)
-  (/ 1. (+ 1. (jexp (- (+ x (white-noise 0. alpha)))) ) ))
-
-(defn poisson-law
-  ; Poisson law simulates random events taking place at a known average rate 
-  ; reminds for k = 0,1,2,... a discrete time, Prob(Event = k) = \lambda^k e^(-lambda ) / k!
-  [lambda]
-  (let [
-        a  (jexp (- lambda))
-        r (atom (rand))
-        n (atom 0)
-        ]
-  (while (> @r a) (do (swap! n inc) (swap! r  #(* % (rand)))) )
-  @n))
-
-(defn poisson-distr->events
-  ; synchronises poisson distr. events of function fct., lambda is the poisson rate.
-  [lambda fct]
-  (time (Thread/sleep (poisson-law lambda)))
-  fct)
-
-(defn mc-choice [x]
-  (< (rand) x))
+  (/ 1. (+ 1. (jexp (- (+ (* alpha x) (white-noise 0. epsilon)))) ) ))
 
 (defn poisson-law [average]
   ; recall that for a Poisson process, 
@@ -84,5 +63,15 @@
         ; recall lambda =  1 / average
         lambda ($= 1. / average)] 
     ($= -1. / lambda * (log arg))))
+
+(defn poisson-distr->events
+  ; synchronises poisson distr. events of function fct., lambda is the poisson rate.
+  [lambda fct]
+  (time (Thread/sleep (poisson-law lambda)))
+  fct)
+
+(defn mc-choice [x]
+  (< (rand) x))
+
 
 

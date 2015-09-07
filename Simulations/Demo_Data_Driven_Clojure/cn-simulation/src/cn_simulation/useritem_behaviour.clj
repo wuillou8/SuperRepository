@@ -4,7 +4,7 @@
             [incanter.core :refer :all]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;             User Item Basics                                  ;
+;             User Item & Interaction                           ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;synthetic data
@@ -43,6 +43,17 @@
         ]  
   score))
 
+(defn item-item->sim
+  ; cosine   ; sim(\vec x, \vec y) = ( \vec x \cdot \vec y )/ ( \norm(x) \times \norm(y) )
+  [item1 item2]
+  ( let[
+        item-feats1  (:features item1)
+        item-feats2  (:features item2)
+        matches (count (filter #(in? item-feats1 %) item-feats2))
+        score (/ matches (Math/sqrt (* (count item-feats1) (count item-feats2))))
+        ]  
+  score))
+
 (defn user-item->utility 
   ; utility function v0:
   ; U(user,item,alpha,beta,epsilon) = 
@@ -54,15 +65,23 @@
      (* epsilon (white-noise 0. 1.))) 
   )
 
-(defn item-item->sim
-  ; cosine similarity:
-  ; sim(\vec x, \vec y) = ( \vec x \cdot \vec y )/ ( \norm(x) \times \norm(y) )
-  [item1 item2]
-  ( let[
-        item-feats1  (:features item1)
-        item-feats2  (:features item2)
-        matches (count (filter #(in? item-feats1 %) item-feats2))
-        score (/ matches (Math/sqrt (* (count item-feats1) (count item-feats2))))
-        ]  
-  score))
+; conversion logic
+(defn user-choice->conversion [user items choice]
+  (mapcat #(choice user %) items))
 
+(defn user-choice->conversion [user items choice]
+  (mapcat (fn [item] (cond 
+                        (choice user item) [(:id item)]
+                        :else [])) 
+          items))
+
+(defn random-choice [user item]
+  (mc-choice 0.05)) 
+
+(defn preference-choice [user item]
+  (<= 0.5 (user-item->sim user item)))
+
+(defn logit-choice [user item]
+  ; logit function calibrated in order to reach approx 5% of conversions
+  (-> ($= 2 * ((user-item->sim user item) - (:price item) - 0.5))
+      (logit-noisy 2.  0.2) (mc-choice)))

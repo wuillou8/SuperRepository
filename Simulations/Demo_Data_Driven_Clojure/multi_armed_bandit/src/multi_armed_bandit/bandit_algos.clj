@@ -6,7 +6,6 @@
 
 
 ; scores functions
-
 (defn score-ucb1 
   ; ucb1 algo, paper 2002 finit-time analysis of mutliarmed bandit
   ; auer/cesa-bianchi/fischer
@@ -29,7 +28,6 @@
 
 
 ; strategies
-
 (defn bandits->random-strategy 
   ; random strategy
   [bandits]
@@ -40,11 +38,6 @@
   ; ucb1
   [bandits]
   (let [n (:n bandits)
-        ;tmp-bandits (vals (:bandits bandits))
         key-bandit (key 
             (apply max-key #(score-ucb1 (val %) n) (:bandits bandits)))]
   key-bandit))
-
-
-;(apply max-key val {:a 3 :b 7 :c 9})
-
