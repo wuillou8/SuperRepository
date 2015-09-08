@@ -2,7 +2,7 @@
  (require [cn-simulation.mc-methods :refer :all]
           [cn-simulation.metrics :refer :all]
           [cn-simulation.useritem-behaviour :refer :all]
-          [cn-simulation.recommender :refer [rand-recomm collab-filtering-item]]
+          [cn-simulation.recommender :refer :all]
           [incanter.core :refer :all]
           [incanter.stats :refer :all]
           [incanter.charts :refer :all]
@@ -72,7 +72,7 @@
         (let [recommended (recommender n-recommlist user items history-db)
               converted (user-choice->conversion user recommended choice)
               user-id (:id user)]
-          {:t t :user-id user-id :recommended (map :id recommended) :converted  converted}))
+          {:timestamp t :user-id user-id :recommended (map :id recommended) :converted  converted}))
         (vals users))))
 
 (defn run-simulation [simulation]
@@ -85,15 +85,77 @@
                (assoc simul :history-db
                   (concat (sweep-simulation simul t) (:history-db simul))))))))
 
-      
-(def simul1 (run-simulation my-simulation1))
-(def simul2 (run-simulation my-simulation2))
-(def simul3 (run-simulation my-simulation2))
 
 
 
+(def nnil? (complement nil?))
 
-;(view (histogram
-;  (map #(logitt (first users) %) items)
-;))
+(defn key-filter [my-key-symbol query-map events]
+    ; this is a function filtering keys dimension that have a non-nil value.
+    (let [my-key-val (my-key-symbol query-map)]
+      (if (nnil? my-key-val) 
+        (filter #(= my-key-val (my-key-symbol %)) events) 
+        events)))
+
+(defn events-filter [simulation query-map t-init t-end]
+  (->> (:history-db simulation)
+       (filter (fn [qm] (and (< t-init (:timestamp qm)) (> t-end (:timestamp qm)))))
+       (key-filter :user-id query-map)
+       (key-filter :recommended query-map)
+       (key-filter :converted query-map)))
+
+;(reduce-functions simul1 {:user-id 1} 0 101)
+(events-filter simul1 {} 0 101)
+
+; kpi
+; 1)
+(defn reduce-conversions [data]
+  (reduce  
+    (fn [output element]
+      (let [nb (count (:converted element))
+            n (:cumul-convers (last output))
+            nnb (count (:recommended element))
+            nn (:cumul-recomms (last output))]
+        (conj output (assoc element :cumul-convers (+ n nb) :cumul-recomms (+ nn nnb)))))
+    [(merge (first data) (let [dat (first data)
+                               cumul-convers (-> data first :converted count)
+                               cumul-recomms (-> data first :recommended count)]
+                              {:cumul-convers cumul-convers :cumul-recomms cumul-recomms}))]
+    (rest data)))
+
+
+(defn summary-vs-time [simulation query-map t-init t-end]
+  (-> (events-filter simulation query-map t-init t-end) 
+      reverse
+      reduce-conversions))
+
+(defn summary-final 
+  ([simulation query-map t-init t-end]
+    (let [data (last (summary-vs-time simulation query-map t-init t-end))
+          convs-per-recomm (float (/ (:cumul-convers data) (:cumul-recomms data)))]
+      (assoc data :convs-per-recomm convs-per-recomm)))
+  ([summary-vs-time]
+   (let [data (last summary-vs-time)
+         convs-per-recomm (float (/ (:cumul-convers data) (:cumul-recomms data)))]
+      (assoc data :convs-per-recomm convs-per-recomm))))
+
+(def simul1 
+  (run-simulation my-simulation1))
+(def simul2 
+  (run-simulation my-simulation2))
+(def simul3 
+  (run-simulation my-simulation2))
+
+(def sum1 (summary-vs-time simul1 {} 0 101))
+(def sum11 (summary-final sum1)) ;simul1 {} 0 101))
+(def sum2 (summary-vs-time simul2 {} 0 101))
+(def sum22 (summary-final sum2)) ; {} 0 101))
+(def sum3 (summary-vs-time simul3 {} 0 101))
+(def sum33 (summary-final sum3)) ; {} 0 101))
+
+(println (:convs-per-recomm sum11))
+(println (:convs-per-recomm sum22))
+(println (:convs-per-recomm sum33))
+
+(println sum1)
 
