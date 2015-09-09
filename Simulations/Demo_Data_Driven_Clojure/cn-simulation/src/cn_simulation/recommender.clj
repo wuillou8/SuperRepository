@@ -10,9 +10,9 @@
     (if (= N (count recomm-list))
       recomm-list
       (recur (distinct 
-               (conj recomm-list (rand-nth (vals hash-items))))))))
+        (conj recomm-list (rand-nth (vals hash-items))))))))
 
-(defn- item-history->scores [item history hash-items]
+(defn- item-history->scores [item user-history hash-items]
   ; produces scores for item-based collaborative filtering
   ; we simply take the mean instead of reweighting for now...
   (mean 
@@ -22,16 +22,28 @@
                   score (- (sum (map #(item-item->sim item %) converted))
                            (sum (map #(item-item->sim item %) recommended)))]
       score))
-    history)))
+    user-history)))
 
-(defn collab-item-filt [N user hash-items history-db]
+(defn collab-filtering-item [N user hash-items history-db]
+  ; item-based collaborative filtering.
+  (let [user-id (:id user)
+        user-history (filter #(= user-id (:user-id %)) 
+                           history-db)
+        scored-list (->> (map (fn [item] 
+                          {:item item :score (item-history->scores item user-history hash-items)}) 
+                            (vals hash-items))
+                      (sort-by :score <);>) 
+                      (map :item))]
+    (take N scored-list)))
+
+(defn collab-filtering-item-p [N user hash-items history-db]
   ; item-based collaborative filtering.
   (let [user-id (:id user)
         history (filter #(= user-id (:user-id %)) 
                            history-db)
         scored-list (->> (map (fn [item] 
-                          {:item item :score (item-history->scores item history)}) 
+                          {:item item :score (item-history->scores item history hash-items)}) 
                             (vals hash-items))
-                      (sort-by :score >) 
+                      (sort-by :score >);>) 
                       (map :item))]
-    scored-list))
+    (take N scored-list)))
