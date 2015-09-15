@@ -7,7 +7,8 @@
            ;[metrics.google-analytics :refer :all]
            [incanter.core :refer :all]
            [incanter.stats :refer :all]
-           [incanter.charts :refer :all])
+           [incanter.charts :refer :all]
+           [incanter.pdf :refer :all])
   )
 
 
@@ -76,18 +77,65 @@
 (def test-data-grid (to-dataset (map #(buy-not-buy? % buy-boundary2 10. 5. 2.) test-grid)))
 
 ; view grid
+(save-pdf
 (doto 
   (scatter-plot :x :y
-                    :title "Calibration: Util(abstract) VS Price"
+                    :title "logit distribution1: Util vs Price"
                     :x-label "Price"
-                    :y-label "Util(abstract)"
+                    :y-label "Utility"
                     :group-by :tag-buy 
-                    :data test-data-grid)
-  (add-function #(buy-boundary0 % 0.4) 0. 1.)
-  (add-function #(buy-boundary1 % 0.4) 0. 1.)
-  (add-function #(buy-boundary2 % 0.4) 0. 1.)
-  view)
+                    :data (to-dataset (map #(buy-not-buy? % buy-boundary1 10. 1. 0.4) test-grid)))
+  ;(add-function #(buy-boundary0 % 0.4) 0. 1.)
+  (add-function #(buy-boundary1 % 0.4) 0. 1. )
+  ;(add-function #(buy-boundary2 % 0.4) 0. 1.)
+  clear-background
+  )
+"./resources/utilvsprice_1.pdf")
 
+(save-pdf
+(doto 
+  (scatter-plot :x :y
+                    :title "logit distribution2: Util vs Price"
+                    :x-label "Price"
+                    :y-label "Utility"
+                    :group-by :tag-buy 
+                    :data (to-dataset (map #(buy-not-buy? % buy-boundary1 5. 2. 0.8) test-grid)))
+  ;(add-function #(buy-boundary0 % 0.4) 0. 1.)
+  (add-function #(buy-boundary1 % 0.4) 0. 1.)
+  ;(add-function #(buy-boundary2 % 0.4) 0. 1.)
+  clear-background
+  view)
+"./resources/utilvsprice_2.pdf")
+
+(save-pdf
+(doto 
+  (scatter-plot :x :y
+                    :title "logit distribution3: dimN vs dim1"
+                    :x-label "dim1"
+                    :y-label "dimN"
+                    :group-by :tag-buy 
+                    :data (to-dataset (map #(buy-not-buy? % buy-boundary2 10. 1. 0.4) test-grid)))
+  ;(add-function #(buy-boundary0 % 0.4) 0. 1.)
+  (add-function #(buy-boundary2 % 0.4) 0. 1. )
+  ;(add-function #(buy-boundary2 % 0.4) 0. 1.)
+  clear-background
+  view)
+"./resources/utilvspricesin_1.pdf")
+
+(save-pdf
+(doto 
+  (scatter-plot :x :y
+                    :title "logit distribution4: dimN vs dim1"
+                    :x-label "dim1"
+                    :y-label "dimN"
+                    :group-by :tag-buy 
+                    :data (to-dataset (map #(buy-not-buy? % buy-boundary2 5. 2. 0.8) test-grid)))
+  ;(add-function #(buy-boundary0 % 0.4) 0. 1.)
+  (add-function #(buy-boundary2 % 0.4) 0. 1.)
+  ;(add-function #(buy-boundary2 % 0.4) 0. 1.)
+  clear-background
+  view)
+"./resources/utilvspricesin_2.pdf")
 ;;;;;;;;;;;;
 ; logit calibration
 
