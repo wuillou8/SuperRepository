@@ -13,7 +13,6 @@
            [incanter.pdf :refer :all]))
 
 
-
 ; model glob variables
 (def Nusers 1)
 (def Nitems 1000)
@@ -30,6 +29,46 @@
 (def usage-history0 (to-dataset 
   {:t-time (), :usr-id (), :item-id (), :util (), 
    :price (), :tag-buy (), :p-choice ()}))
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; collaborative filtering
+(defn collab-score0 
+  ;usage dataset with user usage, item-id is number
+  ;table items is the items table.
+  [id-item usage]
+  (let [ 
+        item-scored (get table-items id-item)
+        scores (map 
+                 (fn [line]
+                    (let [
+                          t (:t-time line)
+                          id (:item-id line)
+                          item-line (get table-items id)
+                          buy? (if (:tag-buy line) 1 0)
+                          sim (item-item->sim item-scored item-line)
+                          score ($= sim * buy?)
+                          ]
+                  {:score score :sim sim}))
+                 (:rows usage))
+        collab-score ($= (sum (map :score scores)) / ( 1 + (count scores) )) 
+       ]
+   {:id-item id-item :collab-score collab-score})) 
+
+(defn collab-filtering0 
+  [user-id recomm-length full-usage-history]
+  (let [
+        user-history ($where {:usr-id user-id} full-usage-history)
+        scores (map #(collab-score0 % user-history) (keys table-items))
+        rankings (sort-by :collab-score > scores)         
+        recomm-list (take recomm-length rankings)
+        
+        recomm-items (map #(get table-items (:id-item %)) recomm-list)
+        ]
+     recomm-items))
+
+
 
 (defn filter-dataset
   ; function taking an event list and preprocessing it into a summary 
@@ -121,11 +160,13 @@
 (save-pdf
   (doto 
     (scatter-plot :t :convs
-                :title "Performance: random vs coll. filtering"
-                :y-label "CTR"
-                :x-label "time"
+                :title "Random vs coll. filtering recomm. for one user"
+                :y-label "conversions"
+                :x-label "timestamp"
                 :group-by :type-recomm
                 :data toplot-total
+;                :series-label  "0th user"
+;                :legend true
                 )
   clear-background
   view)

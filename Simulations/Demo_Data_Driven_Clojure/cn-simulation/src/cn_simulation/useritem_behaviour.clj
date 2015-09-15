@@ -66,8 +66,8 @@
   )
 
 ; conversion logic
-(defn user-choice->conversion [user items choice]
-  (mapcat #(choice user %) items))
+;(defn user-choice->conversion [user items choice]
+;  (mapcat #(choice user %) items))
 
 (defn user-choice->conversion [user items choice]
   (mapcat (fn [item] (cond 
@@ -81,7 +81,21 @@
 (defn preference-choice [user item]
   (<= 0.5 (user-item->sim user item)))
 
-(defn logit-choice [user item]
+; (defn logit-choice [user item]
+;  ; logit function calibrated in order to reach approx 5% of conversions
+(defn logo-choice-score [user item]
   ; logit function calibrated in order to reach approx 5% of conversions
-  (-> ($= 2 * ((user-item->sim user item) - (:price item) - 0.5))
-      (logit-noisy 2.  0.2) (mc-choice)))
+  (-> ($=  ( 5 * (user-item->sim user item) - (exp (:price item) - (:budget user)) - 1.5))
+      (logit-noisy 3.  0.2)))
+
+(defn logit-choice [user item]
+;  ; logit function calibrated in order to reach approx 5% of conversions
+;  (println user item (user-item->sim user item))
+;  (let [value ($= ( 5.0 * (user-item->sim user item) - ( (:price item)) - 1.5))]
+    ;(println  user item (user-item->sim user item) (item-item->sim item item))
+    (mc-choice (logo-choice-score user item)))
+
+
+
+
+
