@@ -26,6 +26,24 @@
  ;     score))
  ;   user-history)))
 
+(defn- item-history->scores [item user-history hash-items]
+  ; produces scores for item-based collaborative filtering
+  ; we simply take the mean instead of reweighting for now...
+  (let [scoring (map (fn [tmp] 
+                  (let [converted (map #(get hash-items %) (:converted tmp))
+                        recommended (map #(get hash-items %) (:recommended tmp))
+                        numera (sum (map #(item-item->sim item %) converted))
+                        denomi (sum (map #(item-item->sim item %) recommended))]
+                    {:numera numera :denom denomi}))
+                  user-history)
+        numera (reduce + (map :numera scoring))
+        denomi (reduce + (map :denom scoring)) 
+        score (if (= 0.0 (float denomi))
+                  0.0  
+                  (float (/ numera denomi))) ] ;(reduce + (map :denom scoring))))]
+    score))
+
+
 
 (defn collab-filtering-item [N user hash-items history-db]
   ; item-based collaborative filtering.
