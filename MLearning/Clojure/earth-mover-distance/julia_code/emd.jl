@@ -1,24 +1,40 @@
-# Russel algo for near optimal basis to transportation problem
+include("classes.jl")
 
-#Houthakker's cost matrix
-type Houthakker_matrix
-    # cost mat
-    #c_matrix_score::Array{Int64,2}
-    c_matrix::Array{Float64,2}
+""" Russel algo for near optimal basis to transportation problem. """
+
+function preprocess (sgn1::Signature, sgn2::Signature, dist::Function)
     
-    # "active" coords.
-    i_a::Array{Int64,1}
-    i_b::Array{Int64,1}
+    # init Cost matrix size:
+    # If costs > demand or inversely, add an additional weight on the demand resp. cost side and fill it with the diff.
+    # The costs are zero for the appended col resp. row.
+    if (abs( 1e-06 > (sum(sgn1.weights) - sum(sgn2.weights)))) #sum(sgn1.weights) - sum(sgn2.weights))
+        C = fill(0., (length(sgn1.features), length(sgn2.features)))
+    elseif (sum(sgn1.weights) > sum(sgn2.weights))
+        C = fill(0., (length(sgn1.features), length(sgn2.features) + 1))
+        push!(sgn2.weights, sum(sgn1.weights) - sum(sgn2.weights))
+    else
+        C = fill(0., (length(sgn1.features) + 1, length(sgn2.features)))
+        push!(sgn1.weights, sum(sgn2.weights) - sum(sgn1.weights))
+    end
+    # create Costs matrix
+    for i = 1:length(sgn1.features)
+        for j = 1:length(sgn2.features)
+            C[i,j] = distance(sgn1.features[i], sgn2.features[j]) 
+        end
+    end
     
-    # supply/demand vects.
-    a::Array{Float64,1}
-    b::Array{Float64,1}
+    # Defs objets for computation:
+    # we use an indices table for the algo.
+    i_x = convert(Vector{Int64},[i for i in 1:size(C)[1]])
+    i_y = convert(Vector{Int64},[i for i in 1:size(C)[2]])
     
-    # result mat.
-    r_matrix::Array{Float64,2}
+    # we store the transaction on a cost matrix.
+    m_final = fill(0, size(C))
+    Russel_decomposition(C, i_x, i_y, sgn1.weights, sgn2.weights, m_final)
 end
 
-function russel_f(m::Houthakker_matrix)
+
+function russel_f(m::Russel_decomposition)
 
     # step 1 : build w and y
     w = [maximum(m.c_matrix[i,:]) for i in m.i_a]
@@ -36,9 +52,7 @@ function russel_f(m::Houthakker_matrix)
             end
         end
     end
-
-println(i_max, j_max, size(m.c_matrix))
-
+    
     # step 3 : reset activity level
     min = minimum([m.a[i_max] m.b[j_max]])
     
@@ -48,18 +62,33 @@ println(i_max, j_max, size(m.c_matrix))
     
     m.r_matrix[i_max, j_max] = min
     
-    m.i_a = filter(x -> !(x in find(x -> x==0, m.a)), m.i_a)
-    m.i_b = filter(x -> !(x in find(x -> x==0, m.b)), m.i_b)
+    m.i_a = filter(x -> (x in find(x -> x>0.000001, m.a)), m.i_a)
+    m.i_b = filter(x -> (x in find(x -> x>0.000001, m.b)), m.i_b)
     
     m
 end
 
-function reduce_cost(res_mat::Houthakker_matrix)
+function reduce_cost(m::Russel_decomposition)
     cost = 0
-    for i = 1:size(h_mat.c_matrix)[1]
-        for j = 1:size(h_mat.c_matrix)[2]
-            cost = cost + res_mat.r_matrix[i,j]*res_mat.c_matrix[i,j]
+    for i = 1:size(m.c_matrix)[1]
+        for j = 1:size(m.c_matrix)[2]
+            cost = cost + m.r_matrix[i,j]*m.c_matrix[i,j]
         end
     end
-    cost
+    # emd = \sum_ij cost_ij x f_ij / \sum_ij f_ij )
+    cost/sum(m.r_matrix)
+end
+
+function emd_russel(sgn1::Signature, sgn2::Signature, dist::Function)
+    # preprocess
+    R_decomp = preprocess(sgn1, sgn2, distance)
+    # run
+    it = 0
+    while ((sum(R_decomp.a) + sum(R_decomp.b)) > 0.00001)
+        russel_f(R_decomp)
+        #println(it, " ", (sum(R_decomp.a) + sum(R_decomp.b)))
+        it += 1
+    end
+    println("costs : ", reduce_cost(R_decomp), " iterations: ", it)
+    R_decomp
 end
