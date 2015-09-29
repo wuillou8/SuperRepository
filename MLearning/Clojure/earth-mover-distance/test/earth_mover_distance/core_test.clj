@@ -61,11 +61,11 @@
 
 
 (deftest tests-emd-russel
+  (is (= 0.0 (emd/emd-russel signature1 signature1 distance-fct)))
   (is (> emd/precis (- 163.0713 (emd/emd-russel signature1 signature2 distance-fct))))
   (is (> emd/precis (- 125.32115 (emd/emd-russel signature1> signature2 distance-fct))))
   (is (> emd/precis (- 159.13945 (emd/emd-russel signature1 signature2> distance-fct))))
   (is (> emd/precis (- 167.80612 (emd/emd-russel signature1> signature2> distance-fct)))))
-
 
 
 

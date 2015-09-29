@@ -7,7 +7,7 @@ function preprocess (sgn1::Signature, sgn2::Signature, dist::Function)
     # init Cost matrix size:
     # If costs > demand or inversely, add an additional weight on the demand resp. cost side and fill it with the diff.
     # The costs are zero for the appended col resp. row.
-    if (abs( 1e-06 > (sum(sgn1.weights) - sum(sgn2.weights)))) #sum(sgn1.weights) - sum(sgn2.weights))
+    if (abs( 1e-06 > abs(sum(sgn1.weights) - sum(sgn2.weights))) ) #sum(sgn1.weights) - sum(sgn2.weights))
         C = fill(0., (length(sgn1.features), length(sgn2.features)))
     elseif (sum(sgn1.weights) > sum(sgn2.weights))
         C = fill(0., (length(sgn1.features), length(sgn2.features) + 1))
