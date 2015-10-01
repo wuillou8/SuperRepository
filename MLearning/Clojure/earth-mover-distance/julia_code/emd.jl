@@ -7,7 +7,7 @@ function preprocess (sgn1::Signature, sgn2::Signature, dist::Function)
     # init Cost matrix size:
     # If costs > demand or inversely, add an additional weight on the demand resp. cost side and fill it with the diff.
     # The costs are zero for the appended col resp. row.
-    if (abs( 1e-06 > abs(sum(sgn1.weights) - sum(sgn2.weights))) ) #sum(sgn1.weights) - sum(sgn2.weights))
+    if (abs( 1e-06 > (sum(sgn1.weights) - sum(sgn2.weights)))) #sum(sgn1.weights) - sum(sgn2.weights))
         C = fill(0., (length(sgn1.features), length(sgn2.features)))
     elseif (sum(sgn1.weights) > sum(sgn2.weights))
         C = fill(0., (length(sgn1.features), length(sgn2.features) + 1))
@@ -19,7 +19,7 @@ function preprocess (sgn1::Signature, sgn2::Signature, dist::Function)
     # create Costs matrix
     for i = 1:length(sgn1.features)
         for j = 1:length(sgn2.features)
-            C[i,j] = distance(sgn1.features[i], sgn2.features[j]) 
+            C[i,j] = dist(sgn1.features[i], sgn2.features[j]) 
         end
     end
     
@@ -75,13 +75,15 @@ function reduce_cost(m::Russel_decomposition)
             cost = cost + m.r_matrix[i,j]*m.c_matrix[i,j]
         end
     end
+
+    #println("m.r_matrix: ", m.r_matrix)
     # emd = \sum_ij cost_ij x f_ij / \sum_ij f_ij )
-    cost/sum(m.r_matrix)
+    cost / sum(m.r_matrix)
 end
 
 function emd_russel(sgn1::Signature, sgn2::Signature, dist::Function)
     # preprocess
-    R_decomp = preprocess(sgn1, sgn2, distance)
+    R_decomp = preprocess(sgn1, sgn2, dist)
     # run
     it = 0
     while ((sum(R_decomp.a) + sum(R_decomp.b)) > 0.00001)

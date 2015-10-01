@@ -1,6 +1,10 @@
 (ns earth-mover-distance.emd
   (:require [clojure.core.matrix :as m]))
 
+; refering to the article:
+; E.j. Russel, Extension of Dantzig's Algorithm to finding an initial
+; near-optimal basis for the transportation problem , operations research 1969 
+
 (defrecord emd-pbm [m-costs v-supply v-demand])
 
 (def precis 0.00001)
@@ -58,16 +62,16 @@
         b (assoc b (:j pos) (- (nth b (:j pos)) ships))
         ; compute transaction costs: nb-ship*c_ij 
         cost (* ships (m/mget m (:i pos) (:j pos)))]
- ;(println (:i pos) " : " (:j pos) " " nb-ship)
+ (println ships " from " (:i pos) " to: " (:j pos))
  {:transport (assoc transport :v-supply a :v-demand b) :cost cost :ships ships}))
 
 (defn run-russel [transport]
-  (println ">>run fanta*stic* russ*el algorit*hm: ")
+  (println ">>run *russ*el algorit*hm: ")
   (loop [trans transport cost 0 ships 0]
     (let [a (:v-supply trans)
           b (:v-demand trans)]
-     (println "   weights: " a b) 
-      (if (> 0.00001 (reduce + (concat b a))) 
+     ;(println "   weights: " a b) 
+      (if (> 0.00001 (reduce + (concat b a)))
         (float (/ cost ships))
         (let [t (algo-russel-iteration trans)]
           (recur (:transport t) (+ cost (:cost t)) (+ ships (:ships t))))))))

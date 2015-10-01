@@ -205,6 +205,7 @@ static float init(signature_t *Signature1, signature_t *Signature2,
     for(j=0, P2=Signature2->Features; j < _n2; j++, P2++) 
       {
 	_C[i][j] = Dist(P1, P2);
+        //pirintf("c_mat: %f %d %d \t", _C[i][j], i, j);
 	if (_C[i][j] > _maxC)
 	  _maxC = _C[i][j];
       }
