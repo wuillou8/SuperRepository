@@ -24,7 +24,8 @@
 
 /*****************************************************************************/
 /* feature_t SHOULD BE MODIFIED BY THE USER TO REFLECT THE FEATURE TYPE      */
-typedef double feature_t;
+//typedef float feature_t[3];
+typedef struct feature_t {float x[3]; } feature_t;
 /*****************************************************************************/
 
 
@@ -47,6 +48,6 @@ typedef struct
 
 float emd(signature_t *Signature1, signature_t *Signature2,
 	  float (*func)(feature_t *, feature_t *),
-	  flow_t *Flow, int *FlowSize);
+	  flow_t *Flow, int *FlowSize, int *jairFlag);
 
 #endif

@@ -7,4 +7,5 @@
                  ;[clocop "0.2.0"]
                  [org.clojure/data.json "0.2.6"]
                  [org.clojure/data.csv "0.1.3"]
-                 [net.mikera/vectorz-clj "0.35.0"]])
+                 [net.mikera/vectorz-clj "0.35.0"]
+                 [org.clojure/math.numeric-tower "0.0.4"]])

@@ -95,12 +95,15 @@ where
               If NULL, the flow is not returned.
    FlowSize   (Optional) Pointer to an integer where the number of elements in
               Flow will be stored
-              
+   jairFlag   sets wether the Russel algo. only or the full emd is computed.           
+              the variable is meanst as boolean.          
+
 ******************************************************************************/
 
 float emd(signature_t *Signature1, signature_t *Signature2,
 	  float (*Dist)(feature_t *, feature_t *),
-	  flow_t *Flow, int *FlowSize)
+	  flow_t *Flow, int *FlowSize,
+          int/*bool*/ *jairFlag)
 {
   int itr;
   double totalCost;
@@ -124,10 +127,11 @@ float emd(signature_t *Signature1, signature_t *Signature2,
 	  findBasicVariables(U, V);
 	  
 	  /* CHECK FOR OPTIMALITY */
-	  if (isOptimal(U, V))
-	    break;
+	  if (*jairFlag || isOptimal(U, V))
+            break; //printf("TES %d %d ",*jairFlag,isOptimal(U, V));
 	  
 	  /* IMPROVE SOLUTION */
+          //printf("\nWE ARE HERE\n");
 	  newSol();
 	  
 #if DEBUG_LEVEL > 1
@@ -204,8 +208,8 @@ static float init(signature_t *Signature1, signature_t *Signature2,
   for(i=0, P1=Signature1->Features; i < _n1; i++, P1++)
     for(j=0, P2=Signature2->Features; j < _n2; j++, P2++) 
       {
+        // jair _C[i][j] = Dist(&Signature1->Features[i*3],&Signature2->Features[j*3]);
 	_C[i][j] = Dist(P1, P2);
-        //pirintf("c_mat: %f %d %d \t", _C[i][j], i, j);
 	if (_C[i][j] > _maxC)
 	  _maxC = _C[i][j];
       }
@@ -260,6 +264,13 @@ static float init(signature_t *Signature1, signature_t *Signature2,
   russel(S, D);
 
   _EnterX = _EndX++;  /* AN EMPTY SLOT (ONLY _n1+_n2-1 BASIC VARIABLES) */
+
+/* show matrix to jair */  
+//for(i=0; i < _n1; i++){
+//    for (j=0; j < _n2; j++){
+//        printf("\n matrix %f %d %d ",_C[i][j],i,j);
+//    }
+//}
 
   return sSum > dSum ? dSum : sSum;
 }

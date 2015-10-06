@@ -5,9 +5,15 @@
 ; E.j. Russel, Extension of Dantzig's Algorithm to finding an initial
 ; near-optimal basis for the transportation problem , operations research 1969 
 
+(def precis 0.00001)
+
 (defrecord emd-pbm [m-costs v-supply v-demand])
 
-(def precis 0.00001)
+; L2 for vectors
+(defn distance-L2 [rgb1 rgb2]
+  (Math/sqrt
+    (reduce + 
+      (map #(Math/pow (- %1 %2) 2) rgb1 rgb2))))
 
 (defn preprocess [sgn1 sgn2 distance-fct]
   ; by convention and analogy to the transportation problem, supply/demand are first/second var. 
