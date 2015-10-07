@@ -21,9 +21,10 @@
         b (:weights sgn2)
         
         ; the supply has to be smaller than the demand
+        ; this is a generic feature that is not useful for normalised weights (sum => 1)
         [a b sgn1 sgn2] (if (< (reduce + a) (reduce + b))
-                [a b sgn1 sgn2]
-                [b a sgn2 sgn1])
+                            [a b sgn1 sgn2]
+                            [b a sgn2 sgn1])
         
         supply (reduce + a) 
         demand (reduce + b)
