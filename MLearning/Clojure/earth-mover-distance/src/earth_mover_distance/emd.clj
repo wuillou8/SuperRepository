@@ -1,5 +1,6 @@
 (ns earth-mover-distance.emd
-  (:require [clojure.core.matrix :as m]))
+  (:require [clojure.core.matrix :as m]
+            [earth-mover-distance.simplex :as simplex]))
 
 ; refering to the article:
 ; E.j. Russel, Extension of Dantzig's Algorithm to finding an initial
@@ -93,4 +94,15 @@
 (defn emd-russel [signature-1 signature-2 distance-fct]
   (-> (preprocess signature-1 signature-2 distance-fct)
       run-russel))
+
+(defn emd-simplex [signature-1 signature-2 distance-fct]
+  (-> (preprocess signature-1 signature-2 distance-fct) 
+          ((comp vals select-keys) [:m-costs :v-supply :v-demand])
+       ;simplex/create-table
+       ;simplex/table->dual
+       ;simplex/simplex-method
+       ))
+  
+
+
 

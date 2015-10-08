@@ -11,7 +11,10 @@
   ; up to the optimal solution.
   ; pseudoproof: if the simplex hypersurface is convex, the algo has to converge, as far as I can see. amen.
 
-(defn create-table [] ;cost-matrix supplyv demandv]
+(defn create-table
+  ([emd-pbm] 
+   (create-table (:m-costs emd-pbm) (:v-supply emd-pbm) (:v-demand emd-pbm))) 
+  ([cost-matrix supplyv demandv]
   ; cost-matrix is the ... cost-matrix::Matrix{float}
   ; supply and demand are Vector{float}
   ; The algorithm below transforms a transport optimisation problem into 
@@ -39,7 +42,8 @@
   ;   -C_11:-C_12 ...  0  
   ;
   ;
-  (let [[d-x d-y] (m/shape cost-matrix)
+  (let [
+        [d-x d-y] (m/shape cost-matrix)
         n-slack 0 ; slack variables are zero if demand = supply, which is the case for now. otherwise, the condition \sum_i f_ij =< 
         n-y (+ d-y n-slack) ; + slack variables s_i's...
 
@@ -148,9 +152,5 @@
             t
             (recur (apply jordan-gauss-decompose-step t (find-pivot t))))))
 
-(defn emd-simplex [signature-1 signature-2 distance-fct]
-  (-> (emd/preprocess signature-1 signature-2 distance-fct) 
-      ((comp vals select-keys) [: :b]))
-      simplex-method))
 
 

@@ -1,8 +1,47 @@
-(ns earth-mover-distance.basic-test
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;(ns earth-mover-distance.basic-test
   (:require [clojure.test :refer :all]
             [clojure.core.matrix :as m]
             [earth-mover-distance.emd :as emd]
             [earth-mover-distance.simplex :as simplex]))
+
+
+; features
+(def f-1 [(->feature 211 20 2) (->feature 32 190 150) (->feature 2 100 100)])
+(def f-2 [(->feature 0 0 0) (->feature 50 100 80)  (->feature 255 255 255)])
+; weights vector
+(def w-1  [0.4 0.3 0.3])
+(def w-2  [0.5 0.3 0.2])
+; signatures
+(def signature1 {:features f-1  :weights w-1})
+(def signature2 {:features f-2  :weights w-2})
+
+
+(emd/emd-simplex signature1 signature2 distance-fct)
+ 
+;[[211.95518394226644 244.18026128252055 141.43549766589715] 
+; [195.97193676646665 115.4296322440646 52.0] 
+; [348.09481466979656 254.9097879642914 334.75214711783406]]
+
+
+
+(emd/emd-russel signature1 signature1 distance-fct)
+;0.3  from  1  to:  1
+;0.2  from  2  to:  2
+;0.1  from  3  to:  3
+;0.4  from  0  to:  0
+
+
+
+[[109.92724866929036 97.28309205612247 352.90083592986855]
+ [211.95518394226644 195.97193676646665 348.09481466979656]
+ [244.18026128252055 115.4296322440646 254.9097879642914]
+ [141.43549766589715 52.0 334.75214711783406]]
+
+
+
+
+
+
 
 (defrecord emd-pbm [m-costs v-supply v-demand])
 
@@ -23,6 +62,23 @@
 
 (deftest test-houthakker-matrix 
  (is (= 34.5 (emd/run-russel transp-houtakker))))
+;4  from  1  to:  4
+;3  from  1  to:  3
+;8  from  0  to:  2
+;5  from  4  to:  1
+;2  from  3  to:  2
+;1  from  3  to:  3
+;3  from  2  to:  1
+;6  from  2  to:  0
+
+
+(->
+(simplex/create-table houthakker-matrix a b)
+       simplex/table->dual
+       simplex/simplex-method
+       simplex/get-result-simplex)
+
+
 
 ;(-> 
 ;(simplex/create-table houthakker-matrix a b)
@@ -58,8 +114,8 @@
 (def signature2> {:features f-2  :weights w-2>})
 
 (distance-fct (->feature 211 20 2) (->feature 50 100 80))
-195.97193676646665
 (distance-fct (->feature 211 20 2) (->feature 50 100 80))
+
 
 (deftest tests-emd-russel
   (is (> emd/precis (Math/abs (- 0.0 (emd/emd-russel signature1 signature1 distance-fct)))))
@@ -94,5 +150,4 @@
 
 (defn test-within-precision [value expression]
  (is (> emd/precis (- 2.2 (emd/emd-russel sign-1 sign-2 distance-example2)))))
-
 
