@@ -11,7 +11,7 @@
   ; up to the optimal solution.
   ; pseudoproof: if the simplex hypersurface is convex, the algo has to converge, as far as I can see. amen.
 
-(defn create-table [cost-matrix supplyv demandv]
+(defn create-table [] ;cost-matrix supplyv demandv]
   ; cost-matrix is the ... cost-matrix::Matrix{float}
   ; supply and demand are Vector{float}
   ; The algorithm below transforms a transport optimisation problem into 
@@ -69,6 +69,26 @@
         ]   
     tableau)) 
 
+(defn table->dual [table]
+  ; for an optimisation using the simplex approach, minimisation can be achieved
+  ; transferring the table into its dual form, with additional slack variables.
+  ; optimisation is done through standard simplex algorithm.
+  (let [nb-slack (m/column-count table)
+        nb-vars (m/row-count table)
+        ; generate slack column elements
+        slack-columns (for [i (range (- nb-slack 1))]
+                  (-> (m/zero-vector nb-slack)
+                      (m/mset i 1.)))
+        
+        ; transpose the matrix and add slack columnes
+        table-T  (m/rows table)
+        last-column (last table-T)
+
+        ; construct dual table
+        table* (m/transpose (apply m/join-along 0 table-T slack-columns))
+        table* (m/join-along 1 table* last-column)
+        table* (m/multiply-row table* (- nb-slack 1) -1.)]       
+    table*))
 
 (defn check-optimality [s-tableau]
   (if (< 0 (count (filter #(< % 0) (last s-tableau))))
@@ -111,6 +131,17 @@
           (recur (inc i) t))
       table))))
 
+(defn get-result-simplex [solved-table]
+  (let [shape (m/shape solved-table)
+        n-vars (- (second shape) (first shape))
+        ; the minimum is on the latest row/column after optimisation
+        minimum (m/mget solved-table (- (first shape) 1) (- (second shape) 1))
+        ; the solution is in the latest row, where the dual problem slack variables are giving the values for the real problem x_i values. 
+        solutionv (-> (m/rows solved-table) last
+                      (subvec n-vars) butlast)
+       ]
+  {:minimum minimum :flow solutionv})) 
+
 (defn simplex-method [table]
     (loop [t table] 
         (if (check-optimality t)
@@ -118,7 +149,8 @@
             (recur (apply jordan-gauss-decompose-step t (find-pivot t))))))
 
 (defn emd-simplex [signature-1 signature-2 distance-fct]
-  (-> (emd/preprocess signature-1 signature-2 distance-fct)
+  (-> (emd/preprocess signature-1 signature-2 distance-fct) 
+      ((comp vals select-keys) [: :b]))
       simplex-method))
 
 

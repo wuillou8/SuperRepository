@@ -5,6 +5,11 @@
             [earth-mover-distance.emd :as emd]
             [earth-mover-distance.simplex :as simplex]))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;   Simplex Method             ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ; examples from http://college.cengage.com/mathematics/larson/elementary_linear/4e/shared/downloads/c09s3.pdf
 (def tableau1  (m/matrix
                [[-1 1 1 0 0 11]
@@ -72,4 +77,46 @@
       (is (> emd/precis (math/abs (- 1052000. optimised-val))))))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;   Simplex Method:            ;
+;     dual for minimisation    ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(def tableau6 (m/matrix 
+                [[2 1 6]
+                 [1 1 4]
+                 [3 2 0]]))
+
+(def tableau7 (m/matrix 
+                [[1 1 1 6]
+                 [0 1 2 8]
+                 [-1 2 2 4]
+                 [2 10 8 0]]))
+
+(def tableau8 (m/matrix 
+                [[400 300 25000]
+                 [300 400 27000]
+                 [200 500 30000]
+                 [20000 25000 0]]))
+
+(deftest test6-simplex-method*
+  (let [res  (-> (simplex/table->dual tableau6)
+                 simplex/simplex-method
+                 simplex/get-result-simplex)]
+    (is (> emd/precis (math/abs (- 10. (:minimum res)))))
+    (is (= (list 2.0 2.0) (:flow res)))))
+
+(deftest test7-simplex-method* 
+  (let [res  (-> (simplex/table->dual tableau7)
+           simplex/simplex-method
+           simplex/get-result-simplex)]
+    (is (> emd/precis (math/abs (- 36. (:minimum res)))))
+    (is (= (list 2.0 0.0 4.0) (:flow res)))))
+
+(deftest test8-simplex-method* 
+  (let [res  (-> (simplex/table->dual tableau8)
+           simplex/simplex-method
+           simplex/get-result-simplex)]
+  (is (> emd/precis (math/abs (- 1750000. (:minimum res))))
+  (is (> emd/precis (reduce + (map #(math/abs (- %1 %2))   (list 25. 50.) (:flow res))))))))  
+  
