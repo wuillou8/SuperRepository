@@ -97,10 +97,10 @@
 
 (defn emd-simplex [signature-1 signature-2 distance-fct]
   (-> (preprocess signature-1 signature-2 distance-fct) 
-          ((comp vals select-keys) [:m-costs :v-supply :v-demand])
-       ;simplex/create-table
-       ;simplex/table->dual
-       ;simplex/simplex-method
+      ; simplex/create-table
+      ; simplex/table->dual
+      ; simplex/simplex-method
+       ;simplex/get-result-simplex
        ))
   
 
