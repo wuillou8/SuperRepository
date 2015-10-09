@@ -97,12 +97,19 @@
 
 (defn emd-simplex [signature-1 signature-2 distance-fct]
   (-> (preprocess signature-1 signature-2 distance-fct) 
-      ; simplex/create-table
-      ; simplex/table->dual
-      ; simplex/simplex-method
-       ;simplex/get-result-simplex
+       simplex/create-table
+       simplex/table->dual
+       simplex/simplex-method
+       simplex/get-result-simplex
        ))
   
+(defn emd-simplex-dbg [signature-1 signature-2 distance-fct]
+  (-> (preprocess signature-1 signature-2 distance-fct) 
+       simplex/create-table
+       ;simplex/table->dual
+       ;simplex/simplex-method
+       ;simplex/get-result-simplex
+       ))
 
 
 
