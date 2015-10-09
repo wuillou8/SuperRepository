@@ -24,8 +24,9 @@
 
 (emd/emd-russel signature1 signature2 distance-fct)
 (emd/emd-russel signature2 signature1 distance-fct)
+(m/shape
 (emd/emd-simplex-dbg signature1 signature2 distance-fct)
-
+)
 ;[[109.92724866929036 97.28309205612247 352.90083592986855] 
 ; [211.95518394226644 195.97193676646665 348.09481466979656] 
 ; [244.18026128252055 115.4296322440646 254.9097879642914] 

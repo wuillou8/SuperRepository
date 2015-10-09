@@ -3,13 +3,24 @@
             [clojure.math.numeric-tower :as math]
             [earth-mover-distance.emd :as emd]))
  
-  ; Heuristic explanation:
-  ; The simplex maximisation is done reducing an optimisation problem
-  ; into its "standard form", which is done introducing slack variables.
+  ; Heuristic explanation of the above code:
+  ;
+  ; The earth mover distance is solved by solving a transportation problem, given a supply, 
+  ; a demand vectors as well as a cost function.
+  ; The problem is formulated as a set of equations as shown below, that can be rephrased into a
+  ; linear problem in normal form by the introduction of slack variables. As in the literature, 
+  ; this can solved by the simplex method, whereas the problem values and conditions are put into
+  ; a "tableau".
+  ; 
+  ; In the case of minimisation, the dual problem is optimised and the Von Neumann fundam. theorem
+  ; ensures that the correct value was found. The resulting translation values f_ij are stored into
+  ; the slack values after optimisation.
+  ;
+  ; The simplex maximisation:
   ; The idea is then to start the algo from a basic solution and through 
-  ; operations done around the pivots, to move along the simplex vertices
+  ; operations done around the pivots, to move along the simplex vertices of largest increase
   ; up to the optimal solution.
-  ; pseudoproof: if the simplex hypersurface is convex, the algo has to converge, as far as I can see. amen.
+  ; Proof: if the simplex hypersurface is convex, the algo has to converge, as far as I can see. amen.
 
 (defn create-table
   ([emd-pbm]
@@ -21,26 +32,30 @@
   ; table so that it can be optimised by the simplex algorithm.
   ;
   ; conditions for the earth mover problem:
-  ;   C cost matrix
-  ;   f_ij earth transported from i to j
-  ;   X_i supply from i
-  ;   Y_j demand from j
-  ;   Z quantity to optimize
-  ;   Z := \sum_i \sum_j C_ij f_ij
-  ;   f_ij >= 0
-  ;   \sum_i f_ij = Y_j (no more transport than demand)
+  ;   C cost matrix,
+  ;   f_ij earth transported from i(supply) to j(demand), notice that f_ij are the problem variables,
+  ;   X_i supply from i,
+  ;   Y_j demand from j,
+  ;   Z quantity to optimize,
+  ;   Z := \sum_i \sum_j C_ij f_ij,
+  ;   f_ij >= 0,
+  ;   \sum_i f_ij = Y_j (no more transport than demand),
   ;   \sum_j f_ij <= X_i (but no strict cond on the offer)
   ;
-  ;   table for the problem:
-  ;   f_11:f_21 ...  val
-  ;   1   : 0   ...  Y_1
-  ;   0   : 1   ...  Y_2       
-  ;          ...
-  ;   1   : 0   ...  X_1
-  ;   0   : 1   ...  X_2
-  ;          ...
-  ;   -C_11:-C_12 ...  0  
+  ;   This is the way the table below is organised for the problem with supply size 3, demand size 2:
   ;
+  ;   f_11 : f_12 : f_13 : f_21 : f_22 ...  val
+  ;   -----------------------------------------
+  ;   1    :  1   :  1   :  0   :  0   ...  X_1
+  ;   0    :  0   :  0   :  1   :  1   ...  X_2 
+  ;          ...
+  ;
+  ;   1    :  0   :  0   :  1   :  0   ...  Y_1
+  ;   0    :  1   :  0   :  0   :  1   ...  Y_2
+  ;          ...
+  ;   -----------------------------------------
+  ;   C_11 : C_12 : C_13 :  C_21       ...   0  
+  ;   -----------------------------------------
   ;
   (let [[d-x d-y] (m/shape cost-matrix)
         n-slack 0 ; slack variables are zero if demand = supply, which is the case for now. otherwise, the condition \sum_i f_ij =< 
@@ -77,6 +92,7 @@
   ; for an optimisation using the simplex approach, minimisation can be achieved
   ; transferring the table into its dual form, with additional slack variables.
   ; optimisation is done through standard simplex algorithm.
+  ; The Von Neumann duality principle ensures that the maximised Z value of the dual problem is the minimal of the standard problem.
   (let [nb-slack (m/column-count table)
         nb-vars (m/row-count table)
         ; generate slack column elements
