@@ -1,8 +1,10 @@
 (ns earth-mover-distance.simplex
   (:require [clojure.core.matrix :as m]
-            [clojure.math.numeric-tower :as math]
-            [earth-mover-distance.emd :as emd]))
+            [clojure.math.numeric-tower :as math]))
+            ;[earth-mover-distance.emd :require [precis]]))
  
+(def precis 0.00001)
+
   ; Heuristic explanation of the above code:
   ;
   ; The earth mover distance is solved by solving a transportation problem, given a supply, 
@@ -115,7 +117,7 @@
     false true))
 
 (defn filter-pivot [ty tx]
-    (if (> (math/abs tx) emd/precis)
+    (if (> (math/abs tx) precis)
       (let [val (/ ty tx)
             val (if (> val 0) val Double/MAX_VALUE)]
         val)
@@ -149,7 +151,7 @@
               ; else pivot row
               (m/multiply-row table i (/ 1. pivot)))]
           (recur (inc i) t))
-      table)))i)
+      table))))
 
 (defn get-result-simplex [solved-table]
   (let [shape (m/shape solved-table)
