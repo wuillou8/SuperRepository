@@ -17,7 +17,7 @@
     (reduce + 
       (map #(Math/pow (- %1 %2) 2) rgb1 rgb2))))
 
-(defn- preprocess [sgn1 sgn2 distance-fct]
+(defn preprocess [sgn1 sgn2 distance-fct]
   ; by convention and analogy to the transportation problem, supply/demand are first/second var. 
   (let [a (:weights sgn1)
         b (:weights sgn2)

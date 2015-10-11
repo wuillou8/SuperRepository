@@ -117,6 +117,6 @@
   (let [res  (-> (simplex/table->dual tableau8)
            simplex/simplex-method
            simplex/get-result-simplex)]
-  (is (> emd/precis (math/abs (- 1750000. (:minimum res))))
-  (is (> emd/precis (reduce + (map #(math/abs (- %1 %2))   (list 25. 50.) (:flow res))))))))  
+    (is (> emd/precis (math/abs (- 1750000. (:minimum res))))
+    (is (> emd/precis (reduce + (map #(math/abs (- %1 %2))   (list 25. 50.) (:flow res))))))))  
   

@@ -22,11 +22,11 @@
 (def signature2> {:features f-2  :weights w-2>})
 
 
-(emd/emd-russel signature1 signature2 distance-fct)
-(emd/emd-russel signature2 signature1 distance-fct)
-(m/shape
-(emd/emd-simplex-dbg signature1 signature2 distance-fct)
-)
+;(emd/emd-russel signature1 signature2 distance-fct)
+;(emd/emd-russel signature2 signature1 distance-fct)
+;(m/shape
+;(emd/emd-simplex-dbg signature1 signature2 distance-fct)
+;)
 ;[[109.92724866929036 97.28309205612247 352.90083592986855] 
 ; [211.95518394226644 195.97193676646665 348.09481466979656] 
 ; [244.18026128252055 115.4296322440646 254.9097879642914] 
@@ -82,14 +82,17 @@
 (def w1  [0.4 0.3 0.3])
 (def w2  [0.5 0.3 0.2])
 ; signatures
-(def sgna1 {:features f-1  :weights w-1})
-(def sgna2 {:features f-2  :weights w-2})
+(def sgna1 {:features f1  :weights w1})
+(def sgna2 {:features f2  :weights w2})
 
 (deftest test-russel-simplex-C
- (let [russel (emd/emd-russel signature1 signature2 distance-fct)
-       simplex (emd/emd-simplex sgna1 sgna2 distance-fct)] 
+ (let [russel (emd/emd-russel sgna1 sgna2 distance-fct)
+       simplex (emd/emd-simplex sgna2 sgna1 distance-fct)] 
   (is (> emd/precis (math/abs (- 175.782059 russel)))) 
   (is (> emd/precis (math/abs (- 171.850555 (:minimum simplex)))))))
+
+(emd/emd sgna1 sgna2 distance-fct)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; examples  from the c code and its python wrapper ;
@@ -109,13 +112,6 @@
 (def signature1> {:features f-1  :weights w-1>})
 (def signature2 {:features f-2  :weights w-2})
 (def signature2> {:features f-2  :weights w-2>})
-
-
-(emd/emd-russel signature1 signature2 distance-fct)
-(emd/emd-russel signature2 signature1 distance-fct)
-(emd/emd-simplex-dbg signature1 signature2 distance-fct)
-
-
 
 
 

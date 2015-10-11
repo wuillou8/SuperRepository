@@ -45,7 +45,12 @@
 
      ; the algorithm terminates when the supply has been attributed to the demand.
       (if (> 0.00001 (reduce + (:v-supply trans)))
-        {:russel-cost (float (/ cost ships)) :from-to-v from-to-v :t-debug trans}
+        {:russel-cost (float (/ cost ships)) :from-to-v from-to-v :trans-debug trans}
         (let [t (algo-russel-iteration trans)]
-          (recur (:transport t) (+ cost (:cost t)) (+ ships (:ships t)) (:from-to-v t))))))
+          (recur (:transport t) (+ cost (:cost t)) (+ ships (:ships t)) (conj from-to-v (:from-to-v t)))))))
+
+
+
+
+
 
