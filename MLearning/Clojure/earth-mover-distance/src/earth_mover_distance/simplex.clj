@@ -1,10 +1,9 @@
 (ns earth-mover-distance.simplex
   (:require [clojure.core.matrix :as m]
             [clojure.math.numeric-tower :as math]))
-            ;[earth-mover-distance.emd :require [precis]]))
+            ;[earth-mover-distance.emd :as emd]))
  
 (def precis 0.00001)
-
   ; Heuristic explanation of the above code:
   ;
   ; The earth mover distance is solved by solving a transportation problem, given a supply, 
@@ -69,15 +68,13 @@
         ; 2) fill the table with the values representing the different conditions.
         ; storage as: [i-coord j-coord val]
         ; demand
-        y-s (for [i (range d-x)] [i (- dim-y 1) (nth supplyv i)])
+        y-s (for [i (range d-x)] [i (- dim-y 1) (nth demandv i)])
         yy-s (for [i (range d-x) j (range d-y)]
                [i (+ i (* j d-y)) 1.]) 
-               ;[i (+ i (* j d-x)) 1.])
         ; supply
-        x-s (for [j (range d-y)] [(+ d-y j) (- dim-y 1) (nth demandv j)])
+        x-s (for [j (range d-y)] [(+ d-y j) (- dim-y 1) (nth supplyv j)])
         xx-s (for [i (range d-x) j (range d-y)]
                [(+ i d-y) (+ j (* i d-y)) 1.]) 
-               ;[(+ i d-y) (+ i (* j d-x)) 1.])
         ; correlations
         c-s (for [i (range d-x) j (range d-y)]
               [(+ d-x d-y) (+ j (* i d-y)) (m/mget cost-matrix i j)])
@@ -119,7 +116,7 @@
 (defn filter-pivot [ty tx]
     (if (> (math/abs tx) precis)
       (let [val (/ ty tx)
-            val (if (> val 0) val Double/MAX_VALUE)]
+            val (if (>= val 0.) val Double/MAX_VALUE)]
         val)
       Double/MAX_VALUE))
 
@@ -169,11 +166,3 @@
         (if (check-optimality t)
             t
             (recur (apply jordan-gauss-decompose-step t (find-pivot t))))))
-
-
-
-
-
-
-
-

@@ -24,9 +24,9 @@
         
         ; the supply has to be smaller than the demand
         ; this is a generic feature that is not useful for normalised weights (sum => 1)
-        [a b sgn1 sgn2] (if (< (reduce + a) (reduce + b))
-                            [a b sgn1 sgn2]
-                            [b a sgn2 sgn1])
+        ;[a b sgn1 sgn2] (if (< (reduce + a) (reduce + b))
+        ;                    [a b sgn1 sgn2]
+        ;                    [b a sgn2 sgn1])
         
         supply (reduce + a) 
         demand (reduce + b)
@@ -64,9 +64,9 @@
 (defn emd-simplex-dbg [signature-1 signature-2 distance-fct]
   (-> (preprocess signature-1 signature-2 distance-fct) 
        simplex/create-table
-       ;simplex/table->dual
-       ;simplex/simplex-method
-       ;simplex/get-result-simplex
+       simplex/table->dual
+       simplex/simplex-method
+       simplex/get-result-simplex
        ))
 
 (defn emd [signature-1 signature-2 distance-fct]
